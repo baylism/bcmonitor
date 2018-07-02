@@ -25,6 +25,7 @@ public class DashClient extends BitcoinClient {
         return mapper.readValue(response, BitcoinBlock.class);
     }
 
+
     @Override
     public BitcoinTransaction getTransaction(String hash) throws IOException {
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
