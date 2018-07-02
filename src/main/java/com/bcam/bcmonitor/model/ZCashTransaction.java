@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * 4. Public transaction: (t-addr to t-addr): all public
  *
  *
- *
  * Implications:
  *      - Shielded transactions can contain any number of shielded transactions. No accurate throughput.
  *      - But can track the total number of coins in the sheilded pool vs in public pools by summing the vpubs in each block.
@@ -36,6 +35,6 @@ public class ZCashTransaction extends BitcoinTransaction {
 
     @Override
     public float calculateFee() {
-        return super.calculateFee();
+        return fee;
     }
 }
