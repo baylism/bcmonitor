@@ -1,10 +1,7 @@
 package com.bcam.bcmonitor.extractor.client;
 
 
-import com.bcam.bcmonitor.extractor.mapper.BitcoinBlockDeserializer;
-import com.bcam.bcmonitor.extractor.mapper.BitcoinTransactionDeserializer;
-import com.bcam.bcmonitor.extractor.mapper.BitcoinTransactionPoolInfoDeserializer;
-import com.bcam.bcmonitor.extractor.mapper.SingleResultDeserializer;
+import com.bcam.bcmonitor.extractor.mapper.*;
 import com.bcam.bcmonitor.extractor.rpc.JSONRPCRequest;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
@@ -46,6 +43,7 @@ public class ReactiveBitcoinClient {
         module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
         module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
+        module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
         module.addDeserializer(String.class, new SingleResultDeserializer());
 
         mapper.registerModule(module);
