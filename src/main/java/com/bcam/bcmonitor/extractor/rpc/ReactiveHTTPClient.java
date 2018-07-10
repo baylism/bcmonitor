@@ -1,9 +1,6 @@
 package com.bcam.bcmonitor.extractor.rpc;
 
-import com.bcam.bcmonitor.extractor.mapper.DashBlockDeserializer;
-import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,8 +25,6 @@ public class ReactiveHTTPClient {
                               String password,
                               ObjectMapper mapper) {
 
-        logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
-
         ExchangeStrategies strategies = buildStrategies(mapper);
 
         client = WebClient.builder()
@@ -40,18 +35,11 @@ public class ReactiveHTTPClient {
                 .filter(logResponse())
                 .exchangeStrategies(strategies)
                 .build();
+
+        logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
     }
 
     // constructor helpers
-    private ObjectMapper buildMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(BitcoinBlock.class, new DashBlockDeserializer());
-        mapper.registerModule(module);
-
-        return mapper;
-    }
-
     private ExchangeStrategies buildStrategies(ObjectMapper decoder) {
 
         return ExchangeStrategies
@@ -86,8 +74,6 @@ public class ReactiveHTTPClient {
     // requests
     public ResponseSpec requestResponseSpec(String JSONRequest) {
 
-        System.out.println("CLIENT ABOUT TO POST");
-
         return client.post()
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(JSONRequest))
@@ -95,8 +81,6 @@ public class ReactiveHTTPClient {
     }
 
     public Mono<String> requestString(String JSONRequest) {
-
-        System.out.println("CLIENT ABOUT TO POST");
 
         return client.post()
                 .accept(MediaType.APPLICATION_JSON)

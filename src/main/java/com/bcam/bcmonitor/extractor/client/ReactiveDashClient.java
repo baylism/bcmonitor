@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 
 @Component
-public class ReactiveDashClient {
+public class ReactiveDashClient extends ReactiveBitcoinClient {
 
     private final ObjectMapper mapper;
 
@@ -47,6 +47,7 @@ public class ReactiveDashClient {
         return mapper;
     }
 
+    @Override
     public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
@@ -56,19 +57,16 @@ public class ReactiveDashClient {
                 .bodyToMono(BitcoinBlock.class);
     }
 
-    public Mono<String> getBlockString(String hash) {
-        JSONRPCRequest request = new JSONRPCRequest("getblock");
+
+    @Override
+    public Mono<BitcoinTransaction> getTransaction(String hash) {
+        JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
         request.addParam(hash);
 
-        return client.requestString(request.toString());
+        return client
+                .requestResponseSpec(request.toString())
+                .bodyToMono(BitcoinTransaction.class);
     }
-
-    public Mono<String> getInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-
-        return client.requestString(request.toString());
-    }
-
 
 }
 

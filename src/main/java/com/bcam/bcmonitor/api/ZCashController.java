@@ -1,7 +1,7 @@
 package com.bcam.bcmonitor.api;
 
 
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
+import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/dash")
-public class DashController {
+@RequestMapping("/api/zcash")
+public class ZCashController {
 
-    private ReactiveDashClient client;
+    private ReactiveZCashClient client;
 
     @Autowired
-    public DashController(ReactiveDashClient client) {
+    public ZCashController(ReactiveZCashClient client) {
         this.client = client;
     }
 
@@ -38,3 +38,4 @@ public class DashController {
     }
 
 }
+
