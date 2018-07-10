@@ -34,6 +34,11 @@ public class DashController {
         return client.getBlock(hash);
     }
 
+    @GetMapping("/blockstring/{hash}")
+    Mono<String> getBlockString(@PathVariable String hash) {
+        return client.getBlockString(hash);
+    }
+
     @GetMapping("/better/{hash}")
     Mono<BitcoinBlock> gb(@PathVariable String hash) throws IOException {
         return client.getBetter(hash);

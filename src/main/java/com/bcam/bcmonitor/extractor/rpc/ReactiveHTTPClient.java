@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.extractor.rpc;
 
 import com.bcam.bcmonitor.extractor.mapper.BitcoinBlockDeserializer;
+import com.bcam.bcmonitor.extractor.mapper.DashBlockDeserializer;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -59,7 +60,7 @@ public class ReactiveHTTPClient {
         // decoder objectmapper
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
+        module.addDeserializer(BitcoinBlock.class, new DashBlockDeserializer());
         mapper.registerModule(module);
 
 
@@ -75,11 +76,9 @@ public class ReactiveHTTPClient {
 
                     clientDefaultCodecsConfigurer
                             .defaultCodecs()
-                            .jackson2JsonDecoder(new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN));
+                            .jackson2JsonDecoder(new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN, MediaType.TEXT_HTML));
 
                 }).build();
-
-
 
 
         client = WebClient.builder()
@@ -87,7 +86,7 @@ public class ReactiveHTTPClient {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
                 .filter(ExchangeFilterFunctions.basicAuthentication(userName, password))
                 .filter(logRequest())
-                .filter(logResposneStatus())
+                .filter(logResponse())
                 .exchangeStrategies(strategies)
                 .build();
 
@@ -103,12 +102,14 @@ public class ReactiveHTTPClient {
         };
     }
 
-    private ExchangeFilterFunction logResposneStatus() {
+    private ExchangeFilterFunction logResponse() {
         return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
             logger.info("Response Status {}", clientResponse.statusCode());
+            logger.info("Response Content type {}", clientResponse.headers().contentType());
             return Mono.just(clientResponse);
         });
     }
+
 
     public Mono<BitcoinBlock> convert(String s) {
         ObjectMapper mapper = new ObjectMapper();

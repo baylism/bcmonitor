@@ -25,8 +25,8 @@ public class ReactiveDashClient {
         userName = "dashuser1";
         password = "password";
         hostName = "localhost";
-        // port = 9998;
-        port = 5000;
+        port = 9998;
+        // port = 5000;
 
         client = new ReactiveHTTPClient(hostName, port, userName, password);
     }
@@ -38,6 +38,15 @@ public class ReactiveDashClient {
         System.out.println("CLIENT GETTING BLOCK");
 
         return client.request(request.toString());
+    }
+
+    public Mono<String> getBlockString(String hash) {
+        JSONRPCRequest request = new JSONRPCRequest("getblock");
+        request.addParam(hash);
+
+        System.out.println("CLIENT GETTING BLOCK");
+
+        return client.requestString(request.toString());
     }
 
     public Mono<String> getInfo() {
