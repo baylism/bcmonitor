@@ -23,7 +23,6 @@ public class ReactiveDashClient {
     private final String userName;
     private final String password;
 
-
     protected ReactiveHTTPClient client;
 
     public ReactiveDashClient() {
@@ -48,49 +47,28 @@ public class ReactiveDashClient {
         return mapper;
     }
 
-
-    // public Mono<BitcoinBlock> getBlock(String hash) {
-    //     JSONRPCRequest request = new JSONRPCRequest("getblock");
-    //     request.addParam(hash);
-    //
-    //     System.out.println("CLIENT GETTING BLOCK");
-    //
-    //     return client.request(request.toString());
-    // }
-
-    public Mono<String> getBlockString(String hash) {
+    public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
-
-        System.out.println("CLIENT GETTING BLOCK");
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<BitcoinBlock> getBlockFromString(String hash) {
-
-        JSONRPCRequest request = new JSONRPCRequest("getblock");
-        request.addParam(hash);
-
-        System.out.println("CLIENT GETTING BLOCK");
 
         return client
                 .requestResponseSpec(request.toString())
                 .bodyToMono(BitcoinBlock.class);
     }
 
+    public Mono<String> getBlockString(String hash) {
+        JSONRPCRequest request = new JSONRPCRequest("getblock");
+        request.addParam(hash);
+
+        return client.requestString(request.toString());
+    }
+
     public Mono<String> getInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
-        System.out.println("CLIENT GETTING INFO");
-
-        Mono<String> response = client.requestString(request.toString());
-        // Mono<String> response = Mono.just("foo");
-
-        System.out.println("request made");
-
-        return response;
+        return client.requestString(request.toString());
     }
+
 
 }
 

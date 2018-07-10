@@ -23,18 +23,12 @@ public class DashController {
 
     @GetMapping("/blockchaininfo")
     Mono<String> getInfo() {
-        // return client.getInfo("00000ffd590b1485b3caadc19b22e6379c733355108f107a430458cdf3407ab6");
         return client.getInfo();
     }
 
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
-        return client.getBlockFromString(hash);
-    }
-
-    @GetMapping("/blockstring/{hash}")
-    Mono<String> getBlockString(@PathVariable String hash) {
-        return client.getBlockString(hash);
+        return client.getBlock(hash);
     }
 
 
