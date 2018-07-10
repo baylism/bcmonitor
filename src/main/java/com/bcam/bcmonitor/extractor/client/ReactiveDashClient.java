@@ -25,8 +25,8 @@ public class ReactiveDashClient {
         userName = "dashuser1";
         password = "password";
         hostName = "localhost";
-        port = 9998;
-        // port = 5000;
+        // port = 9998;
+        port = 5000;
 
         client = new ReactiveHTTPClient(hostName, port, userName, password);
     }

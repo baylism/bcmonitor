@@ -19,6 +19,8 @@ public class DashBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> 
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
+        System.out.println(node);
+
         if (! node.get("error").isNull()) {
             throw new RPCResponseException("Error received from RPC. Message: " + node.get("error").get("message").textValue());
         }

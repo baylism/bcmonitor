@@ -11,10 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -109,7 +106,6 @@ public class ReactiveHTTPClient {
             return Mono.just(clientResponse);
         });
     }
-
 
     public Mono<BitcoinBlock> convert(String s) {
         ObjectMapper mapper = new ObjectMapper();
