@@ -22,7 +22,7 @@ import java.io.IOException;
  * annotation: http://www.baeldung.com/spring-value-annotation
  *
  * http://hc.apache.org/httpcomponents-client-ga/httpclient/examples/org/apache/http/examples/client/ClientWithResponseHandler.java
- *
+ *z
  * http://hc.apache.org/httpcomponents-client-ga/tutorial/html/fundamentals.html
  *
  * rpcuser=bitcoinrpc
