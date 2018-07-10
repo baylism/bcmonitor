@@ -1,10 +1,12 @@
 package com.bcam.bcmonitor.extractor.client;
 
 
+import com.bcam.bcmonitor.extractor.mapper.BitcoinTransactionDeserializer;
 import com.bcam.bcmonitor.extractor.mapper.DashBlockDeserializer;
 import com.bcam.bcmonitor.extractor.rpc.JSONRPCRequest;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,9 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ReactiveDashClient {
+
+    private final ObjectMapper mapper;
+
     private String hostName;
     private int port;
     private String userName;
@@ -28,17 +33,30 @@ public class ReactiveDashClient {
         userName = "dashuser1";
         password = "password";
 
+        mapper = buildMapper();
+
         client = new ReactiveHTTPClient(hostName, port, userName, password);
     }
 
-    public Mono<BitcoinBlock> getBlock(String hash) {
-        JSONRPCRequest request = new JSONRPCRequest("getblock");
-        request.addParam(hash);
+    private ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(BitcoinBlock.class, new DashBlockDeserializer());
+        module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
+        mapper.registerModule(module);
 
-        System.out.println("CLIENT GETTING BLOCK");
-
-        return client.request(request.toString());
+        return mapper;
     }
+
+
+    // public Mono<BitcoinBlock> getBlock(String hash) {
+    //     JSONRPCRequest request = new JSONRPCRequest("getblock");
+    //     request.addParam(hash);
+    //
+    //     System.out.println("CLIENT GETTING BLOCK");
+    //
+    //     return client.request(request.toString());
+    // }
 
     public Mono<String> getBlockString(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
@@ -50,11 +68,6 @@ public class ReactiveDashClient {
     }
 
     public Mono<BitcoinBlock> getBlockFromString(String hash) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(BitcoinBlock.class, new DashBlockDeserializer());
-        mapper.registerModule(module);
 
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);

@@ -1,15 +1,12 @@
 package com.bcam.bcmonitor.extractor.client;
 
-import com.bcam.bcmonitor.model.BitcoinBlock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -92,10 +89,10 @@ class OldReactiveBitcoinClientTest {
 
         ReactiveBitcoinClient bc = new ReactiveBitcoinClient(userName, password, hostName, port);
 
-        Mono<BitcoinBlock> b = bc.getBlock("hash");
-
-        b.subscribe();
-        assertEquals("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048", "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
+        // Mono<BitcoinBlock> b = bc.getBlock("hash");
+        //
+        // b.subscribe();
+        // assertEquals("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048", "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
 
     }
 

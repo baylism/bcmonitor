@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import reactor.core.publisher.Mono;
 
 public class ReactiveHTTPClient {
@@ -77,20 +78,9 @@ public class ReactiveHTTPClient {
         });
     }
 
-    // requests
-    public Mono<BitcoinBlock> request(String JSONRequest) {
-
-        System.out.println("CLIENT ABOUT TO POST");
-
-        return client.post()
-                .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(JSONRequest))
-                .retrieve()
-                .bodyToMono(BitcoinBlock.class);
-    }
 
     // requests
-    public WebClient.ResponseSpec requestResponseSpec(String JSONRequest) {
+    public ResponseSpec requestResponseSpec(String JSONRequest) {
 
         System.out.println("CLIENT ABOUT TO POST");
 
