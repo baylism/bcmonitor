@@ -22,10 +22,14 @@ public class ReactiveHTTPClient {
     private Logger logger;
     private WebClient client;
 
-    public ReactiveHTTPClient(String hostName, int port, String userName, String password) {
+    public ReactiveHTTPClient(String hostName,
+                              int port,
+                              String userName,
+                              String password,
+                              ObjectMapper mapper) {
 
         logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
-        ObjectMapper mapper = buildMapper();
+
         ExchangeStrategies strategies = buildStrategies(mapper);
 
         client = WebClient.builder()

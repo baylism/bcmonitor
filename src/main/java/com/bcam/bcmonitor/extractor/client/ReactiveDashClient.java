@@ -18,10 +18,10 @@ public class ReactiveDashClient {
 
     private final ObjectMapper mapper;
 
-    private String hostName;
-    private int port;
-    private String userName;
-    private String password;
+    private final String hostName;
+    private final int port;
+    private final String userName;
+    private final String password;
 
 
     protected ReactiveHTTPClient client;
@@ -35,7 +35,7 @@ public class ReactiveDashClient {
 
         mapper = buildMapper();
 
-        client = new ReactiveHTTPClient(hostName, port, userName, password);
+        client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
     private ObjectMapper buildMapper() {

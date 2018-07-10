@@ -87,7 +87,7 @@ class OldReactiveBitcoinClientTest {
                                 .withBody(validBlockResponse)
                 );
 
-        ReactiveBitcoinClient bc = new ReactiveBitcoinClient(userName, password, hostName, port);
+        // ReactiveBitcoinClient bc = new ReactiveBitcoinClient(userName, password, hostName, port);
 
         // Mono<BitcoinBlock> b = bc.getBlock("hash");
         //
