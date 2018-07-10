@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/dash")
 public class DashController {
@@ -31,19 +29,13 @@ public class DashController {
 
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
-        return client.getBlock(hash);
+        return client.getBlockFromString(hash);
     }
 
     @GetMapping("/blockstring/{hash}")
     Mono<String> getBlockString(@PathVariable String hash) {
         return client.getBlockString(hash);
     }
-
-    @GetMapping("/better/{hash}")
-    Mono<BitcoinBlock> gb(@PathVariable String hash) throws IOException {
-        return client.getBetter(hash);
-    }
-
 
 
 }
