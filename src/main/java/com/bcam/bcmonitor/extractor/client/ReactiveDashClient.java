@@ -12,32 +12,30 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-
 @Component
 public class ReactiveDashClient extends ReactiveBitcoinClient {
 
-    private final ObjectMapper mapper;
-
-    private final String hostName;
-    private final int port;
-    private final String userName;
-    private final String password;
-
-    protected ReactiveHTTPClient client;
-
     public ReactiveDashClient() {
-        hostName = "localhost";
-        // port = 9998;
-        port = 5000;
-        userName = "dashuser1";
-        password = "password";
-
-        mapper = buildMapper();
-
-        client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
+        super();
     }
 
-    private ObjectMapper buildMapper() {
+    @Override
+    protected ReactiveHTTPClient buildClient() {
+        String hostName = "localhost";
+        int port = 9998;
+        // port = 5000;
+        String userName = "dashuser1";
+        String password = "password";
+
+        System.out.println("Creating a reactive dash client on port " + port);
+
+        ObjectMapper mapper = buildMapper();
+
+        return new ReactiveHTTPClient(hostName, port, userName, password, mapper);
+    }
+
+    @Override
+    protected ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(BitcoinBlock.class, new DashBlockDeserializer());

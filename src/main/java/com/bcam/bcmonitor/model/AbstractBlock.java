@@ -69,4 +69,22 @@ public abstract class AbstractBlock {
     public void setDifficulty(BigDecimal difficulty) {
         this.difficulty = difficulty;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        // self check
+        if (this == o)
+            return true;
+
+        // null check
+        if (o == null)
+            return false;
+
+        // type check and cast
+        if (getClass() != o.getClass())
+            return false;
+
+        AbstractBlock block = (AbstractBlock) o;
+        return hash.equals(block.getHash());
+    }
 }

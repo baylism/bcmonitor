@@ -10,36 +10,38 @@ import com.bcam.bcmonitor.model.TransactionPool;
 import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 
 @Component
+@Primary
 public class ReactiveBitcoinClient {
-
-    private final ObjectMapper mapper;
-
-    private final String hostName;
-    private final int port;
-    private final String userName;
-    private final String password;
 
     protected ReactiveHTTPClient client;
 
     public ReactiveBitcoinClient() {
-        userName = "bitcoinrpc";
-        password = "123";
-        hostName = "localhost";
-        port = 28332;
-
-        mapper = buildMapper();
-
-        client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
+        client = buildClient();
     }
 
-    private ObjectMapper buildMapper() {
+    protected ReactiveHTTPClient buildClient() {
+        String userName = "bitcoinrpc";
+        String password = "123";
+        String hostName = "localhost";
+        int port = 9998;
+
+        System.out.println("Creating a reactive bitcoin client on port " + port);
+
+        ObjectMapper mapper = buildMapper();
+
+        return new ReactiveHTTPClient(hostName, port, userName, password, mapper);
+    }
+
+    protected ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
+
         module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
         module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
@@ -56,6 +58,8 @@ public class ReactiveBitcoinClient {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
         request.addParam(2); // always request decoded JSON with transactions
+
+        System.out.println(request);
 
         return client
                 .requestResponseSpec(request.toString())

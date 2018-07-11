@@ -2,7 +2,6 @@ package com.bcam.bcmonitor.extractor.mapper;
 
 import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,7 +12,7 @@ public class BitcoinTransactionPoolInfoDeserializer extends BlockchainDeserializ
 
 
     @Override
-    public TransactionPoolInfo deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public TransactionPoolInfo deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
         TransactionPoolInfo info = new TransactionPoolInfo();
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);

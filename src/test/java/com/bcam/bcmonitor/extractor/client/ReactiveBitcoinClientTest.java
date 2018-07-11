@@ -1,11 +1,23 @@
 package com.bcam.bcmonitor.extractor.client;
 
+import com.bcam.bcmonitor.model.BitcoinBlock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 @AutoConfigureWebTestClient
 @RunWith(SpringRunner.class)
@@ -17,6 +29,8 @@ public class ReactiveBitcoinClientTest {
     // already configure and ready to issue requests against "localhost:RANDOM_PORT"
     @Autowired
     private WebTestClient webTestClient;
+
+    private ClientAndServer mockServer;
 
 
     private String validBlockResponse = "{\n" +
@@ -46,17 +60,46 @@ public class ReactiveBitcoinClientTest {
             "\t\"id\": null\n" +
             "}";
 
+    @Before
+    public void startServer() {
+        mockServer = startClientAndServer(9998);
+    }
 
-    // @Test
-    // public void testHello() {
-    //     webTestClient
-    //             // Create a GET request to test an endpoint
-    //             .post()
-    //             .body()
-    //             .accept(MediaType.TEXT_PLAIN)
-    //             .exchange()
-    //             // and use the dedicated DSL to test assertions against the response
-    //             .expectStatus().isOk()
-    //             .expectBody(String.class).isEqualTo("Hello, Spring!");
-    // }
+    @After
+    public void stopServer() {
+        mockServer.stop();
+    }
+
+    @Test
+    public void testGetBlock() {
+        BitcoinBlock expectedBlock = new BitcoinBlock();
+        expectedBlock.setHash("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
+        expectedBlock.setHeight(0);
+        expectedBlock.setTimeStamp(1390095618);
+        expectedBlock.setSizeBytes(306);
+        expectedBlock.setDifficulty(BigDecimal.valueOf(0.000244140625));
+        expectedBlock.setMedianTime(1390095618);
+        expectedBlock.setChainWork(BigInteger.valueOf(1048592L));
+        expectedBlock.setConfirmations(1);
+
+        mockServer
+                .when(
+                        request()
+                                .withMethod("POST")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"hash\",2]}")
+                )
+                .respond(
+                        response()
+                                .withBody(validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/block/hash")
+                .exchange()
+                .expectStatus().isOk()
+                // .expectBody(String.class).isEqualTo("foo");
+                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock);
+    }
 }
