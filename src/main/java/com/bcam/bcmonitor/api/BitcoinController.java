@@ -29,12 +29,17 @@ public class BitcoinController {
         return client.getBlockchainInfo();
     }
 
+    @GetMapping("/bestblockhash")
+    Mono<String> getBestBlockHash() {
+        return client.getBestBlockHash();
+    }
+
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
     }
 
-    @GetMapping("/transaction{hash}")
+    @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
         return client.getTransaction(hash);
     }

@@ -47,7 +47,9 @@ public class ReactiveHTTPClient {
                 .codecs(clientDefaultCodecsConfigurer -> clientDefaultCodecsConfigurer
                         .defaultCodecs()
                         .jackson2JsonDecoder(new Jackson2JsonDecoder(decoder, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN, MediaType.TEXT_HTML))
-                )
+                    )
+                // .codecs(clientCodecConfigurer -> clientCodecConfigurer
+                //         .registerDefaults(false))
                 .build();
     }
 

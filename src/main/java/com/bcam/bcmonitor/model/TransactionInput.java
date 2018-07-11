@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.model;
 
 import com.bcam.bcmonitor.extractor.client.BitcoinClient;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 
@@ -16,7 +17,9 @@ public class TransactionInput {
      * 3. get value from output vout
      *
      */
+    @JsonIgnore
     public float getValue() throws IOException {
+        System.out.println("CALLING GETVALUE");
         BitcoinClient client = new BitcoinClient();
         BitcoinTransaction transaction = client.getTransaction(txid);
         TransactionOutput v = transaction.getVout(vout);

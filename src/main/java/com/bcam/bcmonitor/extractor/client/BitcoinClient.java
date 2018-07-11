@@ -91,7 +91,7 @@ public class BitcoinClient {
     public BitcoinTransaction getTransaction(String hash) throws IOException {
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
         request.addParam(hash);
-        request.addParam(new Boolean(true));
+        request.addParam(Boolean.TRUE);
 
         String response = client.request(request.toString());
 

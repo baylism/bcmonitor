@@ -42,11 +42,20 @@ public class ReactiveBitcoinClient {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
-        module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
-        module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
-        module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
-        module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
-        module.addDeserializer(String.class, new SingleResultDeserializer());
+        module.addDeserializer(
+                BitcoinBlock.class, new BitcoinBlockDeserializer());
+
+        module.addDeserializer(
+                BitcoinTransaction.class, new BitcoinTransactionDeserializer());
+
+        module.addDeserializer(
+                TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
+
+        module.addDeserializer(
+                TransactionPool.class, new BitcoinTransactionPoolDeserializer());
+
+        module.addDeserializer(
+                String.class, new SingleResultDeserializer());
 
         mapper.registerModule(module);
 
@@ -104,7 +113,7 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(TransactionPoolInfo.class);
     }
 
-    // basic string queries
+    // single string queries
     public Mono<String> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
@@ -112,6 +121,7 @@ public class ReactiveBitcoinClient {
     }
 
 
+    // TODO fix string deserialisation so it uses SingleResultDeserialiser
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
 

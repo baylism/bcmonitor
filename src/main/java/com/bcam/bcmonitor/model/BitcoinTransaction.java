@@ -22,7 +22,6 @@ public class BitcoinTransaction extends AbstractTransaction {
         return outputsSum;
     }
 
-
     @Override
     public float calculateFee() {
         return inputsSum - outputsSum;
