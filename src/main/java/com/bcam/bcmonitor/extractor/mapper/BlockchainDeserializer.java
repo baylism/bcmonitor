@@ -32,6 +32,4 @@ public abstract class BlockchainDeserializer<T> extends StdDeserializer<T> {
         }
     }
 
-
-
 }

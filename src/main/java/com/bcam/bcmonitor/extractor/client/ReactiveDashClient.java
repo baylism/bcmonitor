@@ -35,35 +35,10 @@ public class ReactiveDashClient extends ReactiveBitcoinClient {
         super();
     }
 
-    // @Override
-    // protected ReactiveHTTPClient buildClient() {
-    //
-    //     String hostName = "localhost";
-    //     int port = 9998;
-    //     // port = 5000;
-    //     String userName = "dashuser1";
-    //     String password = "password";
-    //
-    //     System.out.println("Creating a reactive dash client on port " + port);
-    //
-    //     ObjectMapper mapper = buildMapper();
-    //
-    //     return new ReactiveHTTPClient(hostName, port, userName, password, mapper);
-    // }
-
     @Override
     @PostConstruct
     protected void buildClient() {
-        // String userName = "bitcoinrpc";
-        // String password = "123";
-        // String hostName = "localhost";
-        // int port = 9998;
-        //
-        // System.out.println("Creating a reactive bitcoin client on port " + port);
-
         System.out.println("Building Dash client with hostname " + hostName);
-
-        // System.out.println("THIS IS IT! from dash" + hostName);
 
         ObjectMapper mapper = buildMapper();
 

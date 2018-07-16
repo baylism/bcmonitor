@@ -17,14 +17,12 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/bitcoin")
 public class BitcoinController {
 
-    // @Qualifier("ReactiveBitcoinClient")
     private ReactiveBitcoinClient client;
 
     @Autowired
     public BitcoinController(ReactiveBitcoinClient client) {
         this.client = client;
     }
-
 
     // parameterised requests
     @GetMapping("/block/{hash}")

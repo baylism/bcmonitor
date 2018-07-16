@@ -23,7 +23,7 @@ import static org.mockserver.model.HttpResponse.response;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-        "BITCOIN_HOSTNAME=localhost", "BITCOIN_PORT=9998", "BITCOIN_UN=zcashuser1", "BITCOIN_PW=password", "DASH_HOSTNAME=foobar", "DASH_PORT=9998", "DASH_UN=weasley", "DASH_PW=password"})
+        "BITCOIN_HOSTNAME=localhost", "BITCOIN_PORT=9998", "BITCOIN_UN=bitcoinuser1", "BITCOIN_PW=password", "DASH_HOSTNAME=localhost", "DASH_PORT=9998", "DASH_UN=dashuser1", "DASH_PW=password"})
 public class BitcoinControllerTest {
 
     @Autowired
@@ -41,10 +41,6 @@ public class BitcoinControllerTest {
         mockServer.stop();
     }
 
-    // @Test
-    // void getInfo() {
-    //
-    // }
 
     @Test
     public void getBlock() {

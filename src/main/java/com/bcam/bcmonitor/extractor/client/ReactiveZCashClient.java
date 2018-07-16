@@ -1,7 +1,13 @@
 package com.bcam.bcmonitor.extractor.client;
 
+import com.bcam.bcmonitor.extractor.mapper.BitcoinBlockDeserializer;
+import com.bcam.bcmonitor.extractor.mapper.ZCashTransactionDeserializer;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
+import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.ZCashTransaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -38,35 +44,24 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
     @Override
     @PostConstruct
     protected void buildClient() {
-        // String userName = "bitcoinrpc";
-        // String password = "123";
-        // String hostName = "localhost";
-        // int port = 9998;
-        //
-        // System.out.println("Creating a reactive bitcoin client on port " + port);
-
         System.out.println("Building Zcash client with hostname " + hostName);
-
-        // System.out.println("THIS IS IT! from dash" + hostName);
 
         ObjectMapper mapper = buildMapper();
 
         client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
-    // @Override
-    // protected ReactiveHTTPClient buildClient() {
-    //     // String hostName = "localhost";
-    //     // int port = 9998;
-    //     // // port = 5000;
-    //     // String userName = "zcashuser1";
-    //     // String password = "password";
-    //
-    //     System.out.println("Creating a reactive zcash client on port " + port);
-    //
-    //     ObjectMapper mapper = buildMapper();
-    //
-    //     return new ReactiveHTTPClient(hostName, port, userName, password, mapper);
-    // }
+
+    @Override
+    protected ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
+        module.addDeserializer(ZCashTransaction.class, new ZCashTransactionDeserializer());
+        mapper.registerModule(module);
+
+        return mapper;
+    }
+
 
 }

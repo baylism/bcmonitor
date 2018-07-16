@@ -37,22 +37,11 @@ public class ReactiveBitcoinClient {
     protected ReactiveHTTPClient client;
 
     public ReactiveBitcoinClient() {
-        // ObjectMapper mapper = buildMapper();
 
-        // client = buildClient();
-        // System.out.println("THIS IS IT!" + hostName);
-        // new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
     @PostConstruct
     protected void buildClient() {
-        // String userName = "bitcoinrpc";
-        // String password = "123";
-        // String hostName = "localhost";
-        // int port = 9998;
-        //
-        // System.out.println("Creating a reactive bitcoin client on port " + port);
-
         System.out.println("Building Bitcoin client with hostname " + hostName);
 
         ObjectMapper mapper = buildMapper();
@@ -64,22 +53,11 @@ public class ReactiveBitcoinClient {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
-        module.addDeserializer(
-                String.class, new SingleResultDeserializer());
-
-        module.addDeserializer(
-                BitcoinBlock.class, new BitcoinBlockDeserializer());
-
-        module.addDeserializer(
-                BitcoinTransaction.class, new BitcoinTransactionDeserializer());
-
-        module.addDeserializer(
-                TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
-
-        module.addDeserializer(
-                TransactionPool.class, new BitcoinTransactionPoolDeserializer());
-
-
+        module.addDeserializer(String.class, new SingleResultDeserializer());
+        module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
+        module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
+        module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
+        module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
 
         mapper.registerModule(module);
 
