@@ -10,37 +10,62 @@ import com.bcam.bcmonitor.model.TransactionPool;
 import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.PostConstruct;
 
 
 @Component
 @Primary
 public class ReactiveBitcoinClient {
 
+    @Value("${BITCOIN_HOSTNAME}")
+    private String hostName;
+
+    @Value("${BITCOIN_PORT}")
+    private int port;
+
+    @Value("${BITCOIN_UN}")
+    private String userName;
+
+    @Value("${BITCOIN_PW}")
+    private String password;
+
     protected ReactiveHTTPClient client;
 
     public ReactiveBitcoinClient() {
-        client = buildClient();
+        // ObjectMapper mapper = buildMapper();
+
+        // client = buildClient();
+        // System.out.println("THIS IS IT!" + hostName);
+        // new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
-    protected ReactiveHTTPClient buildClient() {
-        String userName = "bitcoinrpc";
-        String password = "123";
-        String hostName = "localhost";
-        int port = 9998;
+    @PostConstruct
+    protected void buildClient() {
+        // String userName = "bitcoinrpc";
+        // String password = "123";
+        // String hostName = "localhost";
+        // int port = 9998;
+        //
+        // System.out.println("Creating a reactive bitcoin client on port " + port);
 
-        System.out.println("Creating a reactive bitcoin client on port " + port);
+        System.out.println("Building Bitcoin client with hostname " + hostName);
 
         ObjectMapper mapper = buildMapper();
 
-        return new ReactiveHTTPClient(hostName, port, userName, password, mapper);
+        client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
     protected ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(
+                String.class, new SingleResultDeserializer());
 
         module.addDeserializer(
                 BitcoinBlock.class, new BitcoinBlockDeserializer());
@@ -54,8 +79,7 @@ public class ReactiveBitcoinClient {
         module.addDeserializer(
                 TransactionPool.class, new BitcoinTransactionPoolDeserializer());
 
-        module.addDeserializer(
-                String.class, new SingleResultDeserializer());
+
 
         mapper.registerModule(module);
 
@@ -112,6 +136,15 @@ public class ReactiveBitcoinClient {
                 .requestResponseSpec(request.toString())
                 .bodyToMono(TransactionPoolInfo.class);
     }
+
+    // single string queries
+        // public Mono<String> getBlockchainInfo() {
+        //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
+        //
+        //     return client
+        //             .requestResponseSpec(request.toString())
+        //             .bodyToMono(String.class);
+        // }
 
     // single string queries
     public Mono<String> getBlockchainInfo() {

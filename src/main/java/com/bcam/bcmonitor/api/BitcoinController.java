@@ -4,8 +4,9 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.TransactionPool;
+import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/bitcoin")
 public class BitcoinController {
 
-    @Qualifier("ReactiveBitcoinClient")
+    // @Qualifier("ReactiveBitcoinClient")
     private ReactiveBitcoinClient client;
 
     @Autowired
@@ -24,16 +25,8 @@ public class BitcoinController {
         this.client = client;
     }
 
-    @GetMapping("/blockchaininfo")
-    Mono<String> getInfo() {
-        return client.getBlockchainInfo();
-    }
 
-    @GetMapping("/bestblockhash")
-    Mono<String> getBestBlockHash() {
-        return client.getBestBlockHash();
-    }
-
+    // parameterised requests
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
@@ -42,6 +35,28 @@ public class BitcoinController {
     @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
         return client.getTransaction(hash);
+    }
+
+    // basic requests
+    @GetMapping("/transactionpool")
+    Mono<TransactionPool> getTransactionPool() {
+        return client.getTransactionPool();
+    }
+
+    @GetMapping("/transactionpoolinfo")
+    Mono<TransactionPoolInfo> getTransactionPoolInfo() {
+        return client.getTransactionPoolInfo();
+    }
+
+    // basic single string requests
+    @GetMapping("/blockchaininfo")
+    Mono<String> getInfo() {
+        return client.getBlockchainInfo();
+    }
+
+    @GetMapping("/bestblockhash")
+    Mono<String> getBestBlockHash() {
+        return client.getBestBlockHash();
     }
 
 }

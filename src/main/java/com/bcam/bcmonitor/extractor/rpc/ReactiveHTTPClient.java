@@ -18,6 +18,7 @@ public class ReactiveHTTPClient {
 
     private Logger logger;
     private WebClient client;
+    private ObjectMapper mapper;
 
     public ReactiveHTTPClient(String hostName,
                               int port,
@@ -25,7 +26,9 @@ public class ReactiveHTTPClient {
                               String password,
                               ObjectMapper mapper) {
 
+        // this.mapper = mapper;
         ExchangeStrategies strategies = buildStrategies(mapper);
+
 
         client = WebClient.builder()
                 .baseUrl("http://" + hostName + ':' + port)
@@ -40,13 +43,13 @@ public class ReactiveHTTPClient {
     }
 
     // constructor helpers
-    private ExchangeStrategies buildStrategies(ObjectMapper decoder) {
+    private ExchangeStrategies buildStrategies(ObjectMapper mapper) {
 
         return ExchangeStrategies
                 .builder()
                 .codecs(clientDefaultCodecsConfigurer -> clientDefaultCodecsConfigurer
                         .defaultCodecs()
-                        .jackson2JsonDecoder(new Jackson2JsonDecoder(decoder, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN, MediaType.TEXT_HTML))
+                        .jackson2JsonDecoder(new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN, MediaType.TEXT_HTML))
                     )
                 // .codecs(clientCodecConfigurer -> clientCodecConfigurer
                 //         .registerDefaults(false))
@@ -88,6 +91,9 @@ public class ReactiveHTTPClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(JSONRequest))
                 .retrieve()
+                // .flatMap(clientResponse -> clientResponse.body(BodyExtractors.toMono()))
                 .bodyToMono(String.class);
+
+        // return mapper.readValue(RPCResponse.flatMap());
     }
 }

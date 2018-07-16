@@ -49,7 +49,7 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
                 ArrayList<TransactionInput> vin = new ArrayList<>();
 
                 result.get("vin").forEach(jsonNode -> {
-                    System.out.println("THROUGH VIN");
+                    // System.out.println("THROUGH VIN");
                     TransactionInput in = new TransactionInput();
                     in.setTxid(jsonNode.get("txid").textValue());
                     in.setVout(jsonNode.get("vout").intValue());
@@ -68,20 +68,20 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
             ArrayList<TransactionOutput> vout = new ArrayList<>();
 
             result.get("vout").forEach(jsonNode -> {
-                System.out.println("THROUGH VOUT");
+                // System.out.println("THROUGH VOUT");
                 TransactionOutput out = new TransactionOutput();
                 out.setValue(jsonNode.get("value").floatValue());
                 out.setIndex(jsonNode.get("n").intValue());
                 vout.add(out);
-                System.out.println("SET part VOUT");
+                // System.out.println("SET part VOUT");
 
             });
 
-            System.out.println("ADDING VOUT");
+            // System.out.println("ADDING VOUT");
 
             transaction.setVout(vout);
 
-            System.out.println("ADDED VOUT");
+            // System.out.println("ADDED VOUT");
 
         }
 

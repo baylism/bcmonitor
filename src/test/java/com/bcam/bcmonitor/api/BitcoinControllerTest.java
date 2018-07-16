@@ -11,6 +11,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -21,6 +22,8 @@ import static org.mockserver.model.HttpResponse.response;
 @AutoConfigureWebTestClient
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {
+        "BITCOIN_HOSTNAME=localhost", "BITCOIN_PORT=9998", "BITCOIN_UN=zcashuser1", "BITCOIN_PW=password", "DASH_HOSTNAME=foobar", "DASH_PORT=9998", "DASH_UN=weasley", "DASH_PW=password"})
 public class BitcoinControllerTest {
 
     @Autowired
@@ -95,6 +98,7 @@ public class BitcoinControllerTest {
 
     @Test
     public void getBlockchainInfo() {
+
         mockServer
                 .when(request()
                         .withMethod("POST")
@@ -117,6 +121,7 @@ public class BitcoinControllerTest {
 
     @Test
     public void getBestBlockHash() {
+
         mockServer
                 .when(request()
                         .withMethod("POST")
@@ -135,6 +140,5 @@ public class BitcoinControllerTest {
                 .expectStatus().isOk()
                 .expectBody(String.class).isEqualTo(BitcoinRPCResponses.getBestBlockHashResponse);
                 // .expectBody(String.class).isEqualTo("00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff");
-
     }
 }
