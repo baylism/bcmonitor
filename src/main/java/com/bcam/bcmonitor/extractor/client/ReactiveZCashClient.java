@@ -4,7 +4,6 @@ import com.bcam.bcmonitor.extractor.mapper.BitcoinBlockDeserializer;
 import com.bcam.bcmonitor.extractor.mapper.ZCashTransactionDeserializer;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.model.ZCashTransaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -25,16 +24,16 @@ import javax.annotation.PostConstruct;
 @Component
 public class ReactiveZCashClient extends ReactiveBitcoinClient {
 
-    @Value("${BITCOIN_HOSTNAME}")
+    @Value("${ZCASH_HOSTNAME}")
     private String hostName;
 
-    @Value("${BITCOIN_PORT}")
+    @Value("${ZCASH_PORT}")
     private int port;
 
-    @Value("${BITCOIN_UN}")
+    @Value("${ZCASH_UN}")
     private String userName;
 
-    @Value("${BITCOIN_PW}")
+    @Value("${ZCASH_PW}")
     private String password;
 
     public ReactiveZCashClient() {
