@@ -24,6 +24,25 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
         super(vc);
     }
 
+    public static ArrayList<TransactionInput> readInputs(JsonNode result){
+        ArrayList<TransactionInput> vin = new ArrayList<>();
+
+        try {
+            result.get("vin").forEach(jsonNode -> {
+
+                TransactionInput in = new TransactionInput();
+                in.setTxid(jsonNode.get("txid").textValue());
+                in.setVout(jsonNode.get("vout").intValue());
+                vin.add(in);
+            });
+
+        } catch (NullPointerException e) {
+            // if we can't find any inputs this must be a coinbase transaction
+            assert !result.get("vin").get(0).get("coinbase").asText().isEmpty();
+        }
+
+        return vin;
+    }
 
     @Override
     public BitcoinTransaction deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
@@ -43,25 +62,27 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
             transaction.setSizeBytes(result.get("size").asInt());
             transaction.setBlockHash(result.get("blockhash").asText());
 
-            // get inputs
-            try {
+            transaction.setVin(readInputs(result));
 
-                ArrayList<TransactionInput> vin = new ArrayList<>();
-
-                result.get("vin").forEach(jsonNode -> {
-                    // System.out.println("THROUGH VIN");
-                    TransactionInput in = new TransactionInput();
-                    in.setTxid(jsonNode.get("txid").textValue());
-                    in.setVout(jsonNode.get("vout").intValue());
-                    vin.add(in);
-                });
-
-                transaction.setVin(vin);
-
-            } catch (NullPointerException e) {
-                // if we can't find any inputs this must be a coinbase transaction
-                assert ! result.get("vin").get(0).get("coinbase").asText().isEmpty();
-            }
+            // // get inputs
+            // try {
+            //
+            //     ArrayList<TransactionInput> vin = new ArrayList<>();
+            //
+            //     result.get("vin").forEach(jsonNode -> {
+            //         System.out.println("THROUGH VIN");
+            //         TransactionInput in = new TransactionInput();
+            //         in.setTxid(jsonNode.get("txid").textValue());
+            //         in.setVout(jsonNode.get("vout").intValue());
+            //         vin.add(in);
+            //     });
+            //
+            //     transaction.setVin(vin);
+            //
+            // } catch (NullPointerException e) {
+            //     // if we can't find any inputs this must be a coinbase transaction
+            //     assert ! result.get("vin").get(0).get("coinbase").asText().isEmpty();
+            // }
 
 
             // get outputs
