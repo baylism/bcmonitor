@@ -197,4 +197,6 @@ public class ZCashRPCResponses {
             "    \"id\": \"curltest\"\n" +
             "}";
 
+    public static final String getMempoolResponse = "";
+
 }

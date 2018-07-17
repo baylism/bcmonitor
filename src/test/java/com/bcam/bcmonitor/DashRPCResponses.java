@@ -21,4 +21,9 @@ public class DashRPCResponses {
         public static final String getMempoolInfoResponse = "";
 
 
+        public static final String getMempoolResponse = "";
+
+
+
+
 }

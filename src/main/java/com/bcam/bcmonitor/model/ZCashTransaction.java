@@ -22,6 +22,8 @@ import java.util.ArrayList;
  *
  */
 public class ZCashTransaction extends BitcoinTransaction {
+
+    // TODO check this as client response not include
     private long fee; // zcash transactions contain fee field
     private Boolean sheilded;
     private String inputTreestate;
@@ -36,5 +38,25 @@ public class ZCashTransaction extends BitcoinTransaction {
     @Override
     public float calculateFee() {
         return fee;
+    }
+
+    public void setFee(long fee) {
+        this.fee = fee;
+    }
+
+    public void setSheilded(Boolean sheilded) {
+        this.sheilded = sheilded;
+    }
+
+    public void setInputTreestate(String inputTreestate) {
+        this.inputTreestate = inputTreestate;
+    }
+
+    public void setOutputTreestate(String outputTreestate) {
+        this.outputTreestate = outputTreestate;
+    }
+
+    public void setJoinSplitDescriptions(ArrayList<JoinSplit> joinSplitDescriptions) {
+        this.joinSplitDescriptions = joinSplitDescriptions;
     }
 }

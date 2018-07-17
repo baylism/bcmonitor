@@ -15,6 +15,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -46,6 +49,15 @@ public class BitcoinControllerTest {
     public void getBlock() {
         BitcoinBlock expectedBlock = new BitcoinBlock();
         expectedBlock.setHash("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
+
+        // TODO add additional assetions to check these
+        expectedBlock.setHeight(0);
+        expectedBlock.setTimeStamp(1390095618);
+        expectedBlock.setSizeBytes(306);
+        expectedBlock.setDifficulty(BigDecimal.valueOf(0.000244140625));
+        expectedBlock.setMedianTime(1390095618);
+        expectedBlock.setChainWork(BigInteger.valueOf(1048592L));
+        expectedBlock.setConfirmations(1);
 
         mockServer
                 .when(
