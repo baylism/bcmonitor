@@ -125,6 +125,12 @@ public class ReactiveBitcoinClient {
         // }
 
     // single string queries
+    public Mono<String> getRawResponse(String jsonQuery) {
+
+        return client.requestString(jsonQuery);
+    }
+
+
     public Mono<String> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 

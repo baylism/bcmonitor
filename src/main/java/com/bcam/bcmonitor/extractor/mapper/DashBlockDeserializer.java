@@ -1,6 +1,5 @@
 package com.bcam.bcmonitor.extractor.mapper;
 
-
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+@Deprecated
 @Component
 public class DashBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
 
