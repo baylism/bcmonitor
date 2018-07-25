@@ -25,6 +25,11 @@ public class BitcoinController {
     }
 
     // parameterised requests
+    @GetMapping("/raw/{jsonQuery}")
+    Mono<String> getRawResponse(String jsonQuery) {
+        return client.getRawResponse(jsonQuery);
+    }
+
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
@@ -35,7 +40,7 @@ public class BitcoinController {
         return client.getTransaction(hash);
     }
 
-    // basic requests
+    // other objects
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
         return client.getTransactionPool();
@@ -46,7 +51,8 @@ public class BitcoinController {
         return client.getTransactionPoolInfo();
     }
 
-    // basic single string requests
+
+    // other string requests
     @GetMapping("/blockchaininfo")
     Mono<String> getInfo() {
         return client.getBlockchainInfo();
