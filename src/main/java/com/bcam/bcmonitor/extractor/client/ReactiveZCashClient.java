@@ -1,11 +1,9 @@
 package com.bcam.bcmonitor.extractor.client;
 
-import com.bcam.bcmonitor.extractor.mapper.BitcoinBlockDeserializer;
-import com.bcam.bcmonitor.extractor.mapper.ZCashTransactionDeserializer;
+import com.bcam.bcmonitor.extractor.mapper.*;
 import com.bcam.bcmonitor.extractor.rpc.JSONRPCRequest;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.ZCashTransaction;
+import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,8 +55,16 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
     protected ObjectMapper buildMapper() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
+
+        // bitcoin
         module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
+        module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
+        module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
+        module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
+
+        // zcash
         module.addDeserializer(ZCashTransaction.class, new ZCashTransactionDeserializer());
+
         mapper.registerModule(module);
 
         return mapper;

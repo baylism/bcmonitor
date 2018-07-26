@@ -4,10 +4,7 @@ package com.bcam.bcmonitor.extractor.client;
 import com.bcam.bcmonitor.extractor.mapper.*;
 import com.bcam.bcmonitor.extractor.rpc.JSONRPCRequest;
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.TransactionPool;
-import com.bcam.bcmonitor.model.TransactionPoolInfo;
+import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,11 +50,12 @@ public class ReactiveBitcoinClient {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
 
-        module.addDeserializer(String.class, new SingleResultDeserializer());
+        // module.addDeserializer(String.class, new SingleResultDeserializer());
         module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
         module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
+        module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
 
         mapper.registerModule(module);
 
@@ -115,14 +113,22 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(TransactionPoolInfo.class);
     }
 
-    // single string queries
-        // public Mono<String> getBlockchainInfo() {
-        //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-        //
-        //     return client
-        //             .requestResponseSpec(request.toString())
-        //             .bodyToMono(String.class);
-        // }
+    // public Mono<RPCResult> getBlockchainInfo() {
+    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
+    //
+    //     return client
+    //             .requestResponseSpec(request.toString())
+    //             .bodyToMono(RPCResult.class);
+    // }
+
+    public Mono<String> getBlockchainInfo() {
+        JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
+
+        return client
+                .requestResponseSpec(request.toString())
+                .bodyToMono(RPCResult.class)
+                .map(RPCResult::toString);
+    }
 
     // single string queries
     public Mono<String> getRawResponse(String jsonQuery) {
@@ -131,11 +137,11 @@ public class ReactiveBitcoinClient {
     }
 
 
-    public Mono<String> getBlockchainInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-
-        return client.requestString(request.toString());
-    }
+    // public Mono<String> getBlockchainInfo() {
+    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
+    //
+    //     return client.requestString(request.toString());
+    // }
 
 
     // TODO fix string deserialisation so it uses SingleResultDeserialiser

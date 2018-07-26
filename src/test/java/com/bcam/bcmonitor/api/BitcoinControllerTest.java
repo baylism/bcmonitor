@@ -3,6 +3,8 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.BitcoinRPCResponses;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.RPCResult;
+import com.bcam.bcmonitor.model.TransactionPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,12 +133,25 @@ public class BitcoinControllerTest {
                 );
 
 
+        RPCResult expectedRPCResult = new RPCResult();
+        expectedRPCResult.setResponse("{\"chain\":\"main\"}");
+
+        // webTestClient
+        //         .get()
+        //         .uri("/api/bitcoin/blockchaininfo")
+        //         .exchange()
+        //         .expectStatus().isOk()
+        //         .expectBody(RPCResult.class).isEqualTo(expectedRPCResult)
+        //         .consumeWith(result -> {
+        //             Assertions.assertTrue(result.getResponseBody().getResponse().startsWith(expectedRPCResult.getResponse()));
+        //         });
+
         webTestClient
                 .get()
                 .uri("/api/bitcoin/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo(BitcoinRPCResponses.getBlockchainInfoResponse);
+                .expectBody(String.class).isEqualTo("{\"chain\":\"main\"}");
     }
 
     @Test
@@ -160,5 +175,33 @@ public class BitcoinControllerTest {
                 .expectStatus().isOk()
                 .expectBody(String.class).isEqualTo(BitcoinRPCResponses.getBestBlockHashResponse);
                 // .expectBody(String.class).isEqualTo("00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff");
+    }
+
+    @Test
+    public void getTransactionPool() {
+
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getrawmempool\",\"params\":[]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.getMempoolResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        TransactionPool expectedPool = new TransactionPool();
+        expectedPool.addTransaction("5bc76af67921c657c1c321de16a0403671365c6c07376a814b5de28c02ebe09b");
+        expectedPool.addTransaction("22121a969bd36559f38eb4d01850d044b34d5d75d912ba10969e4f64fd345be9");
+        expectedPool.addTransaction("24219415fc41d5205c455b3e1aef2b9323c3a2f5bc82eb2d08c1ea4336b3d3e5");
+        expectedPool.addTransaction("4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c");
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/transactionpool")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionPool.class).isEqualTo(expectedPool);
     }
 }

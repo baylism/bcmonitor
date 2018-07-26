@@ -129,7 +129,7 @@ public class BitcoinRPCResponses {
             "\t\"id\": null\n" +
             "}";
 
-    public static final String getBlockchainInfoResponse = "{\n" +
+    public static final String getBlockchainInfoResponsePretty = "{\n" +
             "\t\"result\": {\n" +
             "\t\t\"chain\": \"main\",\n" +
             "\t\t\"blocks\": 531489,\n" +
@@ -184,5 +184,22 @@ public class BitcoinRPCResponses {
             "\t\"error\": null,\n" +
             "\t\"id\": null\n" +
             "}";
+
+
+    public static final String getBlockchainInfoResponse = "{\n" +
+            "\t\"result\": {\"chain\": \"main\"},\n" +
+            "\t\"error\": null,\n" +
+            "\t\"id\": null\n" +
+            "}";
+
+
+    // from dash client
+    public static final String getMempoolResponse = "{\n" +
+            "    \"result\": [\"5bc76af67921c657c1c321de16a0403671365c6c07376a814b5de28c02ebe09b\", \"22121a969bd36559f38eb4d01850d044b34d5d75d912ba10969e4f64fd345be9\", \"24219415fc41d5205c455b3e1aef2b9323c3a2f5bc82eb2d08c1ea4336b3d3e5\", \"4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c\"],\n" +
+            "    \"error\": null,\n" +
+            "    \"id\": \"curltest\"\n" +
+            "}";
+
+
 }
 

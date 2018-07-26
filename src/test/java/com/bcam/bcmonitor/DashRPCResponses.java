@@ -81,7 +81,7 @@ public class DashRPCResponses {
         public static final String getGetLatestBlockResponse = "{\"result\":{\"hash\":\"00000000000000427a9048cbb95c484afc559c01bc42eef505e075e5ef05c93f\",\"confirmations\":2,\"size\":466,\"height\":909830,\"version\":536870912,\"versionHex\":\"20000000\",\"merkleroot\":\"3968bc2ff0bad53fa3c6decf5b8ead3ecdcc296592b791563a722ae960c1a5c8\",\"tx\":[\"809d92fcdec079782960449c15e759aeb6935f4a124f6bd699e104397b7a30b2\",\"25190c3e6b215542fa211d58bc483556b54b70e567d87b5b9e06c6bb16d79b6c\"],\"time\":1532602907,\"mediantime\":1532602325,\"nonce\":1677675824,\"bits\":\"194d5463\",\"difficulty\":55540178.42653183,\"chainwork\":\"00000000000000000000000000000000000000000000092c50fd0a6b7a9ce843\",\"previousblockhash\":\"0000000000000044bdf2189c36e92d6c6dc2f60f95a84d407e07b6e0456c6e7b\"},\"error\":null,\"id\":\"curltest\"}";
 
 
-        public static final String getBlockchainInfoResponse = "{\n" +
+        public static final String getBlockchainInfoResponsePretty = "{\n" +
                 "    \"result\": {\n" +
                 "        \"chain\": \"main\",\n" +
                 "        \"blocks\": 909341,\n" +
@@ -137,6 +137,8 @@ public class DashRPCResponses {
                 "    \"id\": \"curltest\"\n" +
                 "}";
 
+
+        public static final String getBlockchainInfoResponse = "{\"result\":{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":44463768.24481726,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}},\"error\":null,\"id\":\"curltest\"}";
 
         public static final String getBestBlockHashResponse = "{\n" +
                 "    \"result\": \"000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582\",\n" +

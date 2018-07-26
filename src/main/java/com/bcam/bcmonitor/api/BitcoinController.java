@@ -2,10 +2,7 @@ package com.bcam.bcmonitor.api;
 
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.TransactionPool;
-import com.bcam.bcmonitor.model.TransactionPoolInfo;
+import com.bcam.bcmonitor.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

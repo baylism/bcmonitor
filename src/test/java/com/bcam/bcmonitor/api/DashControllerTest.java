@@ -3,6 +3,7 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.DashRPCResponses;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.RPCResult;
 import com.bcam.bcmonitor.model.TransactionPool;
 import org.junit.After;
 import org.junit.Before;
@@ -159,12 +160,19 @@ public class DashControllerTest {
                 );
 
 
+        String res = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":44463768.24481726,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
+
+        String resScientificNotation = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":4.446376824481726E7,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
+
+        RPCResult expectedRPCResult = new RPCResult();
+        expectedRPCResult.setResponse(resScientificNotation);
+
         webTestClient
                 .get()
                 .uri("/api/dash/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo(DashRPCResponses.getBlockchainInfoResponse);
+                .expectBody(RPCResult.class).isEqualTo(expectedRPCResult);
     }
 
     @Test
@@ -218,6 +226,5 @@ public class DashControllerTest {
                 .expectStatus().isOk()
                 .expectBody(TransactionPool.class).isEqualTo(expectedPool);
                 // .expectBody(String.class).isEqualTo(DashRPCResponses.getMempoolResponse);
-
     }
 }
