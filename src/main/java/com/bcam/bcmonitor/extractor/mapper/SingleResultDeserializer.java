@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 
+@Deprecated
 public class SingleResultDeserializer extends BlockchainDeserializer<String> {
 
 

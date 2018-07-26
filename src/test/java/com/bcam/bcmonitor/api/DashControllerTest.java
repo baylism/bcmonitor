@@ -172,7 +172,7 @@ public class DashControllerTest {
                 .uri("/api/dash/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(RPCResult.class).isEqualTo(expectedRPCResult);
+                .expectBody(String.class).isEqualTo(resScientificNotation);
     }
 
     @Test
@@ -195,7 +195,6 @@ public class DashControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class).isEqualTo(DashRPCResponses.getBestBlockHashResponse);
-        // .expectBody(String.class).isEqualTo("00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff");
     }
 
 
