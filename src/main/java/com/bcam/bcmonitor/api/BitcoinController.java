@@ -2,7 +2,10 @@ package com.bcam.bcmonitor.api;
 
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.TransactionPool;
+import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,11 +25,6 @@ public class BitcoinController {
     }
 
     // parameterised requests
-    @GetMapping("/raw/{jsonQuery}")
-    Mono<String> getRawResponse(String jsonQuery) {
-        return client.getRawResponse(jsonQuery);
-    }
-
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
@@ -36,6 +34,7 @@ public class BitcoinController {
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
         return client.getTransaction(hash);
     }
+
 
     // other objects
     @GetMapping("/transactionpool")
@@ -48,7 +47,6 @@ public class BitcoinController {
         return client.getTransactionPoolInfo();
     }
 
-
     // other string requests
     @GetMapping("/blockchaininfo")
     Mono<String> getInfo() {
@@ -59,5 +57,33 @@ public class BitcoinController {
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();
     }
+
+
+    // client provided requests
+    @GetMapping("/raw/{jsonQuery}")
+    Mono<String> getRawResponse(@PathVariable String jsonQuery) {
+        return client.getRawResponse(jsonQuery);
+    }
+
+
+    @GetMapping("/method/{methodName}")
+    Mono<String> getCustomResponse(@PathVariable String methodName) {
+
+        return client.getCustomResponse(methodName);
+    }
+
+    @GetMapping("/method/{methodName}/{param}")
+    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param) {
+
+        return client.getCustomResponse(methodName, param);
+    }
+
+    @GetMapping("/method/{methodName}/{param}/{param2}")
+    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() String param2) {
+
+        return client.getCustomResponse(methodName, param, param2);
+    }
+
+
 
 }

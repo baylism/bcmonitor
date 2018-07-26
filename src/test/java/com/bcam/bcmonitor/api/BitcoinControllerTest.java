@@ -204,4 +204,51 @@ public class BitcoinControllerTest {
                 .expectStatus().isOk()
                 .expectBody(TransactionPool.class).isEqualTo(expectedPool);
     }
+
+
+    @Test
+    public void getCustomResponse() {
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getbestblockhash\",\"params\":[]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.getBestBlockHashResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getbestblockhash")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("\"00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff\"");
+    }
+
+    @Test
+    public void getCustomResponseWithParam() {
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",\"2\"]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
+                });
+    }
+
 }

@@ -121,18 +121,44 @@ public class ReactiveBitcoinClient {
         return client.requestString(request.toString());
     }
 
-    // single string queries
-    public Mono<String> getRawResponse(String jsonQuery) {
-
-        return client.requestString(jsonQuery);
-    }
-
-
-    // TODO fix string deserialisation so it uses SingleResultDeserialiser
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
 
         return client.requestString(request.toString());
     }
+
+
+    // client provided requests
+    public Mono<String> getRawResponse(String jsonQuery) {
+
+        return client.requestString(jsonQuery);
+    }
+
+    public Mono<String> getCustomResponse(String methodName) {
+        JSONRPCRequest request = new JSONRPCRequest(methodName);
+
+        return client.requestString(request.toString());
+    }
+
+    public Mono<String> getCustomResponse(String methodName, String param) {
+        JSONRPCRequest request = new JSONRPCRequest(methodName);
+
+        request.addParam(param);
+
+        return client.requestString(request.toString());
+    }
+
+    public Mono<String> getCustomResponse(String methodName, String param, String param2) {
+        JSONRPCRequest request = new JSONRPCRequest(methodName);
+
+        request.addParam(param);
+        request.addParam(param2);
+
+        return client.requestString(request.toString());
+    }
+
+
+
+
 }
 
