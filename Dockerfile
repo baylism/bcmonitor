@@ -1,4 +1,5 @@
 # ./mvnw install dockerfile:build
+# ./mvnw install dockerfile:push
 
 FROM openjdk:8-jdk-alpine
 ARG JAR_FILE
