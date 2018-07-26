@@ -57,8 +57,13 @@ public class DashController {
         return client.getBestBlockHash();
     }
 
-    // client provided requests
+    @GetMapping("/blockhash/{height}")
+    Mono<String> getBestBlockHash(@PathVariable int height) {
+        return client.getBlockHash(height);
+    }
 
+
+    // client provided requests
     @GetMapping("/raw/{jsonQuery}")
     Mono<String> getRawResponse(@PathVariable String jsonQuery) {
         return client.getRawResponse(jsonQuery);
