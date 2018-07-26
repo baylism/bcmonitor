@@ -6,6 +6,7 @@ import com.bcam.bcmonitor.model.BitcoinTransaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -59,6 +61,12 @@ public class BitcoinControllerTest {
         expectedBlock.setChainWork(BigInteger.valueOf(1048592L));
         expectedBlock.setConfirmations(1);
 
+
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
+        expectedBlock.setTxids(txids);
+
+
         mockServer
                 .when(
                         request()
@@ -76,7 +84,10 @@ public class BitcoinControllerTest {
                 .uri("/api/bitcoin/block/hash")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock);
+                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock)
+                .consumeWith(result -> {
+                    Assertions.assertIterableEquals(result.getResponseBody().getTxids(), expectedBlock.getTxids());
+                });
     }
 
     @Test
@@ -95,6 +106,7 @@ public class BitcoinControllerTest {
 
         BitcoinTransaction expectedTransaction = new BitcoinTransaction();
         expectedTransaction.setHash("4a4373359f0d2f423d40d9124b100a0917ded551351d7d90e79f5cef90404194");
+
 
         webTestClient
                 .get()

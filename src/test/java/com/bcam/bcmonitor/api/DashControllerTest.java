@@ -3,9 +3,11 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.DashRPCResponses;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.TransactionPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.util.ArrayList;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -48,7 +52,7 @@ public class DashControllerTest {
                 .when(
                         request()
                                 .withMethod("POST")
-                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582\",2]}")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582\",true]}")
                 )
                 .respond(
                         response()
@@ -59,12 +63,60 @@ public class DashControllerTest {
         BitcoinBlock expectedBlock = new BitcoinBlock();
         expectedBlock.setHash("000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582");
 
+        ArrayList<String> txids = new ArrayList<>();
+        // txids.add("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
+        txids.add("d903e90e5745ca48a88c84d6f2e0431d49a27cfede8e6171c1df7ed6aa7747ed");
+        txids.add("09c7ba9498aee4e662c914d9c806d759bf44957fe5f8d771d76e3f2405d28e80");
+        txids.add("85cbbabe0adab7610c37341ec0f4615eea17e2f454f8c718bc1352224234a16d");
+        txids.add("4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c");
+        expectedBlock.setTxids(txids);
+
         webTestClient
                 .get()
                 .uri("/api/dash/block/000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock);
+                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock)
+                // .returnResult();
+                .consumeWith(result -> {
+                    Assertions.assertIterableEquals(result.getResponseBody().getTxids(), expectedBlock.getTxids());
+                });
+    }
+
+    @Test
+    public void getLatestBlock() {
+
+        mockServer
+                .when(
+                        request()
+                                .withMethod("POST")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000000000427a9048cbb95c484afc559c01bc42eef505e075e5ef05c93f\",true]}")
+                )
+                .respond(
+                        response()
+                                .withBody(DashRPCResponses.getGetLatestBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        BitcoinBlock expectedBlock = new BitcoinBlock();
+        expectedBlock.setHash("00000000000000427a9048cbb95c484afc559c01bc42eef505e075e5ef05c93f");
+
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("809d92fcdec079782960449c15e759aeb6935f4a124f6bd699e104397b7a30b2");
+        txids.add("25190c3e6b215542fa211d58bc483556b54b70e567d87b5b9e06c6bb16d79b6c");
+
+        expectedBlock.setTxids(txids);
+
+        webTestClient
+                .get()
+                .uri("/api/dash/block/00000000000000427a9048cbb95c484afc559c01bc42eef505e075e5ef05c93f")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BitcoinBlock.class).isEqualTo(expectedBlock)
+                // .returnResult();
+                .consumeWith(result -> {
+                    Assertions.assertIterableEquals(result.getResponseBody().getTxids(), expectedBlock.getTxids());
+                });
     }
 
     @Test
@@ -139,6 +191,33 @@ public class DashControllerTest {
     }
 
 
+    @Test
+    public void getTransactionPool() {
 
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getrawmempool\",\"params\":[]}")
+                )
+                .respond(
+                        response()
+                                .withBody(DashRPCResponses.getMempoolResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
 
+        TransactionPool expectedPool = new TransactionPool();
+        expectedPool.addTransaction("5bc76af67921c657c1c321de16a0403671365c6c07376a814b5de28c02ebe09b");
+        expectedPool.addTransaction("22121a969bd36559f38eb4d01850d044b34d5d75d912ba10969e4f64fd345be9");
+        expectedPool.addTransaction("24219415fc41d5205c455b3e1aef2b9323c3a2f5bc82eb2d08c1ea4336b3d3e5");
+        expectedPool.addTransaction("4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c");
+
+        webTestClient
+                .get()
+                .uri("/api/dash/transactionpool")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionPool.class).isEqualTo(expectedPool);
+                // .expectBody(String.class).isEqualTo(DashRPCResponses.getMempoolResponse);
+
+    }
 }

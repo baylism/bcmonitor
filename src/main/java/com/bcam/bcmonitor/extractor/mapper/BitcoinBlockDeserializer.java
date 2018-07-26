@@ -43,7 +43,7 @@ public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBloc
         // block.setMedianTime(result.get("mediantime").asLong());  // TODO check if this actually appears in bitcoin responses
         block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
         block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
-        
+
 
         return block;
     }

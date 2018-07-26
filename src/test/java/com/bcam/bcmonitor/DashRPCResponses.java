@@ -62,7 +62,7 @@ public class DashRPCResponses {
                 "        \"version\": 536870916,\n" +
                 "        \"versionHex\": \"20000004\",\n" +
                 "        \"merkleroot\": \"51951e802a6bea4ab2c8e53ece6ac099c63bb3b40e5a536f9cfb1eacd238609c\",\n" +
-                "        \"tx\": [\"d903e90e5745ca48a88c84d6f2e0431d49a27cfede8e6171c1df7ed6aa7747ed\", \"09c7ba9498aee4e662c914d9c806d759bf44957fe5f8d771d76e3f2405d28e80\", \"85cbbabe0adab7610c37341ec0f4615eea17e2f454f8c718bc1352224234a16d\", \"4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c\", \"56b4880a119776d820347efb197a0cb040c30f54591a60fb9094a5ca660b364a\", \"09d8137f37e537c07c803d7d09726f6c9d121995a424d09828e4adaaba80c577\", \"b998f7948450913745123d692d97491274b48867aa5071f2a24aa1a7d43e799e\"],\n" +
+                "        \"tx\": [\"d903e90e5745ca48a88c84d6f2e0431d49a27cfede8e6171c1df7ed6aa7747ed\", \"09c7ba9498aee4e662c914d9c806d759bf44957fe5f8d771d76e3f2405d28e80\", \"85cbbabe0adab7610c37341ec0f4615eea17e2f454f8c718bc1352224234a16d\", \"4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c\"],\n" +
                 "        \"time\": 1532526128,\n" +
                 "        \"mediantime\": 1532525560,\n" +
                 "        \"nonce\": 1009414283,\n" +
@@ -75,6 +75,10 @@ public class DashRPCResponses {
                 "    \"error\": null,\n" +
                 "    \"id\": \"curltest\"\n" +
                 "}";
+
+
+        // doesn't contain nextblockhash
+        public static final String getGetLatestBlockResponse = "{\"result\":{\"hash\":\"00000000000000427a9048cbb95c484afc559c01bc42eef505e075e5ef05c93f\",\"confirmations\":2,\"size\":466,\"height\":909830,\"version\":536870912,\"versionHex\":\"20000000\",\"merkleroot\":\"3968bc2ff0bad53fa3c6decf5b8ead3ecdcc296592b791563a722ae960c1a5c8\",\"tx\":[\"809d92fcdec079782960449c15e759aeb6935f4a124f6bd699e104397b7a30b2\",\"25190c3e6b215542fa211d58bc483556b54b70e567d87b5b9e06c6bb16d79b6c\"],\"time\":1532602907,\"mediantime\":1532602325,\"nonce\":1677675824,\"bits\":\"194d5463\",\"difficulty\":55540178.42653183,\"chainwork\":\"00000000000000000000000000000000000000000000092c50fd0a6b7a9ce843\",\"previousblockhash\":\"0000000000000044bdf2189c36e92d6c6dc2f60f95a84d407e07b6e0456c6e7b\"},\"error\":null,\"id\":\"curltest\"}";
 
 
         public static final String getBlockchainInfoResponse = "{\n" +
@@ -149,7 +153,7 @@ public class DashRPCResponses {
 
 
         public static final String getMempoolResponse = "{\n" +
-                "    \"result\": [\"5bc76af67921c657c1c321de16a0403671365c6c07376a814b5de28c02ebe09b\", \"22121a969bd36559f38eb4d01850d044b34d5d75d912ba10969e4f64fd345be9\", \"24219415fc41d5205c455b3e1aef2b9323c3a2f5bc82eb2d08c1ea4336b3d3e5\", \"4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c\", \"85cbbabe0adab7610c37341ec0f4615eea17e2f454f8c718bc1352224234a16d\", \"478b1ff221d9f42a4864d12e7020e75e5206b5fbf9c642b7c54d67e3972689dc\", \"b998f7948450913745123d692d97491274b48867aa5071f2a24aa1a7d43e799e\", \"09c7ba9498aee4e662c914d9c806d759bf44957fe5f8d771d76e3f2405d28e80\"],\n" +
+                "    \"result\": [\"5bc76af67921c657c1c321de16a0403671365c6c07376a814b5de28c02ebe09b\", \"22121a969bd36559f38eb4d01850d044b34d5d75d912ba10969e4f64fd345be9\", \"24219415fc41d5205c455b3e1aef2b9323c3a2f5bc82eb2d08c1ea4336b3d3e5\", \"4607202d56516e4f10af26ada8f210c4802e195e8d43e5ef7f7470d2d0171c9c\"],\n" +
                 "    \"error\": null,\n" +
                 "    \"id\": \"curltest\"\n" +
                 "}";
