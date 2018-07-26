@@ -96,7 +96,7 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(BitcoinTransaction.class);
     }
 
-    // basic queries
+    // other objects
     public Mono<TransactionPool> getTransactionPool() {
         JSONRPCRequest request = new JSONRPCRequest("getrawmempool");
 
@@ -113,21 +113,12 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(TransactionPoolInfo.class);
     }
 
-    // public Mono<RPCResult> getBlockchainInfo() {
-    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-    //
-    //     return client
-    //             .requestResponseSpec(request.toString())
-    //             .bodyToMono(RPCResult.class);
-    // }
 
+    // other string requests
     public Mono<String> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(RPCResult.class)
-                .map(RPCResult::toString);
+        return client.requestString(request.toString());
     }
 
     // single string queries
@@ -135,13 +126,6 @@ public class ReactiveBitcoinClient {
 
         return client.requestString(jsonQuery);
     }
-
-
-    // public Mono<String> getBlockchainInfo() {
-    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-    //
-    //     return client.requestString(request.toString());
-    // }
 
 
     // TODO fix string deserialisation so it uses SingleResultDeserialiser

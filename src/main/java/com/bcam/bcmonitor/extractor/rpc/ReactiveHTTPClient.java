@@ -1,5 +1,6 @@
 package com.bcam.bcmonitor.extractor.rpc;
 
+import com.bcam.bcmonitor.model.RPCResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +92,8 @@ public class ReactiveHTTPClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(JSONRequest))
                 .retrieve()
-                // .flatMap(clientResponse -> clientResponse.body(BodyExtractors.toMono()))
-                .bodyToMono(String.class);
+                .bodyToMono(RPCResult.class)
+                .map(RPCResult::toString);
 
         // return mapper.readValue(RPCResponse.flatMap());
     }
