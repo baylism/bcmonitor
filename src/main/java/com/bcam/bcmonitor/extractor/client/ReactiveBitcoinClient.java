@@ -75,15 +75,6 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(BitcoinBlock.class);
     }
 
-    public Mono<BitcoinBlock> getBlockHash(int height) {
-        JSONRPCRequest request = new JSONRPCRequest("getblockhash");
-        request.addParam(height);
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(BitcoinBlock.class);
-    }
-
 
     public Mono<BitcoinTransaction> getTransaction(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
@@ -123,6 +114,15 @@ public class ReactiveBitcoinClient {
 
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
+
+        return client.requestString(request.toString());
+    }
+
+
+    public Mono<String> getBlockHash(int height) {
+        JSONRPCRequest request = new JSONRPCRequest("getblockhash");
+
+        request.addParam(height);
 
         return client.requestString(request.toString());
     }

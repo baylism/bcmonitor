@@ -178,6 +178,31 @@ public class BitcoinControllerTest {
     }
 
     @Test
+    public void getBlockHash() {
+
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblockhash\",\"params\":[0]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.getBlockHashResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/blockhash/0")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("\"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"");
+    }
+
+
+
+
+    @Test
     public void getTransactionPool() {
 
         mockServer

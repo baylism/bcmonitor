@@ -7,10 +7,7 @@ import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.model.TransactionPool;
 import com.bcam.bcmonitor.model.TransactionPoolInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -47,6 +44,7 @@ public class BitcoinController {
         return client.getTransactionPoolInfo();
     }
 
+
     // other string requests
     @GetMapping("/blockchaininfo")
     Mono<String> getInfo() {
@@ -56,6 +54,11 @@ public class BitcoinController {
     @GetMapping("/bestblockhash")
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();
+    }
+
+    @GetMapping("/blockhash/{height}")
+    Mono<String> getBestBlockHash(@PathVariable int height) {
+        return client.getBlockHash(height);
     }
 
 

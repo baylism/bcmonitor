@@ -22,7 +22,7 @@ public class RPCResultDeserializer extends BlockchainDeserializer<RPCResult> {
 
         RPCResult response = new RPCResult();
 
-        System.out.println("DECODING");
+        // System.out.println("DECODING");
 
         response.setResponse(result.toString());
 
