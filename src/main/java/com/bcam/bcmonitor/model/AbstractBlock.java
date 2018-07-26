@@ -16,10 +16,12 @@ public abstract class AbstractBlock {
     private ArrayList<String> minerHashes;
 
     private ArrayList<AbstractTransaction> transactions;
+    private ArrayList<String> txids;
 
     public AbstractBlock(){
         minerHashes = new ArrayList<>();
         transactions = new ArrayList<>();
+        txids = new ArrayList<>();
     }
 
     public String getHash() {
@@ -68,6 +70,14 @@ public abstract class AbstractBlock {
 
     public void setDifficulty(BigDecimal difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public ArrayList<String> getTxids() {
+        return txids;
+    }
+
+    public void setTxids(ArrayList<String> txids) {
+        this.txids = txids;
     }
 
     @Override

@@ -16,7 +16,6 @@ public class BitcoinBlock extends AbstractBlock {
     private long difficulty;
     private BigInteger chainWork;
     private int confirmations; // 1 at best chain tip, -1 not in best chain
-    private String nextBlockHash; // TODO delete this?
 
     public int getConfirmations() {
         return confirmations;
@@ -25,15 +24,6 @@ public class BitcoinBlock extends AbstractBlock {
     public void setConfirmations(int confirmations) {
         this.confirmations = confirmations;
     }
-
-    public String getNextBlockHash() {
-        return nextBlockHash;
-    }
-
-    public void setNextBlockHash(String nextBlockHash) {
-        this.nextBlockHash = nextBlockHash;
-    }
-
 
     public void setMedianTime(long medianTime) {
         this.medianTime = medianTime;

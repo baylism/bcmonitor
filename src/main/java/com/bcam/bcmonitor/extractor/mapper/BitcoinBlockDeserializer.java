@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
 
@@ -22,28 +23,29 @@ public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBloc
             throw new RPCResponseException("Error received from RPC. Message: " + node.get("error").get("message").textValue());
         }
 
-        else {
-            JsonNode result = node.get("result");
+        JsonNode result = node.get("result");
 
-            // abstract
-            block.setHash(result.get("hash").asText());
-            block.setDifficulty(BigDecimal.valueOf(result.get("difficulty").asLong()));
-            block.setHeight(result.get("height").asInt());
-            block.setSizeBytes(result.get("size").asInt());
-            block.setTimeStamp(result.get("time").asLong());
-            block.setPrevBlockHash(result.get("previousblockhash").asText());
+        // abstract
+        block.setHash(result.get("hash").asText());
+        block.setDifficulty(BigDecimal.valueOf(result.get("difficulty").asLong()));
+        block.setHeight(result.get("height").asInt());
+        block.setSizeBytes(result.get("size").asInt());
+        block.setTimeStamp(result.get("time").asLong());
+        block.setPrevBlockHash(result.get("previousblockhash").asText());
 
-            // bitcoin
-            block.setConfirmations(result.get("confirmations").asInt());
-            // block.setMedianTime(result.get("mediantime").asLong());  // TODO check if this actually appears in bitcoin responses
-            block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
-            block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
-            block.setNextBlockHash(result.get("nextblockhash").asText());
+        // for now, just add TXIDs
+        ArrayList<String> txids = new ArrayList<>();
+        result.get("tx").forEach(jsonNode -> txids.add(jsonNode.asText()));
+        block.setTxids(txids);
 
-        }
+        // bitcoin
+        block.setConfirmations(result.get("confirmations").asInt());
+        // block.setMedianTime(result.get("mediantime").asLong());  // TODO check if this actually appears in bitcoin responses
+        block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
+        block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
+        
+
         return block;
     }
-
-
 
 }
