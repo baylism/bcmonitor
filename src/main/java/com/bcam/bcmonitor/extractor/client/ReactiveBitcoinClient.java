@@ -148,6 +148,14 @@ public class ReactiveBitcoinClient {
         return client.requestString(request.toString());
     }
 
+    public Mono<String> getCustomResponse(String methodName, int param) {
+        JSONRPCRequest request = new JSONRPCRequest(methodName);
+
+        request.addParam(param);
+
+        return client.requestString(request.toString());
+    }
+
     public Mono<String> getCustomResponse(String methodName, String param, String param2) {
         JSONRPCRequest request = new JSONRPCRequest(methodName);
 
@@ -157,8 +165,14 @@ public class ReactiveBitcoinClient {
         return client.requestString(request.toString());
     }
 
+    public Mono<String> getCustomResponse(String methodName, String param, int param2) {
+        JSONRPCRequest request = new JSONRPCRequest(methodName);
 
+        request.addParam(param);
+        request.addParam(param2);
 
+        return client.requestString(request.toString());
+    }
 
 }
 
