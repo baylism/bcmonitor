@@ -75,18 +75,33 @@ public class BitcoinController {
         return client.getCustomResponse(methodName);
     }
 
-    @GetMapping("/method/{methodName}/{param}")
+    @GetMapping("/method/{methodName}/{param:.*[a-z]+.*}")
     Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param) {
+        System.out.println("USING STRING");
 
         return client.getCustomResponse(methodName, param);
     }
 
-    @GetMapping("/method/{methodName}/{param}/{param2}")
+    @GetMapping("/method/{methodName}/{param:[0-9]+}")
+    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() int param) {
+        System.out.println("USING INT");
+
+        return client.getCustomResponse(methodName, param);
+    }
+
+    // only support double parameter request where the first is a string
+    @GetMapping("/method/{methodName}/{param}/{param2:.*[a-z]+.*}")
     Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() String param2) {
+        System.out.println("USING INT");
 
         return client.getCustomResponse(methodName, param, param2);
     }
 
+    @GetMapping("/method/{methodName}/{param}/{param2:[0-9]+}")
+    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() int param2) {
+        System.out.println("USING STRING");
 
+        return client.getCustomResponse(methodName, param, param2);
+    }
 
 }

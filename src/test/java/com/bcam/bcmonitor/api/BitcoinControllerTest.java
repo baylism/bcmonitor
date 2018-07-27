@@ -253,11 +253,60 @@ public class BitcoinControllerTest {
     }
 
     @Test
-    public void getCustomResponseWithParam() {
+    public void getCustomResponseWithOneParamString() {
         mockServer
                 .when(request()
                         .withMethod("POST")
-                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",\"2\"]}")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblockhash\",\"params\":[\"2a\"]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2a")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
+                });
+    }
+
+    @Test
+    public void getCustomResponseWithOneParamInt() {
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblockhash\",\"params\":[2]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
+                });
+    }
+
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondInt() {
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",2]}")
                 )
                 .respond(
                         response()
@@ -268,6 +317,30 @@ public class BitcoinControllerTest {
         webTestClient
                 .get()
                 .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(result -> {
+                    Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
+                });
+    }
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondString() {
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",\"abs8921\"]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/abs8921")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
