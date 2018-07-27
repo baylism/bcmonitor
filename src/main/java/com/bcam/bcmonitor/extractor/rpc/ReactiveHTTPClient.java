@@ -21,6 +21,9 @@ public class ReactiveHTTPClient {
     private WebClient client;
     private ObjectMapper mapper;
 
+    /**
+     * Creates an HTTP client with a authentication and a custom Jackson deserializer
+     */
     public ReactiveHTTPClient(String hostName,
                               int port,
                               String userName,
@@ -38,6 +41,41 @@ public class ReactiveHTTPClient {
                 .filter(logRequest())
                 .filter(logResponse())
                 .exchangeStrategies(strategies)
+                .build();
+
+        logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
+    }
+
+    /**
+     * Creates an HTTP client with authentication and default Jackson serializers
+     */
+    public ReactiveHTTPClient(String hostName,
+                              int port,
+                              String userName,
+                              String password) {
+
+        client = WebClient.builder()
+                .baseUrl("http://" + hostName + ':' + port)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+                .filter(ExchangeFilterFunctions.basicAuthentication(userName, password))
+                .filter(logRequest())
+                .filter(logResponse())
+                .build();
+
+        logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
+    }
+
+    /**
+     * Creates an HTTP client with default Jackson serializers
+     */
+    public ReactiveHTTPClient(String hostName,
+                              int port) {
+
+        client = WebClient.builder()
+                .baseUrl("http://" + hostName + ':' + port)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+                 .filter(logRequest())
+                .filter(logResponse())
                 .build();
 
         logger = LoggerFactory.getLogger(ReactiveHTTPClient.class);
@@ -78,6 +116,26 @@ public class ReactiveHTTPClient {
 
 
     // requests
+    public ResponseSpec requestResponseSpec(String blockchain, String method, String param) {
+
+        String URIPath = String.join("/", blockchain, method, param);
+        return client.get()
+                .uri(URIPath)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+    }
+
+    // requests
+    public ResponseSpec requestResponseSpec(String blockchain, String method) {
+
+        String URIPath = String.join("/", blockchain, method);
+        return client.get()
+                .uri(URIPath)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+    }
+
+
     public ResponseSpec requestResponseSpec(String JSONRequest) {
 
         return client.post()
