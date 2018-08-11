@@ -37,4 +37,11 @@ public class TransactionPool {
 
         return Objects.hash(poolHashes);
     }
+
+    @Override
+    public String toString() {
+        return "TransactionPool{" +
+                "poolHashes=" + poolHashes +
+                '}';
+    }
 }

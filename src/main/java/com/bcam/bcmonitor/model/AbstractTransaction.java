@@ -9,7 +9,6 @@ public abstract class AbstractTransaction {
     private int timeConfirmed;
 
 
-
     public AbstractTransaction() {
         // initialise attributes currently not supported by mapper
         timeReceived = 0;

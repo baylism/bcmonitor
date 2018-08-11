@@ -37,7 +37,6 @@ public class DashController {
 
 
     // ============ other objects ============
-    //TODO
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
         return client.getTransactionPool();
@@ -71,7 +70,6 @@ public class DashController {
     Mono<String> getRawResponse(@PathVariable String jsonQuery) {
         return client.getRawResponse(jsonQuery);
     }
-
 
     @GetMapping("/method/{methodName}")
     Mono<String> getCustomResponse(@PathVariable String methodName) {
