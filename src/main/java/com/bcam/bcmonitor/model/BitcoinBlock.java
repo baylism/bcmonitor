@@ -19,8 +19,8 @@ public class BitcoinBlock extends AbstractBlock {
     public BitcoinBlock() {
     }
 
-    public BitcoinBlock(String hash) {
-        super(hash);
+    public BitcoinBlock(String hash, long height) {
+        super(hash, height);
     }
 
     public int getConfirmations() {

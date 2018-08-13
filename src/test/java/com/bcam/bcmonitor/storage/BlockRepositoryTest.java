@@ -36,6 +36,13 @@ public class BlockRepositoryTest {
     ReactiveMongoOperations operations;
 
 
+
+    // @Before
+    // public void before() {
+    //     StepVerifier.create(operations.execute(it -> it.serverCommands().flushDb())).expectNext("OK").verifyComplete();
+    // }
+
+
     @Before
     public void setUp() {
 

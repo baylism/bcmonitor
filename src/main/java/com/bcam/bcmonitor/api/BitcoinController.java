@@ -57,7 +57,7 @@ public class BitcoinController {
     }
 
     @GetMapping("/blockhash/{height}")
-    Mono<String> getBestBlockHash(@PathVariable int height) {
+    Mono<String> getBestBlockHash(@PathVariable long height) {
         return client.getBlockHash(height);
     }
 
