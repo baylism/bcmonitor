@@ -1,10 +1,8 @@
 package com.bcam.bcmonitor.api;
 
+import com.bcam.bcmonitor.BitcoinRPCResponses;
 import com.bcam.bcmonitor.DashRPCResponses;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.RPCResult;
-import com.bcam.bcmonitor.model.TransactionPool;
+import com.bcam.bcmonitor.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -145,8 +143,41 @@ public class DashControllerTest {
                 .expectBody(BitcoinTransaction.class).isEqualTo(expectedTransaction);
     }
 
+    // @Test
+    // public void getBlockchainInfo() {
+    //
+    //     mockServer
+    //             .when(request()
+    //                     .withMethod("POST")
+    //                     .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblockchaininfo\",\"params\":[]}")
+    //             )
+    //             .respond(
+    //                     response()
+    //                             .withBody(DashRPCResponses.getBlockchainInfoResponse)
+    //                             .withHeader("Content-Type", "text/html")
+    //             );
+    //
+    //
+    //     String res = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":44463768.24481726,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
+    //
+    //     String resScientificNotation = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":4.446376824481726E7,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
+    //
+    //     RPCResult expectedRPCResult = new RPCResult();
+    //     expectedRPCResult.setResponse(resScientificNotation);
+    //
+    //     webTestClient
+    //             .get()
+    //             .uri("/api/dash/blockchaininfo")
+    //             .exchange()
+    //             .expectStatus().isOk()
+    //             .expectBody(String.class).isEqualTo(resScientificNotation);
+    // }
+
+
     @Test
     public void getBlockchainInfo() {
+
+        String res = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":44463768.24481726,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
 
         mockServer
                 .when(request()
@@ -159,20 +190,21 @@ public class DashControllerTest {
                                 .withHeader("Content-Type", "text/html")
                 );
 
+        BlockchainInfo expectedResult = new BlockchainInfo();
+        expectedResult.setBlocks(531489L);
 
-        String res = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":44463768.24481726,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
-
-        String resScientificNotation = "{\"chain\":\"main\",\"blocks\":909894,\"headers\":909894,\"bestblockhash\":\"000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4\",\"difficulty\":4.446376824481726E7,\"mediantime\":1532612865,\"verificationprogress\":0.9999992287526149,\"chainwork\":\"00000000000000000000000000000000000000000000092d21b401da81406d40\",\"pruned\":false,\"softforks\":[{\"id\":\"bip34\",\"version\":2,\"reject\":{\"status\":true}},{\"id\":\"bip66\",\"version\":3,\"reject\":{\"status\":true}},{\"id\":\"bip65\",\"version\":4,\"reject\":{\"status\":true}}],\"bip9_softforks\":{\"csv\":{\"status\":\"active\",\"startTime\":1486252800,\"timeout\":1517788800,\"since\":622944},\"dip0001\":{\"status\":\"active\",\"startTime\":1508025600,\"timeout\":1539561600,\"since\":782208},\"bip147\":{\"status\":\"started\",\"bit\":2,\"startTime\":1524477600,\"timeout\":1556013600,\"since\":858816}}}";
-
-        RPCResult expectedRPCResult = new RPCResult();
-        expectedRPCResult.setResponse(resScientificNotation);
 
         webTestClient
                 .get()
                 .uri("/api/dash/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo(resScientificNotation);
+                .expectBody(BlockchainInfo.class)
+                .consumeWith(result -> {
+                    Assertions.assertEquals(result.getResponseBody().getBlocks(), 909894L);
+                    Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "000000000000001707165ebe701845fde191fd2c300e7a05c55107382398bfc4");
+                    Assertions.assertEquals(result.getResponseBody().getMediantime(), 1532612865L);
+                });
     }
 
     @Test

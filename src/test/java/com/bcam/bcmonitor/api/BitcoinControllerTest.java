@@ -129,22 +129,9 @@ public class BitcoinControllerTest {
                                 .withHeader("Content-Type", "text/html")
                 );
 
-
-        // RPCResult expectedRPCResult = new RPCResult();
-        // expectedRPCResult.setResponse("{\"chain\":\"main\"}");
-
         BlockchainInfo expectedResult = new BlockchainInfo();
         expectedResult.setBlocks(531489L);
 
-        // webTestClient
-        //         .get()
-        //         .uri("/api/bitcoin/blockchaininfo")
-        //         .exchange()
-        //         .expectStatus().isOk()
-        //         .expectBody(RPCResult.class).isEqualTo(expectedRPCResult)
-        //         .consumeWith(result -> {
-        //             Assertions.assertTrue(result.getResponseBody().getResponse().startsWith(expectedRPCResult.getResponse()));
-        //         });
 
         webTestClient
                 .get()
