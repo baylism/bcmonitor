@@ -53,7 +53,7 @@ public class ZCashController {
 
     // other string requests
     @GetMapping("/blockchaininfo")
-    Mono<String> getInfo() {
+    Mono<BlockchainInfo> getInfo() {
         return client.getBlockchainInfo();
     }
 

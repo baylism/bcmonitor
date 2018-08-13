@@ -1,10 +1,7 @@
 package com.bcam.bcmonitor.api;
 
 import com.bcam.bcmonitor.BitcoinRPCResponses;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.RPCResult;
-import com.bcam.bcmonitor.model.TransactionPool;
+import com.bcam.bcmonitor.model.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,13 +125,16 @@ public class BitcoinControllerTest {
                 )
                 .respond(
                         response()
-                                .withBody(BitcoinRPCResponses.getBlockchainInfoResponse)
+                                .withBody(BitcoinRPCResponses.getBlockchainInfoResponsePretty)
                                 .withHeader("Content-Type", "text/html")
                 );
 
 
-        RPCResult expectedRPCResult = new RPCResult();
-        expectedRPCResult.setResponse("{\"chain\":\"main\"}");
+        // RPCResult expectedRPCResult = new RPCResult();
+        // expectedRPCResult.setResponse("{\"chain\":\"main\"}");
+
+        BlockchainInfo expectedResult = new BlockchainInfo();
+        expectedResult.setBlocks(531489L);
 
         // webTestClient
         //         .get()
@@ -151,7 +151,12 @@ public class BitcoinControllerTest {
                 .uri("/api/bitcoin/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("{\"chain\":\"main\"}");
+                .expectBody(BlockchainInfo.class)
+                .consumeWith(result -> {
+                    Assertions.assertEquals(result.getResponseBody().getBlocks(), 531489L);
+                    Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "0000000000000000003092e0372f341f5e027e026612b79d24558211eb486909");
+                    Assertions.assertEquals(result.getResponseBody().getMediantime(), 1531318259L);
+                });
     }
 
     @Test

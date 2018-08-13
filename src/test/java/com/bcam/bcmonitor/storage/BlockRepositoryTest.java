@@ -17,6 +17,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -68,10 +72,6 @@ public class BlockRepositoryTest {
 
     }
 
-    /**
-     * This sample performs a count, inserts data and performs a count again using reactive operator chaining. It prints
-     * the two counts ({@code 4} and {@code 6}) to the console.
-     */
     @Test
     public void shouldInsertAndCountData() {
 
@@ -94,5 +94,36 @@ public class BlockRepositoryTest {
                 .create(saveAndCount)
                 .expectNext(6L)
                 .verifyComplete();
+    }
+
+    @Test
+    public void insertBlockAndVerify() {
+
+        BitcoinBlock block = new BitcoinBlock();
+
+        block.setHash("abc");
+        block.setChainWork(new BigInteger("001"));
+
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("tx1");
+        txids.add("tx2");
+        txids.add("tx3");
+
+        block.setTxids(txids);
+
+        blockRepository.save(block).block();
+
+        Mono<BitcoinBlock> insertedBlockMono = blockRepository.findById("abc");
+
+        StepVerifier
+                .create(insertedBlockMono)
+                .assertNext(insertedBlock -> {
+                    assertEquals("abc", insertedBlock.getHash());
+                    assertEquals(new BigInteger("001"), insertedBlock.getChainWork());
+                    assertEquals(txids, insertedBlock.getTxids());
+                })
+                .expectComplete()
+                .verify();
+
     }
 }

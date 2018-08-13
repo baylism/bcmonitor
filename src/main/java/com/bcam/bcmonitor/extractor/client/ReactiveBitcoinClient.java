@@ -55,6 +55,7 @@ public class ReactiveBitcoinClient {
         module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
+        module.addDeserializer(BlockchainInfo.class, new BlockchainInfoDeserializer());
         module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
 
         mapper.registerModule(module);
@@ -104,13 +105,22 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(TransactionPoolInfo.class);
     }
 
-
-    // other string requests
-    public Mono<String> getBlockchainInfo() {
+    // alt: get RPCresult; get string; map to object
+    public Mono<BlockchainInfo> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
-        return client.requestString(request.toString());
+        return client
+                .requestResponseSpec(request.toString())
+                .bodyToMono(BlockchainInfo.class);
     }
+
+
+    // other string requests
+    // public Mono<String> getBlockchainInfoString() {
+    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
+    //
+    //     return client.requestString(request.toString());
+    // }
 
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
