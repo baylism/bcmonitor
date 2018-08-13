@@ -1,11 +1,24 @@
 package com.bcam.bcmonitor.storage;
 
 import com.bcam.bcmonitor.model.AbstractBlock;
+import com.bcam.bcmonitor.model.BitcoinBlock;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 
+/**
+ * from talk:
+ * tail a mongodb collection with @Tailable
+ *
+ * use a redis for caching
+ *
+ * for send application/stream json Flux<block>
+ *
+ *
+ */
 @Repository
-public interface BlockchainRepository extends ReactiveCrudRepository<AbstractBlock, String> {
+public interface BlockRepository extends ReactiveCrudRepository<BitcoinBlock, String> {
+
 
 }
