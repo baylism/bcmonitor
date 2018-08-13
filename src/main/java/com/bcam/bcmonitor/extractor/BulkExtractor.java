@@ -14,11 +14,20 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
 
 /**
+ *
  * https://github.com/spring-projects/spring-data-examples/blob/master/redis/reactive/src/test/java/example/springdata/redis/operations/ValueOperationsTests.java
+ *
+ *
+ *
+ * 20 mins. cache
+ *
+ *
+ *
  */
 @Component
 public class BulkExtractor {
@@ -73,9 +82,13 @@ public class BulkExtractor {
         }
     }
 
-    public void saveBlocksFromHashes(long fromHeight, long toHeight) {
 
-        toHeight = validateHeight(toHeight);
+    /**
+     * .delete .then(mono.just) https://codereview.stackexchange.com/questions/159139/is-my-implementation-of-a-simple-crud-service-with-spring-webflux-correct
+     *
+     *
+     */
+    private void saveBlocksFromHashes(long fromHeight, long toHeight) {
 
         Flux<String> hashes =
                 repository
@@ -86,6 +99,7 @@ public class BulkExtractor {
                 .map(client::getBlock)
                 .doOnNext(repository::saveAll)
                 .subscribe();
+
 
 
         // for (long i = fromHeight; i < toHeight; i++) {
@@ -101,5 +115,24 @@ public class BulkExtractor {
         //             .map(repository::save);
         //
         // }
+    }
+
+    public void batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
+
+        toHeight = validateHeight(toHeight);
+
+        long i = fromHeight + batchSize;
+
+        while (i != toHeight) {
+
+            saveBlocksFromHashes(fromHeight, i);
+
+            fromHeight += batchSize;
+            i += batchSize;
+
+            if (i > toHeight) {
+                i = toHeight;
+            }
+        }
     }
 }
