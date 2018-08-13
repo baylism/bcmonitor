@@ -27,6 +27,7 @@ import java.util.ArrayList;
  * 20 mins. cache
  *
  *
+ * .delete .then(mono.just) https://codereview.stackexchange.com/questions/159139/is-my-implementation-of-a-simple-crud-service-with-spring-webflux-correct
  *
  */
 @Component
@@ -83,38 +84,25 @@ public class BulkExtractor {
     }
 
 
-    /**
-     * .delete .then(mono.just) https://codereview.stackexchange.com/questions/159139/is-my-implementation-of-a-simple-crud-service-with-spring-webflux-correct
-     *
-     *
-     */
     private void saveBlocksFromHashes(long fromHeight, long toHeight) {
 
-        Flux<String> hashes =
-                repository
-                        .findAllByHeightBetween(fromHeight, toHeight)
-                        .map(AbstractBlock::getHash);
+        // Flux<String> hashes =
+        //         repository
+        //                 .findAllByHeightBetween(fromHeight, toHeight)
+        //                 .map(AbstractBlock::getHash);
+        //
+        // hashes
+        //         .map(client::getBlock)
+        //         .doOnNext(repository::saveAll)
+        //         .subscribe();
 
-        hashes
+        Mono<Void> done = repository
+                .findAllByHeightBetween(fromHeight, toHeight)
+                .map(AbstractBlock::getHash)
                 .map(client::getBlock)
                 .doOnNext(repository::saveAll)
-                .subscribe();
+                .then();
 
-
-
-        // for (long i = fromHeight; i < toHeight; i++) {
-        //
-        //     repository
-        //             .findByHeight(fromHeight)
-        //             .map(AbstractBlock::getHash)
-        //             .map(client::getBlock)
-        //
-        //             // wait for client to respond
-        //             .block()
-        //
-        //             .map(repository::save);
-        //
-        // }
     }
 
     public void batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
