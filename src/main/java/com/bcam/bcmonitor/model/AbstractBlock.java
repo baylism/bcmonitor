@@ -1,11 +1,15 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.annotation.Id;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public abstract class AbstractBlock {
 
+    @Id
     private String hash; // in RPC byte order
+
     private String prevBlockHash;
 
     private int height;
@@ -19,6 +23,13 @@ public abstract class AbstractBlock {
     private ArrayList<String> txids;
 
     public AbstractBlock(){
+        minerHashes = new ArrayList<>();
+        transactions = new ArrayList<>();
+        txids = new ArrayList<>();
+    }
+
+    public AbstractBlock(String hash){
+        this.hash = hash;
         minerHashes = new ArrayList<>();
         transactions = new ArrayList<>();
         txids = new ArrayList<>();

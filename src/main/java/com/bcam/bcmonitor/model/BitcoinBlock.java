@@ -13,9 +13,15 @@ import java.math.BigInteger;
 public class BitcoinBlock extends AbstractBlock {
 
     private long medianTime; // of previous 11 block
-    private long difficulty;
     private BigInteger chainWork;
     private int confirmations; // 1 at best chain tip, -1 not in best chain
+
+    public BitcoinBlock() {
+    }
+
+    public BitcoinBlock(String hash) {
+        super(hash);
+    }
 
     public int getConfirmations() {
         return confirmations;
