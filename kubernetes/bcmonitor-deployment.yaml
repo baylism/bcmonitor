@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment                 
+metadata:
+  name: bcmonitor
+spec:
+  replicas: 1                   
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate          
+    rollingUpdate: 
+      maxUnavailable: 1          
+      maxSurge: 1                
+  template:                      
+    metadata:
+      labels:
+        app: bcmonitor
+    spec:
+      containers:
+        - image: baylism/bcmonitor:latest
+          imagePullPolicy: Always
+          name: bcmonitor
+          ports:
+            - containerPort: 8080
+          envFrom:
+          - configMapRef: 
+              name: rpc-config

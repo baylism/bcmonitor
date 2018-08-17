@@ -1,0 +1,13 @@
+# change, then kubectl apply -f deploy-frontend-green-pods.yaml --record
+apiVersion: v1
+kind: Service
+metadata:
+  name: bcmonitor
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80               # on which the service gets requests
+    protocol: TCP          # 4
+    targetPort: 8080       # at which incoming requests are forwarded
+  selector:                # for selecting pods
+    app: bcmonitor    # target pod
