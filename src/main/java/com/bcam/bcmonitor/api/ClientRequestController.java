@@ -29,23 +29,13 @@ public class ClientRequestController {
     @GetMapping("/{blockchain}/raw/{jsonQuery}")
     Mono<String> getRawResponse(@PathVariable String blockchain, @PathVariable String jsonQuery) {
 
-        switch (blockchain) {
-            case "dash" : return dashClient.getRawResponse(jsonQuery);
-            case "zcash" : return zCashClient.getRawResponse(jsonQuery);
-            case "bitcoin" : return bitcoinClient.getRawResponse(jsonQuery);
-            default: throw new RuntimeException("can't find client");
-        }
+        return getClient(blockchain).getRawResponse(jsonQuery);
     }
 
     @GetMapping("/{blockchain}/method/{methodName}")
     Mono<String> getCustomResponse(@PathVariable String blockchain, @PathVariable String methodName) {
 
-        switch (blockchain) {
-            case "dash" : return dashClient.getCustomResponse(methodName);
-            case "zcash" : return zCashClient.getCustomResponse(methodName);
-            case "bitcoin" : return bitcoinClient.getCustomResponse(methodName);
-            default: throw new RuntimeException("can't find client");
-        }
+        return getClient(blockchain).getCustomResponse(methodName);
     }
 
     // match requests where param contains a letter (e.g. a hash)
@@ -76,6 +66,7 @@ public class ClientRequestController {
     }
 
     private ReactiveBitcoinClient getClient(String blockchain) {
+
         switch (blockchain) {
             case "dash" : return dashClient;
             case "zcash" : return zCashClient;
@@ -83,13 +74,4 @@ public class ClientRequestController {
             default: throw new RuntimeException("can't find client");
         }
     }
-    // private Mono<String> handler(String blockchain, String param) {
-    //
-    //     switch (blockchain) {
-    //         case "dash" : return dashClient.getCustomResponse(args);
-    //         case "zcash" : return zCashClient.getCustomResponse(args);
-    //         case "bitcoin" : return bitcoinClient.getCustomResponse(args);
-    //         default: throw new RuntimeException("can't find client");
-    //     }
-    // }
 }
