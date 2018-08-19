@@ -61,6 +61,7 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
         module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
+        module.addDeserializer(BlockchainInfo.class, new BlockchainInfoDeserializer());
 
         // zcash
         module.addDeserializer(ZCashTransaction.class, new ZCashTransactionDeserializer());

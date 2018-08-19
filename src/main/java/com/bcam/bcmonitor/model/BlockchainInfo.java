@@ -10,7 +10,7 @@ public class BlockchainInfo {
         // private long headers;
         private String bestblockhash;
         // private BigDecimal difficult;
-        private long mediantime;
+        // private long mediantime;
         // private BigDecimal verificationprogress;
         // private boolean initialblockdownload;
         // private BigInteger chainwork;
@@ -24,14 +24,6 @@ public class BlockchainInfo {
 
     public void setBestblockhash(String bestblockhash) {
         this.bestblockhash = bestblockhash;
-    }
-
-    public long getMediantime() {
-        return mediantime;
-    }
-
-    public void setMediantime(long mediantime) {
-        this.mediantime = mediantime;
     }
 
     public long getBlocks() {
