@@ -22,6 +22,8 @@ import java.util.ArrayList;
  *
  * https://github.com/spring-projects/spring-data-examples/blob/master/redis/reactive/src/test/java/example/springdata/redis/operations/ValueOperationsTests.java
  *
+ * batch downloads https://dzone.com/articles/bulk-operations-in-mongodb
+ * api to select attributes for bulk downloads
  *
  *
  * 20 mins. cache
@@ -78,13 +80,12 @@ public class BulkExtractor {
                     .map(hash -> new BitcoinBlock(hash, finalI))
                     .map(repository::save)
 
-                    // wait for block to be saved before requesting the next one
+                    // subscribes Mono and blocks the current thread until a result is available
                     .block();
         }
     }
 
-
-    private void saveBlocksFromHashes(long fromHeight, long toHeight) {
+    private Mono<Void> saveBlocksFromHashes(long fromHeight, long toHeight) {
 
         // Flux<String> hashes =
         //         repository
@@ -96,24 +97,26 @@ public class BulkExtractor {
         //         .doOnNext(repository::saveAll)
         //         .subscribe();
 
-        Mono<Void> done = repository
+        return repository
                 .findAllByHeightBetween(fromHeight, toHeight)
                 .map(AbstractBlock::getHash)
                 .map(client::getBlock)
                 .doOnNext(repository::saveAll)
                 .then();
-
     }
 
-    public void batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
+
+    public Mono<Void> batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
+
+        // TODO fix with proper reactive types. Compose result of saveBlocks... into return value
+        Mono<Void> result = null;
 
         toHeight = validateHeight(toHeight);
-
         long i = fromHeight + batchSize;
 
         while (i != toHeight) {
 
-            saveBlocksFromHashes(fromHeight, i);
+            result = saveBlocksFromHashes(fromHeight, i);
 
             fromHeight += batchSize;
             i += batchSize;
@@ -122,5 +125,7 @@ public class BulkExtractor {
                 i = toHeight;
             }
         }
+
+        return result;
     }
 }

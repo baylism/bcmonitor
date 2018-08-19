@@ -66,9 +66,9 @@ public class BlockRepositoryTest {
         // insert some blocks
         Flux<BitcoinBlock> insertAll = operations.insertAll(
                 Flux.just(
-                        new BitcoinBlock("foo"),
-                        new BitcoinBlock("bar"),
-                        new BitcoinBlock("baz")
+                        new BitcoinBlock("foo", 1L),
+                        new BitcoinBlock("bar", 2L),
+                        new BitcoinBlock("baz", 3L)
                 ).collectList());
 
         // run insertion test
@@ -87,9 +87,9 @@ public class BlockRepositoryTest {
                 .thenMany(
                         blockRepository.saveAll(
                                 Flux.just(
-                                        new BitcoinBlock("add1"),
-                                        new BitcoinBlock("add2"),
-                                        new BitcoinBlock("add3")
+                                        new BitcoinBlock("add1", 4L),
+                                        new BitcoinBlock("add2", 5L),
+                                        new BitcoinBlock("add3", 6L)
                                 )
                         )
                 )
