@@ -21,12 +21,7 @@ public class ZCashController {
         this.client = client;
     }
 
-    // parameterised requests
-    @GetMapping("/raw/{jsonQuery}")
-    Mono<String> getRawResponse(String jsonQuery) {
-        return client.getRawResponse(jsonQuery);
-    }
-
+    // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
@@ -39,7 +34,7 @@ public class ZCashController {
     }
 
 
-    // other objects
+    // ============ other objects ============
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
         return client.getTransactionPool();
@@ -50,17 +45,61 @@ public class ZCashController {
         return client.getTransactionPoolInfo();
     }
 
-
-    // other string requests
     @GetMapping("/blockchaininfo")
     Mono<BlockchainInfo> getInfo() {
         return client.getBlockchainInfo();
     }
 
+
+    // ============ other string requests ============
     @GetMapping("/bestblockhash")
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();
     }
 
+    @GetMapping("/blockhash/{height}")
+    Mono<String> getBestBlockHash(@PathVariable long height) {
+        return client.getBlockHash(height);
+    }
+
+
+    // // ============ client provided requests ============
+    // @GetMapping("/raw/{jsonQuery}")
+    // Mono<String> getRawResponse(@PathVariable String jsonQuery) {
+    //     return client.getRawResponse(jsonQuery);
+    // }
+    //
+    // @GetMapping("/method/{methodName}")
+    // Mono<String> getCustomResponse(@PathVariable String methodName) {
+    //
+    //     return client.getCustomResponse(methodName);
+    // }
+    //
+    // // match requests where param contains a letter (e.g. a hash)
+    // @GetMapping("/method/{methodName}/{param:.*[a-z]+.*}")
+    // Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param) {
+    //
+    //     return client.getCustomResponse(methodName, param);
+    // }
+    //
+    // // match requests where param contains only numbers (e.g. a block height)
+    // @GetMapping("/method/{methodName}/{param:[0-9]+}")
+    // Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() int param) {
+    //
+    //     return client.getCustomResponse(methodName, param);
+    // }
+    //
+    // // only support double parameter request where the first is a string
+    // @GetMapping("/method/{methodName}/{param}/{param2:.*[a-z]+.*}")
+    // Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() String param2) {
+    //
+    //     return client.getCustomResponse(methodName, param, param2);
+    // }
+    //
+    // @GetMapping("/method/{methodName}/{param}/{param2:[0-9]+}")
+    // Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() int param2) {
+    //
+    //     return client.getCustomResponse(methodName, param, param2);
+    // }
 }
 
