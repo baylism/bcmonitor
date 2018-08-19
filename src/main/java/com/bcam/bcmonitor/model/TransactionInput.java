@@ -19,7 +19,7 @@ public class TransactionInput {
      */
     @JsonIgnore
     public float getValue() throws IOException {
-        System.out.println("CALLING GETVALUE");
+        // System.out.println("CALLING GETVALUE");
         BitcoinClient client = new BitcoinClient();
         BitcoinTransaction transaction = client.getTransaction(txid);
         TransactionOutput v = transaction.getVout(vout);
