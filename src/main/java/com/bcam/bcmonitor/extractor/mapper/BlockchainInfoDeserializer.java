@@ -24,7 +24,7 @@ public class BlockchainInfoDeserializer extends BlockchainDeserializer<Blockchai
 
         response.setBlocks(result.get("blocks").asLong());
         response.setBestblockhash(result.get("bestblockhash").asText());
-        response.setMediantime(result.get("mediantime").asLong());
+        // response.setMediantime(result.get("mediantime").asLong());
 
 
         return response;
