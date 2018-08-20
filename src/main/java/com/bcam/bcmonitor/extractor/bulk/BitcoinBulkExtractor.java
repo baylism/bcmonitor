@@ -181,6 +181,7 @@ public class BitcoinBulkExtractor implements BulkExtractor {
     //     }
     // }
 
+    // use subscribon
     public Flux<BitcoinBlock> saveBlocksFromHashes(long fromHeight, long toHeight) {
 
         // Flux<String> hashes =
@@ -195,11 +196,19 @@ public class BitcoinBulkExtractor implements BulkExtractor {
 
         return repository
                 .findAllByHeightInRange(fromHeight, toHeight)
-                .map(bitcoinBlock -> {
-                    logger.info("Found block " + bitcoinBlock);
-                    bitcoinBlock.setConfirmations(9000);
-                    return bitcoinBlock;
+                .map(bitcoinBlock -> bitcoinBlock.getHash())
+                .doOnNext(hash -> logger.info("Mapped to hash " + hash))
+                .map(hash -> client.getBlock(hash))
+                .flatMap(source -> {
+                    // logger.info("Got block from client " + source);
+                    return source;
                 })
+                .doOnNext(bitcoinBlock -> logger.info("Got block from client " + bitcoinBlock + " confirmations " + bitcoinBlock.getConfirmations()))
+                // .map(bitcoinBlock -> {
+                //     logger.info("Found block " + bitcoinBlock);
+                //     bitcoinBlock.setConfirmations(9000);
+                //     return bitcoinBlock;
+                // })
                 .flatMap(block -> repository.save(block));
 
 
