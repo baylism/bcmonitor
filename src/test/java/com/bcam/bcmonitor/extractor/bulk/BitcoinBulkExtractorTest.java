@@ -28,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -70,51 +71,6 @@ public class BitcoinBulkExtractorTest {
     ReactiveMongoOperations operations;
 
 
-    // @Test
-    // public void name() {
-    //     BlockchainInfo info1 = new BlockchainInfo();
-    //     info1.setBestblockhash("hash1");
-    //     info1.setBlocks(1L);
-    //
-    //     BlockchainInfo info2 = new BlockchainInfo();
-    //     info2.setBestblockhash("hash1");
-    //     info2.setBlocks(1L);
-    //
-    //     BlockchainInfo info3 = new BlockchainInfo();
-    //     info3.setBestblockhash("hash1");
-    //     info3.setBlocks(1L);
-    //
-    //
-    //     Mockito.when(mockBitcoinClient.getBlockchainInfo())
-    //             .thenReturn(Mono.just(info1))
-    //             .thenReturn(Mono.just(info2))
-    //             .thenReturn(Mono.just(info3));
-    // }
-
-    // @Test
-    // public void shouldInsertAndCountData() {
-    //
-    //     Mono<Long> saveAndCount = blockRepository.count()
-    //             .doOnNext(System.out::println)
-    //             .thenMany(
-    //                     blockRepository.saveAll(
-    //                             Flux.just(
-    //                                     new BitcoinBlock("add1", 4L),
-    //                                     new BitcoinBlock("add2", 5L),
-    //                                     new BitcoinBlock("add3", 6L)
-    //                             )
-    //                     )
-    //             )
-    //             .last()
-    //             .flatMap(v -> blockRepository.count())
-    //             .doOnNext(System.out::println);
-    //
-    //     StepVerifier
-    //             .create(saveAndCount)
-    //             .expectNext(3L)
-    //             .verifyComplete();
-    // }
-
     @Test
     public void testSaveHashes() {
 
@@ -138,14 +94,6 @@ public class BitcoinBulkExtractorTest {
 
         bulkExtractor.saveHashes(0L, 3L);
 
-        // // perform extract/save
-        // StepVerifier
-        //         .create(save)
-        //         .expectNextCount(1)
-        //         .verifyComplete();
-
-        // Mono<BitcoinBlock> insertedBlockMono = blockRepository.findById("hash1");
-
         Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 3L);
 
         StepVerifier
@@ -164,6 +112,59 @@ public class BitcoinBulkExtractorTest {
                     logger.info("Got block " + insertedBlock);
                     assertEquals("hash2", insertedBlock.getHash());
                     assertEquals(2L, insertedBlock.getHeight());
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void saveBlocksFromHashes() throws InterruptedException {
+
+        // insert some block hashes
+        Flux<BitcoinBlock> insertAll = operations.insertAll(
+                Flux.just(
+                        new BitcoinBlock("hash0", 0L),
+                        new BitcoinBlock("hash1", 1L),
+                        new BitcoinBlock("hash2", 2L)
+                ).collectList());
+
+        // run insertion test
+        StepVerifier
+                .create(insertAll)
+                .expectNextCount(3)
+                .verifyComplete();
+
+        Flux<BitcoinBlock> save = bulkExtractor.saveBlocksFromHashes(0L, 2L);
+
+        // run insertion test
+        StepVerifier
+                .create(save)
+                .expectNextCount(3)
+                .verifyComplete();
+
+
+        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+
+        StepVerifier
+                .create(insertedBlocks)
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("hash0", insertedBlock.getHash());
+                    assertEquals(0L, insertedBlock.getHeight());
+                    assertEquals(9000, insertedBlock.getConfirmations());
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("hash1", insertedBlock.getHash());
+                    assertEquals(1L, insertedBlock.getHeight());
+                    assertEquals(9000, insertedBlock.getConfirmations());
+
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("hash2", insertedBlock.getHash());
+                    assertEquals(2L, insertedBlock.getHeight());
+                    assertEquals(9000, insertedBlock.getConfirmations());
                 })
                 .expectComplete()
                 .verify();

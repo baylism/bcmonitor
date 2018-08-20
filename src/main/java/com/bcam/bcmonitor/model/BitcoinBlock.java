@@ -51,6 +51,6 @@ public class BitcoinBlock extends AbstractBlock {
 
     @Override
     public String toString() {
-        return "BitcoinBlock{hash = " + getHash() + ", height = " + getHeight() + "}";
+        return "BitcoinBlock{ hash = " + getHash() + ", height = " + getHeight() + "}";
     }
 }

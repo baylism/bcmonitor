@@ -182,6 +182,5 @@ public class BlockRepositoryTest {
                 })
                 .expectComplete()
                 .verify();
-
     }
 }

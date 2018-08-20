@@ -111,9 +111,11 @@ public class BitcoinBulkExtractor implements BulkExtractor {
 
             logger.debug("Got hash from client " + hash);
 
-            repository
+            Disposable d = repository
                     .save(new BitcoinBlock(hash, i))
                     .subscribe(bitcoinBlock -> logger.info("Inserted block" + bitcoinBlock));
+
+            d.dispose();
         }
     }
 
@@ -179,7 +181,7 @@ public class BitcoinBulkExtractor implements BulkExtractor {
     //     }
     // }
 
-    private Mono<Void> saveBlocksFromHashes(long fromHeight, long toHeight) {
+    public Flux<BitcoinBlock> saveBlocksFromHashes(long fromHeight, long toHeight) {
 
         // Flux<String> hashes =
         //         repository
@@ -192,35 +194,53 @@ public class BitcoinBulkExtractor implements BulkExtractor {
         //         .subscribe();
 
         return repository
-                .findAllByHeightBetween(fromHeight, toHeight)
-                .map(AbstractBlock::getHash)
-                .map(client::getBlock)
-                .flatMap(repository::saveAll)
-                // .doOnNext(repository::saveAll)
-                .then();
+                .findAllByHeightInRange(fromHeight, toHeight)
+                .map(bitcoinBlock -> {
+                    logger.info("Found block " + bitcoinBlock);
+                    bitcoinBlock.setConfirmations(9000);
+                    return bitcoinBlock;
+                })
+                .flatMap(block -> repository.save(block));
+
+
+        // .map(p -> {
+        //     p.setTitle(post.getTitle());
+        //     p.setContent(post.getContent());
+        //
+        //     return p;
+        // })
+        //         .flatMap(p -> this.posts.save(p));
+
+        // return repository
+                // .findAllByHeightInRange(fromHeight, toHeight)
+                // .map(AbstractBlock::getHash)
+                // .map(client::getBlock)
+                // .doOnNext(bitcoinBlock -> logger.info("Got Block " + bitcoinBlock))
+                // .flatMap(repository::saveAll)
+                // .then();
     }
 
 
-    public Mono<Void> batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
-
-        // TODO fix with proper reactive types. Compose result of saveBlocks... into return value
-        Mono<Void> result = null;
-
-        toHeight = validateHeight(toHeight);
-        long i = fromHeight + batchSize;
-
-        while (i != toHeight) {
-
-            result = saveBlocksFromHashes(fromHeight, i);
-
-            fromHeight += batchSize;
-            i += batchSize;
-
-            if (i > toHeight) {
-                i = toHeight;
-            }
-        }
-
-        return result;
-    }
+    // public Mono<Void> batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
+    //
+    //     // TODO fix with proper reactive types. Compose result of saveBlocks... into return value
+    //     Mono<Void> result = null;
+    //
+    //     toHeight = validateHeight(toHeight);
+    //     long i = fromHeight + batchSize;
+    //
+    //     while (i != toHeight) {
+    //
+    //         result = saveBlocksFromHashes(fromHeight, i);
+    //
+    //         fromHeight += batchSize;
+    //         i += batchSize;
+    //
+    //         if (i > toHeight) {
+    //             i = toHeight;
+    //         }
+    //     }
+    //
+    //     return result;
+    // }
 }
