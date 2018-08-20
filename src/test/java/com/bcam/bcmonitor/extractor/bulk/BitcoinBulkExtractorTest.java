@@ -181,4 +181,74 @@ public class BitcoinBulkExtractorTest {
                 .expectComplete()
                 .verify();
     }
+
+    @Test
+    public void saveBlocks() throws InterruptedException {
+
+        //setup mock client
+        Mockito.when(mockBitcoinClient.getBlockHash(0L))
+                .thenReturn(Mono.just("hash0"));
+
+        Mockito.when(mockBitcoinClient.getBlockHash(1L))
+                .thenReturn(Mono.just("hash1"));
+
+        Mockito.when(mockBitcoinClient.getBlockHash(2L))
+                .thenReturn(Mono.just("hash2"));
+
+
+
+        BitcoinBlock block0 = new BitcoinBlock("hash0", 0L);
+        block0.setConfirmations(2);
+
+        BitcoinBlock block1 = new BitcoinBlock("hash1", 1L);
+        block1.setConfirmations(1);
+
+        BitcoinBlock block2 = new BitcoinBlock("hash2", 2L);
+        block2.setConfirmations(0);
+
+
+
+        Mockito.when(mockBitcoinClient.getBlock("hash0"))
+                .thenReturn(Mono.just(block0));
+
+        Mockito.when(mockBitcoinClient.getBlock("hash1"))
+                .thenReturn(Mono.just(block1));
+
+        Mockito.when(mockBitcoinClient.getBlock("hash2"))
+                .thenReturn(Mono.just(block2));
+
+
+
+
+        Flux<BitcoinBlock> save = bulkExtractor.saveBlocks(0L, 2L);
+
+        save.blockLast();
+
+        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+
+        StepVerifier
+                .create(insertedBlocks)
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
+                    // assertEquals("hash0", insertedBlock.getHash());
+                    // assertEquals(0L, insertedBlock.getHeight());
+                    // assertEquals(2, insertedBlock.getConfirmations());
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
+                    // assertEquals("hash1", insertedBlock.getHash());
+                    // assertEquals(1L, insertedBlock.getHeight());
+                    // assertEquals(1, insertedBlock.getConfirmations());
+
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
+                    // assertEquals("hash2", insertedBlock.getHash());
+                    // assertEquals(2L, insertedBlock.getHeight());
+                    // assertEquals(0, insertedBlock.getConfirmations());
+                })
+                .expectComplete()
+                .verify();
+    }
 }
+

@@ -4,37 +4,41 @@ import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BlockchainInfo;
+import com.bcam.bcmonitor.model.Transaction;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.UnicastProcessor;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
- *
  * https://github.com/spring-projects/spring-data-examples/blob/master/redis/reactive/src/test/java/example/springdata/redis/operations/ValueOperationsTests.java
- *
+ * <p>
  * batch downloads https://dzone.com/articles/bulk-operations-in-mongodb
  * api to select attributes for bulk downloads
- *
- *
+ * <p>
+ * <p>
  * 20 mins. cache
- *
- *
+ * <p>
+ * <p>
  * .delete .then(mono.just) https://codereview.stackexchange.com/questions/159139/is-my-implementation-of-a-simple-crud-service-with-spring-webflux-correct
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
  * can make a repo by creating client the to construtor
- *
- *
- *
  */
 @Component
 public class BitcoinBulkExtractor implements BulkExtractor {
@@ -69,22 +73,6 @@ public class BitcoinBulkExtractor implements BulkExtractor {
 
     }
 
-    // private Mono<Void> saveHash(long height) {
-    //     logger.info("Saving hash for height " + height);
-    //
-    //     return client
-    //             .getBlockHash(height)
-    //             .map(
-    //                     hash -> {
-    //                         logger.info("Got hash" + hash);
-    //                         return hash;
-    //                     }
-    //             )
-    //             .map(hash -> new BitcoinBlock(hash, height))
-    //             .flatMap(repository::save)
-    //             .then();
-    // }
-
     private Mono<Void> saveHash(long height) {
         logger.info("Saving hash for height " + height);
 
@@ -101,6 +89,7 @@ public class BitcoinBulkExtractor implements BulkExtractor {
                 .then();
     }
 
+    // @Async
     public void saveHashes(long fromHeight, long toHeight) {
 
         logger.debug("About to save hashes between height " + fromHeight + " - " + toHeight);
@@ -121,19 +110,80 @@ public class BitcoinBulkExtractor implements BulkExtractor {
         }
     }
 
+    public Flux<BitcoinBlock> saveHashes2(long fromHeight, long toHeight) {
 
-    // public Flux<String> saveHashes(long fromHeight, long toHeight) {
-    //
-    //     logger.info("About to save hashes between height " + fromHeight + " - " + toHeight);
-    //
-    //     int fromInt = (int) fromHeight;
-    //     int count = (int) (fromHeight - fromInt) + 1;
-    //
-    //     return Flux.range(fromInt, count)
-    //             .map(height -> getStubBlock(height))
-    //             .concatMap(block -> block)
-    //             .flatMap(bitcoinBlock -> repository.save(bitcoinBlock));
-    // }
+        // UnicastProcessor<String> eventPublisher = UnicastProcessor.create();
+        //
+        // eventPublisher.onNext();
+
+        int fromInt = (int) fromHeight;
+        int count = (int) (fromHeight - fromInt) + 1;
+
+
+        return Flux.range(fromInt, count)
+                .index((i, v) -> Tuples.of(i + fromHeight, v))
+                .doOnNext(tup -> logger.info("TUPa" + tup.toString()))
+                .map(tup -> Tuples.of(tup.getT1(), client.getBlockHash(tup.getT2())))
+                .doOnNext(tup -> logger.info("TUPb" + tup.toString()))
+                .map(tup -> {
+                    String hash = tup.getT2().block();
+                    return Tuples.of(tup.getT1(), hash);
+                })
+                .doOnNext(tup -> logger.info("TUPc" + tup.toString()))
+                .map(tup -> new BitcoinBlock(tup.getT2(), tup.getT1()))
+                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                .doOnNext(bitcoinBlock -> repository.save(bitcoinBlock));
+
+        // Flux<BitcoinBlock> fbb = Flux.range(fromInt, count)
+        //         .index((i, v) -> Tuples.of(i + fromHeight, v))
+        //         .map(tup -> Tuples.of(tup.getT1(), client.getBlockHash(tup.getT2())))
+        //         .map(tup -> Tuples.of(tup.getT1(), tup.getT2().block()))
+        //         .map(tup -> new BitcoinBlock(tup.getT2(), tup.getT1()));
+        //
+        // return repository.saveAll(fbb);
+
+    }
+
+    public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
+
+
+        int fromInt = (int) fromHeight;
+        int count = (int) (toHeight - fromInt) + 1;
+
+        System.out.println("Count: " + count);
+
+
+        return Flux.range(fromInt, count)
+                .map(height -> client.getBlockHash(height))
+                .doOnNext(hash -> logger.info("Got hash " + hash))
+                .flatMap(source -> source) // == merge()
+                .flatMap(hash -> client.getBlock(hash))
+                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                .flatMap(block -> repository.save(block))
+                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+
+
+                // .index((i, v) -> Tuples.of(i + fromHeight, v))
+                // .doOnNext(tup -> logger.info("TUPa" + tup.toString()))
+                // .map(tup -> Tuples.of(tup.getT1(), client.getBlockHash(tup.getT2())))
+                // .doOnNext(tup -> logger.info("TUPb" + tup.toString()))
+                // .map(tup -> Tuples.of(tup.getT1(), tup.getT2().block()))
+                // .doOnNext(tup -> logger.info("TUPc" + tup.toString()))
+                // .map(tup -> new BitcoinBlock(tup.getT2(), tup.getT1()))
+                // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                // .doOnNext(bitcoinBlock -> repository.save(bitcoinBlock));
+
+        // Flux<BitcoinBlock> fbb = Flux.range(fromInt, count)
+        //         .index((i, v) -> Tuples.of(i + fromHeight, v))
+        //         .map(tup -> Tuples.of(tup.getT1(), client.getBlockHash(tup.getT2())))
+        //         .map(tup -> Tuples.of(tup.getT1(), tup.getT2().block()))
+        //         .map(tup -> new BitcoinBlock(tup.getT2(), tup.getT1()));
+        //
+        // return repository.saveAll(fbb);
+
+    }
+
+
 
     private Mono<BitcoinBlock> getStubBlock(long height) {
         return client.getBlockHash(height)
@@ -141,45 +191,7 @@ public class BitcoinBulkExtractor implements BulkExtractor {
 
     }
 
-    // private Mono<BitcoinBlock> getStubBlock(long height) {
-    //     return client.getBlockHash(height)
-    //             .flatMap(h -> Mono.just(new BitcoinBlock(h, height)));
-    //
-    // }
-
-    //
-    // public void saveHashes(long fromHeight, long toHeight) {
-    //
-    //
-    //     toHeight = validateHeight(toHeight);
-    //
-    //     for (long i = fromHeight; i < toHeight; i++) {
-    //
-    //         long finalI = i;
-    //
-    //         Mono<BitcoinBlock> block = client
-    //                 .getBlockHash(i)
-    //                 .map(hash -> new BitcoinBlock(hash, finalI))
-    //                 .map(repository::save)
-    //
-    //                 // subscribes Mono and blocks the current thread until a result is available
-    //                 .block();
-    //
-    //     }
-    // }
-
-    // use subscribon
     public Flux<BitcoinBlock> saveBlocksFromHashes(long fromHeight, long toHeight) {
-
-        // Flux<String> hashes =
-        //         repository
-        //                 .findAllByHeightBetween(fromHeight, toHeight)
-        //                 .map(AbstractBlock::getHash);
-        //
-        // hashes
-        //         .map(client::getBlock)
-        //         .doOnNext(repository::saveAll)
-        //         .subscribe();
 
         return repository
                 .findAllByHeightInRange(fromHeight, toHeight)
@@ -190,45 +202,48 @@ public class BitcoinBulkExtractor implements BulkExtractor {
                 // .doOnNext(bitcoinBlock -> logger.info("Got block from client " + bitcoinBlock + " confirmations " + bitcoinBlock.getConfirmations()))
                 .flatMap(block -> repository.save(block));
 
-
-        // .map(p -> {
-        //     p.setTitle(post.getTitle());
-        //     p.setContent(post.getContent());
-        //
-        //     return p;
-        // })
-        //         .flatMap(p -> this.posts.save(p));
-
-        // return repository
-                // .findAllByHeightInRange(fromHeight, toHeight)
-                // .map(AbstractBlock::getHash)
-                // .map(client::getBlock)
-                // .doOnNext(bitcoinBlock -> logger.info("Got Block " + bitcoinBlock))
-                // .flatMap(repository::saveAll)
-                // .then();
     }
 
 
-    // public Mono<Void> batchedSaveBlocksFromHashes(long fromHeight, long toHeight, int batchSize) {
+    // public Flux<Transaction>
+
+    // public Flux<BitcoinBlock> saveBlocksFromHeights(long fromHeight, long toHeight) {
     //
-    //     // TODO fix with proper reactive types. Compose result of saveBlocks... into return value
-    //     Mono<Void> result = null;
+    //     saveHashes(fromHeight, toHeight);
     //
-    //     toHeight = validateHeight(toHeight);
-    //     long i = fromHeight + batchSize;
+    //     saveBlocksFromHashes(fromHeight, toHeight).subscribe(
+    //             bitcoinBlock ->
+    //     );
     //
-    //     while (i != toHeight) {
     //
-    //         result = saveBlocksFromHashes(fromHeight, i);
+    //     // /**
+    //     //  *
+    //     //  * flux heights
+    //     //  * collect list
+    //     //  * then same as below
+    //     //  *
+    //     //  */
+    //     //
+    //     // int fromInt = (int) fromHeight;
+    //     // int count = (int) (fromHeight - fromInt) + 1;
+    //     //
+    //     // List<String> hashes = new ArrayList<>();
+    //     //
+    //     // Flux.range(fromInt, count)
+    //     //         .map(client::getBlockHash)
+    //     //         .flatMap(source -> source)
+    //     //         .subscribe(
+    //     //                 hashes::add
+    //     //         );
+    //     //
+    //     // return repository
+    //     //         .findAllByHeightInRange(fromHeight, toHeight)
+    //     //         .map(bitcoinBlock -> bitcoinBlock.getHash())
+    //     //         // .doOnNext(hash -> logger.info("Mapped to hash " + hash))
+    //     //         .map(hash -> client.getBlock(hash))
+    //     //         .flatMap(source -> source)
+    //     //         // .doOnNext(bitcoinBlock -> logger.info("Got block from client " + bitcoinBlock + " confirmations " + bitcoinBlock.getConfirmations()))
+    //     //         .flatMap(block -> repository.save(block));
     //
-    //         fromHeight += batchSize;
-    //         i += batchSize;
-    //
-    //         if (i > toHeight) {
-    //             i = toHeight;
-    //         }
-    //     }
-    //
-    //     return result;
     // }
 }
