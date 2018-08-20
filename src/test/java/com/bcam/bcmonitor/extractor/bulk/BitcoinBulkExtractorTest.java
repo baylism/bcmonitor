@@ -39,7 +39,7 @@ import java.math.BigInteger;
 
 import static org.junit.Assert.*;
 
-@ActiveProfiles("test")
+@ActiveProfiles("mockedBlockchainClients")
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(properties = {
@@ -48,17 +48,6 @@ public class BitcoinBulkExtractorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BitcoinBulkExtractorTest.class);
 
-//     // you can mock concrete classes, not only interfaces
-//     LinkedList mockedList = mock(LinkedList.class);
-//
-//     // stubbing appears before the actual execution
-//     when(mockedList.get(0)).thenReturn("first");
-//
-// // the following prints "first"
-// System.out.println(mockedList.get(0));
-//
-// // the following prints "null" because get(999) was not stubbed
-// System.out.println(mockedList.get(999));
 
     @Autowired
     ReactiveBitcoinClient mockBitcoinClient;
@@ -142,13 +131,6 @@ public class BitcoinBulkExtractorTest {
                 .expectNextCount(3)
                 .verifyComplete();
 
-
-        // // run insertion test
-        // StepVerifier
-        //         .create(save)
-        //         .expectNextCount(3)
-        //         .verifyComplete();
-
         //setup mock client
         BitcoinBlock block0 = new BitcoinBlock("hash0", 0L);
         block0.setConfirmations(2);
@@ -158,7 +140,6 @@ public class BitcoinBulkExtractorTest {
 
         BitcoinBlock block2 = new BitcoinBlock("hash2", 2L);
         block2.setConfirmations(0);
-
 
         Mockito.when(mockBitcoinClient.getBlock("hash0"))
                 .thenReturn(Mono.just(block0));
@@ -199,6 +180,5 @@ public class BitcoinBulkExtractorTest {
                 })
                 .expectComplete()
                 .verify();
-
     }
 }

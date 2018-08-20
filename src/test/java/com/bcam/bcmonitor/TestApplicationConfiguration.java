@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
+@Profile("mockedBlockchainClients")
 @Configuration
 @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ExtractionScheduler.class))
-@EnableAutoConfiguration
 public class TestApplicationConfiguration {
 
     @Bean

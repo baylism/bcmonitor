@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 
 /**
@@ -120,34 +122,19 @@ public class BitcoinBulkExtractor implements BulkExtractor {
     }
 
 
-    // public void saveHashes(long fromHeight, long toHeight) {
+    // public Flux<String> saveHashes(long fromHeight, long toHeight) {
     //
     //     logger.info("About to save hashes between height " + fromHeight + " - " + toHeight);
     //
     //     int fromInt = (int) fromHeight;
     //     int count = (int) (fromHeight - fromInt) + 1;
-    //     //
-    //     // return Flux.range(fromInt, count)
-    //     //         .map(height -> getStubBlock(height))
-    //     //         .flatMap()
     //
-    //     // Mono<String> hash = client.getBlockHash(fromInt);
-    //     //
-    //     // return hash
-    //     //         .flatMap(h -> Mono.just(new BitcoinBlock(h, fromInt)))
-    //     //         .subscribe(
-    //     //                 s -> repository.save(s)
-    //     //         );
-    //     // ;
-    //
-    //     while (fromHeight != toHeight) {
-    //         getStubBlock(fromHeight)
-    //                 .subscribe(repository::save);
-    //
-    //         fromHeight ++;
-    //     }
+    //     return Flux.range(fromInt, count)
+    //             .map(height -> getStubBlock(height))
+    //             .concatMap(block -> block)
+    //             .flatMap(bitcoinBlock -> repository.save(bitcoinBlock));
     // }
-    //
+
     private Mono<BitcoinBlock> getStubBlock(long height) {
         return client.getBlockHash(height)
                 .flatMap(h -> Mono.just(new BitcoinBlock(h, height)));
@@ -197,18 +184,10 @@ public class BitcoinBulkExtractor implements BulkExtractor {
         return repository
                 .findAllByHeightInRange(fromHeight, toHeight)
                 .map(bitcoinBlock -> bitcoinBlock.getHash())
-                .doOnNext(hash -> logger.info("Mapped to hash " + hash))
+                // .doOnNext(hash -> logger.info("Mapped to hash " + hash))
                 .map(hash -> client.getBlock(hash))
-                .flatMap(source -> {
-                    // logger.info("Got block from client " + source);
-                    return source;
-                })
-                .doOnNext(bitcoinBlock -> logger.info("Got block from client " + bitcoinBlock + " confirmations " + bitcoinBlock.getConfirmations()))
-                // .map(bitcoinBlock -> {
-                //     logger.info("Found block " + bitcoinBlock);
-                //     bitcoinBlock.setConfirmations(9000);
-                //     return bitcoinBlock;
-                // })
+                .flatMap(source -> source)
+                // .doOnNext(bitcoinBlock -> logger.info("Got block from client " + bitcoinBlock + " confirmations " + bitcoinBlock.getConfirmations()))
                 .flatMap(block -> repository.save(block));
 
 
