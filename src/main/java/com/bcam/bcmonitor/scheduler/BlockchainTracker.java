@@ -4,6 +4,7 @@ import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.Blockchain;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,11 @@ public class BlockchainTracker {
     private ReactiveDashClient dashClient;
     private ReactiveZCashClient zCashClient;
 
-    public BlockchainTracker() {
+    @Autowired
+    public BlockchainTracker(ReactiveBitcoinClient bitcoinClient, ReactiveDashClient dashClient, ReactiveZCashClient zCashClient) {
+        this.bitcoinClient = bitcoinClient;
+        this.dashClient = dashClient;
+        this.zCashClient = zCashClient;
 
         tips = new ConcurrentHashMap<>();
         tips.put(BITCOIN, 0L);

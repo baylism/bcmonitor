@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import static com.bcam.bcmonitor.model.Blockchain.*;
 
-@Profile("!test")
+@Profile("scheduler")  // prevent scheduler from unless we need it
 @Component
 public class ExtractionScheduler {
 
@@ -32,7 +32,7 @@ public class ExtractionScheduler {
     }
 
 
-    @Scheduled(fixedRate = 5000L)
+    @Scheduled(fixedRate = 10000L)
     public void updateBlocks() {
 
         long currentHeight = blockchainTracker.getTipFor(BITCOIN);
