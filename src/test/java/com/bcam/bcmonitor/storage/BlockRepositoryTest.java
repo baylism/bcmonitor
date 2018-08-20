@@ -1,5 +1,6 @@
 package com.bcam.bcmonitor.storage;
 
+import com.bcam.bcmonitor.extractor.bulk.BitcoinBulkExtractor;
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -7,6 +8,8 @@ import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.CollectionOptions;
@@ -28,6 +31,9 @@ import static org.junit.Assert.*;
 @TestPropertySource(properties = {
         "BITCOIN_HOSTNAME=localhost", "BITCOIN_PORT=9998", "BITCOIN_UN=bitcoinuser1", "BITCOIN_PW=password", "DASH_HOSTNAME=localhost", "DASH_PORT=9998", "DASH_UN=dashuser1", "DASH_PW=password", "ZCASH_HOSTNAME=localhost", "ZCASH_PORT=9998", "ZCASH_UN=dashuser1", "ZCASH_PW=password"})
 public class BlockRepositoryTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(BlockRepositoryTest.class);
+
 
     @Autowired
     BlockRepository blockRepository;
@@ -66,9 +72,9 @@ public class BlockRepositoryTest {
         // insert some blocks
         Flux<BitcoinBlock> insertAll = operations.insertAll(
                 Flux.just(
-                        new BitcoinBlock("foo", 1L),
-                        new BitcoinBlock("bar", 2L),
-                        new BitcoinBlock("baz", 3L)
+                        new BitcoinBlock("foo", 0L),
+                        new BitcoinBlock("bar", 1L),
+                        new BitcoinBlock("baz", 2L)
                 ).collectList());
 
         // run insertion test
@@ -87,9 +93,9 @@ public class BlockRepositoryTest {
                 .thenMany(
                         blockRepository.saveAll(
                                 Flux.just(
-                                        new BitcoinBlock("add1", 4L),
-                                        new BitcoinBlock("add2", 5L),
-                                        new BitcoinBlock("add3", 6L)
+                                        new BitcoinBlock("add1", 3L),
+                                        new BitcoinBlock("add2", 4L),
+                                        new BitcoinBlock("add3", 5L)
                                 )
                         )
                 )
@@ -103,12 +109,56 @@ public class BlockRepositoryTest {
                 .verifyComplete();
     }
 
+
+    @Test
+    public void findByHeight() {
+
+
+        Mono<BitcoinBlock> insertedBlockMono = blockRepository.findByHeight(1L);
+
+        StepVerifier
+                .create(insertedBlockMono)
+                .assertNext(insertedBlock -> {
+                    assertEquals("bar", insertedBlock.getHash());
+                    assertEquals(1L, insertedBlock.getHeight());
+                })
+                .expectComplete()
+                .verify();
+
+    }
+
+    @Test
+    public void findAllByHeightInRange() {
+
+        Flux<BitcoinBlock> insertedBlockFlux = blockRepository.findAllByHeightInRange(0L, 2L);
+
+        StepVerifier
+                .create(insertedBlockFlux)
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("foo", insertedBlock.getHash());
+                    assertEquals(0L, insertedBlock.getHeight());
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("bar", insertedBlock.getHash());
+                    assertEquals(1L, insertedBlock.getHeight());
+                })
+                .assertNext(insertedBlock -> {
+                    logger.info("Got block " + insertedBlock);
+                    assertEquals("baz", insertedBlock.getHash());
+                    assertEquals(2L, insertedBlock.getHeight());
+                })
+                .expectComplete()
+                .verify();
+
+    }
+
     @Test
     public void insertBlockAndVerify() {
 
-        BitcoinBlock block = new BitcoinBlock();
+        BitcoinBlock block = new BitcoinBlock("abc", 7L);
 
-        block.setHash("abc");
         block.setChainWork(new BigInteger("001"));
 
         ArrayList<String> txids = new ArrayList<>();
@@ -128,6 +178,7 @@ public class BlockRepositoryTest {
                     assertEquals("abc", insertedBlock.getHash());
                     assertEquals(new BigInteger("001"), insertedBlock.getChainWork());
                     assertEquals(txids, insertedBlock.getTxids());
+                    assertEquals(7L, insertedBlock.getHeight());
                 })
                 .expectComplete()
                 .verify();

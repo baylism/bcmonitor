@@ -47,4 +47,10 @@ public class BitcoinBlock extends AbstractBlock {
     public BigInteger getChainWork() {
         return chainWork;
     }
+
+
+    @Override
+    public String toString() {
+        return "BitcoinBlock{hash = " + getHash() + ", height = " + getHeight() + "}";
+    }
 }

@@ -1,10 +1,13 @@
 package com.bcam.bcmonitor.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+@Document
 public abstract class AbstractBlock {
 
     @Id
@@ -12,6 +15,7 @@ public abstract class AbstractBlock {
 
     private String prevBlockHash;
 
+    @Indexed
     private long height;
     private long timeStamp;
     private long sizeBytes;

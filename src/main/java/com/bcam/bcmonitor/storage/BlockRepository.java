@@ -2,6 +2,7 @@ package com.bcam.bcmonitor.storage;
 
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import org.springframework.data.domain.Example;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -21,15 +22,10 @@ import reactor.core.publisher.Mono;
  *
  */
 @Repository
-public interface BlockRepository extends ReactiveMongoRepository<BitcoinBlock, String> {
+public interface BlockRepository extends ReactiveMongoRepository<BitcoinBlock, String>, BlockRepositoryCustom{
 
-    @Query(value="{}", fields="{height : 1, _id : 0}")
     Mono<BitcoinBlock> findByHeight(long height);
 
-    @Query(value="{}", fields="{height : 1, _id : 0}")
     Flux<BitcoinBlock> findAllByHeightBetween(long fromHeight, long toHeight);
-
-
-
 
 }

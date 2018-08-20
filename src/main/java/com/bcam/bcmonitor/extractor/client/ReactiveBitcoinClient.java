@@ -130,6 +130,7 @@ public class ReactiveBitcoinClient {
 
 
     public Mono<String> getBlockHash(long height) {
+        System.out.println("RBC Getting hash");
         JSONRPCRequest request = new JSONRPCRequest("getblockhash");
 
         request.addParam(height);
