@@ -18,31 +18,7 @@ import javax.annotation.PostConstruct;
 @Component
 public abstract class ReactiveClientImpl {
 
-    @Value("${BITCOIN_HOSTNAME}")
-    private String hostName;
-
-    @Value("${BITCOIN_PORT}")
-    private int port;
-
-    @Value("${BITCOIN_UN}")
-    private String userName;
-
-    @Value("${BITCOIN_PW}")
-    private String password;
-
     protected ReactiveHTTPClient client;
-
-    public ReactiveClientImpl() {
-    }
-
-    @PostConstruct
-    protected void buildClient() {
-        System.out.println("Building Impl client with hostname " + hostName);
-
-        ObjectMapper mapper = buildMapper();
-
-        client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
-    }
 
     abstract ObjectMapper buildMapper();
 

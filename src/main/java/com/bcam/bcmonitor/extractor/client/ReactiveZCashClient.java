@@ -43,7 +43,6 @@ public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveC
         super();
     }
 
-    @Override
     @PostConstruct
     protected void buildClient() {
         System.out.println("Building Zcash client with hostname " + hostName);
@@ -52,7 +51,6 @@ public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveC
 
         client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
-
 
     @Override
     protected ObjectMapper buildMapper() {

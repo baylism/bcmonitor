@@ -35,7 +35,6 @@ public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveCl
         super();
     }
 
-    @Override
     @PostConstruct
     protected void buildClient() {
         System.out.println("Building Dash client with hostname " + hostName);
@@ -67,7 +66,7 @@ public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveCl
 
     @Override
     ReactiveHTTPClient getClient() {
-        return null;
+        return client;
     }
 
     @Override
