@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 
 // @Qualifier("ReactiveBitcoinClient")
 @Component
-public class ReactiveBitcoinClient extends ReactiveClientImpl implements ReactiveClient<BitcoinBlock, BitcoinTransaction> {
+public class ReactiveBitcoinClient extends ReactiveClientImpl implements ReactiveClient<BitcoinBlock, BitcoinTransaction>, BlockchainInfoClient {
 
     @Value("${BITCOIN_HOSTNAME}")
     private String hostName;

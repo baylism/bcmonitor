@@ -71,6 +71,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     }
 
     public Flux<T> saveTransactions(Flux<B> blocks) {
+
         return blocks
                 .map(block -> block.getTxids())
                 .flatMap(listIds -> Flux.fromIterable(listIds))
@@ -78,22 +79,4 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
                 .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
     }
 
-    // public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
-    //
-    //     int fromInt = (int) fromHeight;
-    //     int count = (int) (toHeight - fromInt) + 1;
-    //
-    //     System.out.println("Count: " + count);
-    //
-    //     Flux<BitcoinBlock> blockFlux = Flux.range(fromInt, count)
-    //             .map(client::getBlockHash)
-    //             .flatMap(source -> source) // == merge()
-    //             .flatMap(hash -> client.getBlock(hash));
-    //
-    //     return blockFlux;
-    //
-    //     // blockFlux
-    //     //         .map(block -> blockRepository.save());
-    //     // return blockRepository.saveAll(blockFlux);
-    // }
 }

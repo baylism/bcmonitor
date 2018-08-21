@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 // @Qualifier("ReactiveZCashClient")
 @Component
-public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveClient<ZCashBlock, ZCashTransaction>{
+public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveClient<ZCashBlock, ZCashTransaction>, BlockchainInfoClient {
 
     @Value("${ZCASH_HOSTNAME}")
     private String hostName;

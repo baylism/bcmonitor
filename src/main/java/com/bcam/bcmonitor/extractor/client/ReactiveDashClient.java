@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
 
 // @Qualifier("ReactiveDashClient")
 @Component
-public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveClient<DashBlock, DashTransaction> {
+public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveClient<DashBlock, DashTransaction>, BlockchainInfoClient {
 
 
     @Value("${DASH_HOSTNAME}")

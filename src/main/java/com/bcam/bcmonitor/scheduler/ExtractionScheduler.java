@@ -1,6 +1,5 @@
 package com.bcam.bcmonitor.scheduler;
 
-import com.bcam.bcmonitor.extractor.bulk.BitcoinBulkExtractor;
 import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
@@ -26,53 +25,47 @@ import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 @Component
 public class ExtractionScheduler {
 
-    private BlockchainTrackerGeneric<ReactiveBitcoinClient> bitcoinTracker;
-    private BlockchainTrackerGeneric<ReactiveDashClient> dashTracker;
-    private BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker;
+    // private BlockchainTrackerGeneric<BitcoinBlock> bitcoinTracker;
+    // private BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker;
 
-
+    private BlockchainTracker blockchainTracker;
     // start extracting blocks from this height
     private Long initialOffset;
 
     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
 
-
-
     @Autowired
-    public ExtractionScheduler(BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor
-            BlockchainTrackerGeneric<ReactiveBitcoinClient> bitcoinTracker,
-            BlockchainTrackerGeneric<ReactiveDashClient> dashTracker,
-            BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker,
+    public ExtractionScheduler(
+            BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor,
+            BlockchainTracker blockchainTracker
+            // BlockchainTrackerGeneric<BitcoinBlock> bitcoinTracker
     ) {
-        this.bitcoinTracker = bitcoinTracker;
-        this.dashTracker = dashTracker;
-        this.zCashTracker = zCashTracker;
+        this.blockchainTracker = blockchainTracker;
 
         initialOffset = 100L;
 
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
-        this.dashBulkExtractor = dashBulkExtractor;
-        this.zCashBulkExtractor = zCashBulkExtractor;
+
     }
 
     @Scheduled(fixedRate = 2000L)
     public void syncBlocks() {
 
         // get current height
-        bitcoinTracker.updateChainTip();
+        blockchainTracker.updateChainTips();
 
         // check whether synced up to best height
-        long bestHeight = bitcoinTracker.getTip();
-        long lastSynced = bitcoinTracker.getLastSynced();
+        // long bestHeight = blockchainTracker.getTips();
+        // long lastSynced = blockchainTracker.getLastSynced();
 
-        // if not synced up to best height
-        if (lastSynced < bestHeight) {
-
-            long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
-
-            Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
-
-        }
+        // // if not synced up to best height
+        // if (lastSynced < bestHeight) {
+        //
+        //     long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
+        //
+        //     Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
+        //
+        // }
     }
 
 }
