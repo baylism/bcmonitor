@@ -4,6 +4,7 @@ import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.model.BlockchainInfo;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.BlockRepositoryCustom;
@@ -59,7 +60,7 @@ public class BitcoinBulkExtractorTest {
     ReactiveDashClient mockDashClient;
 
     @Autowired
-    BulkExtractor<BitcoinBlock> bulkExtractor;
+    BulkExtractor<BitcoinBlock, BitcoinTransaction> bulkExtractor;
 
     @Autowired
     BlockRepository blockRepository;

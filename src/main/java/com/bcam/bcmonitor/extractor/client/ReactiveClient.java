@@ -10,4 +10,6 @@ public interface ReactiveClient<B, T> {
 
     Mono<T> getTransaction(String hash);
 
+    Mono<String> getBlockHash(long height);
+
 }

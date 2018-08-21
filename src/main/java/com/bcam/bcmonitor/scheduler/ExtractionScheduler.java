@@ -2,6 +2,7 @@ package com.bcam.bcmonitor.scheduler;
 
 import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,10 +24,10 @@ public class ExtractionScheduler {
     private Long initialOffset;
 
     private BlockchainTracker blockchainTracker;
-    private BulkExtractor<BitcoinBlock> bitcoinBulkExtractor;
+    private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
 
     @Autowired
-    public ExtractionScheduler(BlockchainTracker blockchainTracker, BulkExtractor<BitcoinBlock> bitcoinBulkExtractor) {
+    public ExtractionScheduler(BlockchainTracker blockchainTracker, BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor) {
 
         initialOffset = 100L;
 
