@@ -147,6 +147,14 @@ public class BitcoinBulkExtractor implements BulkExtractor {
                 .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
     }
 
+    public Flux<BitcoinTransaction> saveTransactions(Flux<BitcoinBlock> blocks) {
+        return blocks
+                .map(block -> block.getTxids())
+                .flatMap(listIds -> Flux.fromIterable(listIds))
+                .flatMap(id -> client.getTransaction(id))
+                .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
+    }
+
     public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
 
 

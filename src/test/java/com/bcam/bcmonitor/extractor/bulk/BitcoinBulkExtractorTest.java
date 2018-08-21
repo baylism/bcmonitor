@@ -295,21 +295,99 @@ public class BitcoinBulkExtractorTest {
                 .assertNext(insertedTransaction -> {
                     logger.info("Got transaction " + insertedTransaction);
                     assertEquals("aaa", insertedTransaction.getHash());
-                    // assertEquals(0L, insertedTransaction.getHeight());
-                    // assertEquals(2, insertedTransaction.getConfirmations());
                 })
                 .assertNext(insertedTransaction -> {
                     logger.info("Got transaction " + insertedTransaction);
                     assertEquals("bbb", insertedTransaction.getHash());
-                    // assertEquals(1L, insertedTransaction.getHeight());
-                    // assertEquals(1, insertedTransaction.getConfirmations());
 
                 })
                 .assertNext(insertedTransaction -> {
                     logger.info("Got transaction " + insertedTransaction);
                     assertEquals("ccc", insertedTransaction.getHash());
-                    // assertEquals(2L, insertedTransaction.getHeight());
-                    // assertEquals(0, insertedTransaction.getConfirmations());
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void saveTransactionsFromFlux() {
+
+        BitcoinTransaction transaction0 = new BitcoinTransaction("aaa");
+        BitcoinTransaction transaction1 = new BitcoinTransaction("bbb");
+        BitcoinTransaction transaction2 = new BitcoinTransaction("ccc");
+        BitcoinTransaction transaction3 = new BitcoinTransaction("ddd");
+        BitcoinTransaction transaction4 = new BitcoinTransaction("eee");
+        BitcoinTransaction transaction5 = new BitcoinTransaction("fff");
+
+
+        Mockito.when(mockBitcoinClient.getTransaction("aaa"))
+                .thenReturn(Mono.just(transaction0));
+        Mockito.when(mockBitcoinClient.getTransaction("bbb"))
+                .thenReturn(Mono.just(transaction1));
+        Mockito.when(mockBitcoinClient.getTransaction("ccc"))
+                .thenReturn(Mono.just(transaction2));
+
+        Mockito.when(mockBitcoinClient.getTransaction("ddd"))
+                .thenReturn(Mono.just(transaction3));
+        Mockito.when(mockBitcoinClient.getTransaction("eee"))
+                .thenReturn(Mono.just(transaction4));
+        Mockito.when(mockBitcoinClient.getTransaction("fff"))
+                .thenReturn(Mono.just(transaction5));
+
+
+        BitcoinBlock block1 = new BitcoinBlock("blockhash1", 0L);
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("aaa");
+        txids.add("bbb");
+        txids.add("ccc");
+        block1.setTxids(txids);
+
+        BitcoinBlock block2 = new BitcoinBlock("blockhash2", 1L);
+        ArrayList<String> txids2 = new ArrayList<>();
+        txids.add("ddd");
+        txids.add("eee");
+        txids.add("fff");
+        block2.setTxids(txids2);
+
+        Flux<BitcoinBlock> blockFlux = Flux.just(block1, block2);
+
+        Flux<BitcoinTransaction> save = bulkExtractor.saveTransactions(blockFlux);
+        save.blockLast();
+
+        Sort sort = new Sort(Sort.Direction.ASC, "hash");
+        Flux<BitcoinTransaction> insertedTransactions = transactionRepository.findAll(sort);
+
+        // StepVerifier
+        //         .create(insertedTransactions)
+        //         .expectNext(transaction0, transaction1, transaction2, transaction3, transaction4, transaction5)
+        //         .expectComplete()
+        //         .verify();
+
+        StepVerifier
+                .create(insertedTransactions)
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("aaa", insertedTransaction.getHash());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("bbb", insertedTransaction.getHash());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("ccc", insertedTransaction.getHash());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("ddd", insertedTransaction.getHash());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("eee", insertedTransaction.getHash());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("fff", insertedTransaction.getHash());
                 })
                 .expectComplete()
                 .verify();
