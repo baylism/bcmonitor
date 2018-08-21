@@ -20,9 +20,13 @@ public class DashController {
     private ReactiveDashClient client;
 
     @Autowired
-    public DashController(@Qualifier("ReactiveDashClient") ReactiveDashClient client) {
+    public DashController( ReactiveDashClient client) {
         this.client = client;
     }
+
+    // public DashController(@Qualifier("ReactiveDashClient") ReactiveDashClient client) {
+    //     this.client = client;
+    // }
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")

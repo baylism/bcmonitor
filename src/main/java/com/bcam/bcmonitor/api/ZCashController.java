@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.api;
 
 
+import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,17 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/zcash")
 public class ZCashController {
 
-    @Qualifier("reactiveDashClient")
+    // @Qualifier("reactiveDashClient")
     private ReactiveZCashClient client;
 
     @Autowired
-    public ZCashController(@Qualifier("ReactiveZCashClient") ReactiveZCashClient client) {
+    public ZCashController(ReactiveZCashClient client) {
         this.client = client;
     }
+    // @Autowired
+    // public ZCashController(@Qualifier("ReactiveZCashClient") ReactiveZCashClient client) {
+    //     this.client = client;
+    // }
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")

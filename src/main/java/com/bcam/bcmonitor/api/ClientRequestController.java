@@ -13,21 +13,31 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api")
 public class ClientRequestController {
 
-    @Qualifier("ReactiveZCashClient")
     private ReactiveZCashClient zCashClient;
     private ReactiveDashClient dashClient;
     private ReactiveBitcoinClient bitcoinClient;
 
     @Autowired
     public ClientRequestController(
-            @Qualifier("ReactiveZCashClient") ReactiveZCashClient zCashClient,
-            @Qualifier("ReactiveDashClient") ReactiveDashClient dashClient,
-            @Qualifier("ReactiveBitcoinClient") ReactiveBitcoinClient bitcoinClient
+            ReactiveZCashClient zCashClient,
+            ReactiveDashClient dashClient,
+            ReactiveBitcoinClient bitcoinClient
     ) {
         this.zCashClient = zCashClient;
         this.dashClient = dashClient;
         this.bitcoinClient = bitcoinClient;
     }
+
+    // @Autowired
+    // public ClientRequestController(
+    //         @Qualifier("ReactiveZCashClient") ReactiveZCashClient zCashClient,
+    //         @Qualifier("ReactiveDashClient") ReactiveDashClient dashClient,
+    //         @Qualifier("ReactiveBitcoinClient") ReactiveBitcoinClient bitcoinClient
+    // ) {
+    //     this.zCashClient = zCashClient;
+    //     this.dashClient = dashClient;
+    //     this.bitcoinClient = bitcoinClient;
+    // }
 
     // ============ client provided requests ============
     @GetMapping("/{blockchain}/raw/{jsonQuery}")
@@ -72,10 +82,14 @@ public class ClientRequestController {
     private ReactiveClientImpl getClient(String blockchain) {
 
         switch (blockchain) {
-            case "dash" : return dashClient;
-            case "zcash" : return zCashClient;
-            case "bitcoin" : return bitcoinClient;
-            default: throw new RuntimeException("can't find client");
+            case "dash":
+                return dashClient;
+            case "zcash":
+                return zCashClient;
+            case "bitcoin":
+                return bitcoinClient;
+            default:
+                throw new RuntimeException("can't find client");
         }
     }
 }

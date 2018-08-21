@@ -17,8 +17,13 @@ public class BitcoinController {
 
     private ReactiveBitcoinClient client;
 
+    // @Autowired
+    // public BitcoinController(@Qualifier("ReactiveBitcoinClient") ReactiveBitcoinClient client) {
+    //     this.client = client;
+    // }
+
     @Autowired
-    public BitcoinController(@Qualifier("ReactiveBitcoinClient") ReactiveBitcoinClient client) {
+    public BitcoinController(ReactiveBitcoinClient client) {
         this.client = client;
     }
 

@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
-@Qualifier("ReactiveBitcoinClient")
+// @Qualifier("ReactiveBitcoinClient")
 @Component
 public class ReactiveBitcoinClient extends ReactiveClientImpl implements ReactiveClient<BitcoinBlock, BitcoinTransaction> {
 

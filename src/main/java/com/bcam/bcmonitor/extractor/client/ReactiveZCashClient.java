@@ -23,7 +23,7 @@ import java.io.IOException;
  *
  * the account parameter exists in the API, please use “” as its value, otherwise an error will be returned
  */
-@Qualifier("ReactiveZCashClient")
+// @Qualifier("ReactiveZCashClient")
 @Component
 public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveClient<ZCashBlock, ZCashTransaction>{
 

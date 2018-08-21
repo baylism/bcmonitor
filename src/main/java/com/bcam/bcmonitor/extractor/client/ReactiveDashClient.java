@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
-@Qualifier("ReactiveDashClient")
+// @Qualifier("ReactiveDashClient")
 @Component
 public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveClient<DashBlock, DashTransaction> {
 

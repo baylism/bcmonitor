@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -29,7 +30,6 @@ import reactor.core.publisher.Flux;
  * <p>
  * can make a repo by creating client the to construtor
  */
-@Component
 public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransaction> implements BulkExtractor<B, T> {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkExtractorImpl.class);
@@ -39,7 +39,6 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
     final private ReactiveClient<B, T> client;
 
-    @Autowired
     public BulkExtractorImpl(
             BlockRepository<B> repository,
             TransactionRepository<T> transactionRepository,
