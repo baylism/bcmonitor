@@ -60,6 +60,12 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl implements Reactiv
 
         return mapper;
     }
+
+    @Override
+    ReactiveHTTPClient getClient() {
+        return client;
+    }
+
     // parameterised queries
     public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");

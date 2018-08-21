@@ -32,7 +32,8 @@ public abstract class ReactiveClientImpl {
 
     protected ReactiveHTTPClient client;
 
-    public ReactiveClientImpl() {}
+    public ReactiveClientImpl() {
+    }
 
     @PostConstruct
     protected void buildClient() {
@@ -43,13 +44,15 @@ public abstract class ReactiveClientImpl {
         client = new ReactiveHTTPClient(hostName, port, userName, password, mapper);
     }
 
-     abstract ObjectMapper buildMapper();
+    abstract ObjectMapper buildMapper();
+
+    abstract ReactiveHTTPClient getClient();
 
     // other objects
     public Mono<TransactionPool> getTransactionPool() {
         JSONRPCRequest request = new JSONRPCRequest("getrawmempool");
 
-        return client
+        return getClient()
                 .requestResponseSpec(request.toString())
                 .bodyToMono(TransactionPool.class);
     }
@@ -57,7 +60,7 @@ public abstract class ReactiveClientImpl {
     public Mono<TransactionPoolInfo> getTransactionPoolInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getmempoolinfo");
 
-        return client
+        return getClient()
                 .requestResponseSpec(request.toString())
                 .bodyToMono(TransactionPoolInfo.class);
     }
@@ -66,7 +69,7 @@ public abstract class ReactiveClientImpl {
     public Mono<BlockchainInfo> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
-        return client
+        return getClient()
                 .requestResponseSpec(request.toString())
                 .bodyToMono(BlockchainInfo.class);
     }
@@ -75,7 +78,7 @@ public abstract class ReactiveClientImpl {
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
 
@@ -85,19 +88,19 @@ public abstract class ReactiveClientImpl {
 
         request.addParam(height);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
-    // client provided requests
+    // getClient() provided requests
     public Mono<String> getRawResponse(String jsonQuery) {
 
-        return client.requestString(jsonQuery);
+        return getClient().requestString(jsonQuery);
     }
 
     public Mono<String> getCustomResponse(String methodName) {
         JSONRPCRequest request = new JSONRPCRequest(methodName);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
     public Mono<String> getCustomResponse(String methodName, String param) {
@@ -105,7 +108,7 @@ public abstract class ReactiveClientImpl {
 
         request.addParam(param);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
     public Mono<String> getCustomResponse(String methodName, int param) {
@@ -113,7 +116,7 @@ public abstract class ReactiveClientImpl {
 
         request.addParam(param);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
     public Mono<String> getCustomResponse(String methodName, String param, String param2) {
@@ -122,7 +125,7 @@ public abstract class ReactiveClientImpl {
         request.addParam(param);
         request.addParam(param2);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
     public Mono<String> getCustomResponse(String methodName, String param, int param2) {
@@ -131,7 +134,7 @@ public abstract class ReactiveClientImpl {
         request.addParam(param);
         request.addParam(param2);
 
-        return client.requestString(request.toString());
+        return getClient().requestString(request.toString());
     }
 
 }

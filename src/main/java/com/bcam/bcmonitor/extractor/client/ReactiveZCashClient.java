@@ -74,6 +74,11 @@ public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveC
         return mapper;
     }
 
+    @Override
+    ReactiveHTTPClient getClient() {
+        return client;
+    }
+
     public Mono<ZCashTransaction> getTransaction(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
 

@@ -66,6 +66,11 @@ public class ReactiveDashClient extends ReactiveClientImpl implements ReactiveCl
     }
 
     @Override
+    ReactiveHTTPClient getClient() {
+        return null;
+    }
+
+    @Override
     public Mono<DashBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
