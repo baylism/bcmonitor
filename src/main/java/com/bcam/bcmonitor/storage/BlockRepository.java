@@ -22,10 +22,9 @@ import reactor.core.publisher.Mono;
  *
  */
 @Repository
-public interface BlockRepository extends ReactiveMongoRepository<BitcoinBlock, String>, BlockRepositoryCustom{
+public interface BlockRepository<T extends AbstractBlock> extends ReactiveMongoRepository<T, String>, BlockRepositoryCustom {
 
-    Mono<BitcoinBlock> findByHeight(long height);
+    Mono<T> findByHeight(long height);
 
-    Flux<BitcoinBlock> findAllByHeightBetween(long fromHeight, long toHeight);
-
+    Flux<T> findAllByHeightBetween(long fromHeight, long toHeight);
 }
