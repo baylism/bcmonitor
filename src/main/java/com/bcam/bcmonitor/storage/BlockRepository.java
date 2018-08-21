@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 
 /**
+ *
  * from talk:
  * tail a mongodb collection with @Tailable
  *
@@ -22,7 +23,7 @@ import reactor.core.publisher.Mono;
  *
  */
 @Repository
-public interface BlockRepository extends ReactiveMongoRepository<BitcoinBlock, String>, BlockRepositoryCustom{
+public interface BlockRepository extends ReactiveMongoRepository<BitcoinBlock, String>, BlockRepositoryCustom {
 
     Mono<BitcoinBlock> findByHeight(long height);
 

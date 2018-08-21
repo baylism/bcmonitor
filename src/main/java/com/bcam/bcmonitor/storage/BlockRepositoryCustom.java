@@ -7,5 +7,4 @@ public interface BlockRepositoryCustom {
 
     Flux<BitcoinBlock> findAllByHeightInRange(long fromHeight, long toHeight);
 
-
 }

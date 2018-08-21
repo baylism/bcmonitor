@@ -4,10 +4,12 @@ import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.model.BlockchainInfo;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.BlockRepositoryCustom;
 import com.bcam.bcmonitor.storage.BlockRepositoryTest;
+import com.bcam.bcmonitor.storage.TransactionRepository;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bson.Document;
@@ -23,6 +25,7 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +39,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -63,6 +67,9 @@ public class BitcoinBulkExtractorTest {
 
     @Autowired
     BlockRepository blockRepository;
+
+    @Autowired
+    TransactionRepository transactionRepository;
 
     @Autowired
     ReactiveMongoOperations operations;
@@ -183,7 +190,7 @@ public class BitcoinBulkExtractorTest {
     }
 
     @Test
-    public void saveBlocks() throws InterruptedException {
+    public void saveBlocks() {
 
         //setup mock client
         Mockito.when(mockBitcoinClient.getBlockHash(0L))
@@ -196,7 +203,6 @@ public class BitcoinBulkExtractorTest {
                 .thenReturn(Mono.just("hash2"));
 
 
-
         BitcoinBlock block0 = new BitcoinBlock("hash0", 0L);
         block0.setConfirmations(2);
 
@@ -207,7 +213,6 @@ public class BitcoinBulkExtractorTest {
         block2.setConfirmations(0);
 
 
-
         Mockito.when(mockBitcoinClient.getBlock("hash0"))
                 .thenReturn(Mono.just(block0));
 
@@ -216,8 +221,6 @@ public class BitcoinBulkExtractorTest {
 
         Mockito.when(mockBitcoinClient.getBlock("hash2"))
                 .thenReturn(Mono.just(block2));
-
-
 
 
         Flux<BitcoinBlock> save = bulkExtractor.saveBlocks(0L, 2L);
@@ -246,6 +249,67 @@ public class BitcoinBulkExtractorTest {
                     // assertEquals("hash2", insertedBlock.getHash());
                     // assertEquals(2L, insertedBlock.getHeight());
                     // assertEquals(0, insertedBlock.getConfirmations());
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void saveTransactions() {
+
+        BitcoinTransaction transaction0 = new BitcoinTransaction("aaa");
+
+        BitcoinTransaction transaction1 = new BitcoinTransaction("bbb");
+
+        BitcoinTransaction transaction2 = new BitcoinTransaction("ccc");
+
+
+        Mockito.when(mockBitcoinClient.getTransaction("aaa"))
+                .thenReturn(Mono.just(transaction0));
+
+        Mockito.when(mockBitcoinClient.getTransaction("bbb"))
+                .thenReturn(Mono.just(transaction1));
+
+        Mockito.when(mockBitcoinClient.getTransaction("ccc"))
+                .thenReturn(Mono.just(transaction2));
+
+
+        BitcoinBlock block = new BitcoinBlock();
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("aaa");
+        txids.add("bbb");
+        txids.add("ccc");
+        block.setTxids(txids);
+
+
+        Flux<BitcoinTransaction> save = bulkExtractor.saveTransactions(block);
+
+        save.blockLast();
+
+        Sort sort = new Sort(Sort.Direction.ASC, "hash");
+
+        Flux<BitcoinTransaction> insertedTransactions = transactionRepository.findAll(sort);
+
+        StepVerifier
+                .create(insertedTransactions)
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("aaa", insertedTransaction.getHash());
+                    // assertEquals(0L, insertedTransaction.getHeight());
+                    // assertEquals(2, insertedTransaction.getConfirmations());
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("bbb", insertedTransaction.getHash());
+                    // assertEquals(1L, insertedTransaction.getHeight());
+                    // assertEquals(1, insertedTransaction.getConfirmations());
+
+                })
+                .assertNext(insertedTransaction -> {
+                    logger.info("Got transaction " + insertedTransaction);
+                    assertEquals("ccc", insertedTransaction.getHash());
+                    // assertEquals(2L, insertedTransaction.getHeight());
+                    // assertEquals(0, insertedTransaction.getConfirmations());
                 })
                 .expectComplete()
                 .verify();
