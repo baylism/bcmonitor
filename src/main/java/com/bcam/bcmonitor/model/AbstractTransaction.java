@@ -1,6 +1,12 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public abstract class AbstractTransaction {
+
+    @Id
     private String hash;
     private String blockHash;
 
@@ -8,6 +14,9 @@ public abstract class AbstractTransaction {
     private int timeInBlock;
     private int timeConfirmed;
 
+    public AbstractTransaction(String hash) {
+        this.hash = hash;
+    }
 
     public AbstractTransaction() {
         // initialise attributes currently not supported by mapper
@@ -64,6 +73,13 @@ public abstract class AbstractTransaction {
         this.blockHash = blockHash;
     }
 
+
+    @Override
+    public String toString() {
+        return "AbstractTransaction{" +
+                "hash='" + hash + '\'' +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {

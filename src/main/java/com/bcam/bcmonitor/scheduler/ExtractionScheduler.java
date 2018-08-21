@@ -1,5 +1,10 @@
 package com.bcam.bcmonitor.scheduler;
 
+import com.bcam.bcmonitor.extractor.bulk.BitcoinBulkExtractor;
+import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
+import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
+import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
+import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
@@ -7,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 
@@ -20,45 +26,52 @@ import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 @Component
 public class ExtractionScheduler {
 
+    private BlockchainTrackerGeneric<ReactiveBitcoinClient> bitcoinTracker;
+    private BlockchainTrackerGeneric<ReactiveDashClient> dashTracker;
+    private BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker;
+
+
     // start extracting blocks from this height
     private Long initialOffset;
 
-    private BlockchainTracker blockchainTracker;
     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
 
+
+
     @Autowired
-    public ExtractionScheduler(BlockchainTracker blockchainTracker, BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor) {
+    public ExtractionScheduler(BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor
+            BlockchainTrackerGeneric<ReactiveBitcoinClient> bitcoinTracker,
+            BlockchainTrackerGeneric<ReactiveDashClient> dashTracker,
+            BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker,
+    ) {
+        this.bitcoinTracker = bitcoinTracker;
+        this.dashTracker = dashTracker;
+        this.zCashTracker = zCashTracker;
 
         initialOffset = 100L;
 
-        this.blockchainTracker = blockchainTracker;
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
+        this.dashBulkExtractor = dashBulkExtractor;
+        this.zCashBulkExtractor = zCashBulkExtractor;
     }
 
-
-    // @Scheduled(fixedRate = 1000L)
-    // public void updateTips() {
-    //     blockchainTracker.updateChainTips();
-    // }
-
-
-    // separate for each blockchain so have different rates?
     @Scheduled(fixedRate = 2000L)
-    public void updateHashes() {
+    public void syncBlocks() {
 
         // get current height
-        blockchainTracker.updateChainTips();
+        bitcoinTracker.updateChainTip();
 
         // check whether synced up to best height
-        long bestHeight = blockchainTracker.getTipFor(BITCOIN);
-        long lastSynced = blockchainTracker.getLastSyncedFor(BITCOIN);
+        long bestHeight = bitcoinTracker.getTip();
+        long lastSynced = bitcoinTracker.getLastSynced();
 
         // if not synced up to best height
         if (lastSynced < bestHeight) {
 
             long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
 
-            // bitcoinBulkExtractor.saveHashes(fromHeight, bestHeight);
+            Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
+
         }
     }
 
