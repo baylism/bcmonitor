@@ -1,8 +1,6 @@
 package com.bcam.bcmonitor.api;
 
-import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
+import com.bcam.bcmonitor.extractor.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +21,8 @@ public class ClientRequestController {
     @Autowired
     public ClientRequestController(
             @Qualifier("ReactiveZCashClient") ReactiveZCashClient zCashClient,
-            @Qualifier("ReactiveDashClient")ReactiveDashClient dashClient,
-            @Qualifier("ReactiveBitcoinClient")ReactiveBitcoinClient bitcoinClient
+            @Qualifier("ReactiveDashClient") ReactiveDashClient dashClient,
+            @Qualifier("ReactiveBitcoinClient") ReactiveBitcoinClient bitcoinClient
     ) {
         this.zCashClient = zCashClient;
         this.dashClient = dashClient;
@@ -71,7 +69,7 @@ public class ClientRequestController {
         return getClient(blockchain).getCustomResponse(methodName, param, param2);
     }
 
-    private ReactiveBitcoinClient getClient(String blockchain) {
+    private ReactiveClientImpl getClient(String blockchain) {
 
         switch (blockchain) {
             case "dash" : return dashClient;

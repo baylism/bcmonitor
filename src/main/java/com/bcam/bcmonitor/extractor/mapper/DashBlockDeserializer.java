@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.extractor.mapper;
 
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.DashBlock;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -9,44 +10,48 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
-@Deprecated
 @Component
-public class DashBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
+public class DashBlockDeserializer extends BlockchainDeserializer<DashBlock> {
 
     @Override
-    public BitcoinBlock deserialize(JsonParser parser, DeserializationContext deserializer) throws IOException {
-        BitcoinBlock block = new BitcoinBlock();
+    public DashBlock deserialize(JsonParser parser, DeserializationContext deserializer) throws IOException {
+        DashBlock block = new DashBlock();
+
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
         System.out.println(node);
 
-        if (! node.get("error").isNull()) {
+        if (!node.get("error").isNull()) {
             throw new RPCResponseException("Error received from RPC. Message: " + node.get("error").get("message").textValue());
         }
 
-        else {
-            JsonNode result = node.get("result");
 
-            // abstract
-            block.setHash(result.get("hash").asText());
-            block.setDifficulty(BigDecimal.valueOf(result.get("difficulty").asLong()));
-            block.setHeight(result.get("height").asInt());
-            block.setSizeBytes(result.get("size").asInt());
-            block.setTimeStamp(result.get("time").asLong());
+        JsonNode result = node.get("result");
 
-            // Dash
-            block.setConfirmations(result.get("confirmations").asInt());
-            block.setMedianTime(result.get("mediantime").asLong());
-            block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
-            block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
-            // block.setNextBlockHash(result.get("nextblockhash").asText());
+        // abstract
+        block.setHash(result.get("hash").asText());
+        block.setDifficulty(BigDecimal.valueOf(result.get("difficulty").asLong()));
+        block.setHeight(result.get("height").asInt());
+        block.setSizeBytes(result.get("size").asInt());
+        block.setTimeStamp(result.get("time").asLong());
+        block.setPrevBlockHash(result.get("previousblockhash").asText());
 
-        }
+        // for now, just add TXIDs
+        ArrayList<String> txids = new ArrayList<>();
+        result.get("tx").forEach(jsonNode -> txids.add(jsonNode.asText()));
+        block.setTxids(txids);
+
+        // bitcoin
+        block.setConfirmations(result.get("confirmations").asInt());
+        block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
+        block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
+
+
         return block;
     }
-
 
 
 }

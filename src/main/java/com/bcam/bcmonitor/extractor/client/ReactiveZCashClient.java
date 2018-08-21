@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 /**
  *
@@ -24,7 +25,7 @@ import javax.annotation.PostConstruct;
  */
 @Qualifier("ReactiveZCashClient")
 @Component
-public class ReactiveZCashClient extends ReactiveBitcoinClient {
+public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveClient<ZCashBlock, ZCashTransaction>{
 
     @Value("${ZCASH_HOSTNAME}")
     private String hostName;
@@ -59,13 +60,13 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
         SimpleModule module = new SimpleModule();
 
         // bitcoin
-        module.addDeserializer(BitcoinBlock.class, new BitcoinBlockDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
         module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
         module.addDeserializer(BlockchainInfo.class, new BlockchainInfoDeserializer());
 
         // zcash
+        module.addDeserializer(ZCashBlock.class, new ZCashBlockDeserializer());
         module.addDeserializer(ZCashTransaction.class, new ZCashTransactionDeserializer());
 
         mapper.registerModule(module);
@@ -73,7 +74,7 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
         return mapper;
     }
 
-    public Mono<ZCashTransaction> getZCashTransaction(String hash) {
+    public Mono<ZCashTransaction> getTransaction(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
 
         request.addParam(hash);
@@ -82,6 +83,18 @@ public class ReactiveZCashClient extends ReactiveBitcoinClient {
         return client
                 .requestResponseSpec(request.toString())
                 .bodyToMono(ZCashTransaction.class);
+    }
+
+    public Mono<ZCashBlock> getBlock(String hash) {
+        JSONRPCRequest request = new JSONRPCRequest("getblock");
+        request.addParam(hash);
+        request.addParam(2); // always request decoded JSON with transactions
+
+        System.out.println(request);
+
+        return client
+                .requestResponseSpec(request.toString())
+                .bodyToMono(ZCashBlock.class);
     }
 
 

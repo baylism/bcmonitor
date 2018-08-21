@@ -26,13 +26,13 @@ public class DashController {
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
-    Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
+    Mono<DashBlock> getBlock(@PathVariable String hash) {
 
         return client.getBlock(hash);
     }
 
     @GetMapping("/transaction/{hash}")
-    Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
+    Mono<DashTransaction> getTransaction(@PathVariable String hash) {
         return client.getTransaction(hash);
     }
 

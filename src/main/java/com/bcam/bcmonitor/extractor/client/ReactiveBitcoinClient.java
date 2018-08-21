@@ -17,8 +17,7 @@ import javax.annotation.PostConstruct;
 
 @Qualifier("ReactiveBitcoinClient")
 @Component
-@Primary
-public class ReactiveBitcoinClient extends ReactiveClientImpl {
+public class ReactiveBitcoinClient extends ReactiveClientImpl implements ReactiveClient<BitcoinBlock, BitcoinTransaction> {
 
     @Value("${BITCOIN_HOSTNAME}")
     private String hostName;
@@ -63,7 +62,6 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl {
 
         return mapper;
     }
-
     // parameterised queries
     public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
@@ -89,102 +87,6 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl {
                 .bodyToMono(BitcoinTransaction.class);
     }
 
-    // other objects
-    public Mono<TransactionPool> getTransactionPool() {
-        JSONRPCRequest request = new JSONRPCRequest("getrawmempool");
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(TransactionPool.class);
-    }
-
-    public Mono<TransactionPoolInfo> getTransactionPoolInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getmempoolinfo");
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(TransactionPoolInfo.class);
-    }
-
-    // alt: get RPCresult; get string; map to object
-    public Mono<BlockchainInfo> getBlockchainInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(BlockchainInfo.class);
-    }
-
-
-    // other string requests
-    // public Mono<String> getBlockchainInfoString() {
-    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-    //
-    //     return client.requestString(request.toString());
-    // }
-
-    public Mono<String> getBestBlockHash() {
-        JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
-
-        return client.requestString(request.toString());
-    }
-
-
-    public Mono<String> getBlockHash(long height) {
-        System.out.println("RBC Getting hash");
-        JSONRPCRequest request = new JSONRPCRequest("getblockhash");
-
-        request.addParam(height);
-
-        return client.requestString(request.toString());
-    }
-
-
-    // client provided requests
-    public Mono<String> getRawResponse(String jsonQuery) {
-
-        return client.requestString(jsonQuery);
-    }
-
-    public Mono<String> getCustomResponse(String methodName) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, int param) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param, String param2) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-        request.addParam(param2);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param, int param2) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-        request.addParam(param2);
-
-        return client.requestString(request.toString());
-    }
 
 }
 

@@ -33,10 +33,6 @@ public class ZCashTransactionDeserializer extends BlockchainDeserializer<ZCashTr
         transaction.setVout(readOutputs(result));
 
 
-        // Zcash specific
-
-
-
         return transaction;
     }
 

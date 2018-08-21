@@ -16,6 +16,7 @@ public class BitcoinTransaction extends AbstractTransaction {
         vout = new ArrayList<>();
     }
 
+
     // abstract method implementations
     @Override
     public float calculateValue() {

@@ -1,7 +1,7 @@
 package com.bcam.bcmonitor.extractor.mapper;
 
 import com.bcam.bcmonitor.model.AbstractBlock;
-import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.ZCashBlock;
 import com.bcam.bcmonitor.model.DashBlock;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -14,13 +14,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 
-public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
+public class ZCashBlockDeserializer extends BlockchainDeserializer<ZCashBlock> {
 
 
     @Override
-    public BitcoinBlock deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+    public ZCashBlock deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 
-        BitcoinBlock block = new BitcoinBlock();
+        ZCashBlock block = new ZCashBlock();
 
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);

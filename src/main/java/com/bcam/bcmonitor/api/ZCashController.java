@@ -25,14 +25,14 @@ public class ZCashController {
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
-    Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
+    Mono<ZCashBlock> getBlock(@PathVariable String hash) {
         return client.getBlock(hash);
     }
 
     @GetMapping("/transaction/{hash}")
     Mono<ZCashTransaction> getTransaction(@PathVariable String hash) {
 
-        return client.getZCashTransaction(hash);
+        return client.getTransaction(hash);
     }
 
 

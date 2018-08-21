@@ -1,31 +1,26 @@
 package com.bcam.bcmonitor;
 
-
-import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.scheduler.ExtractionScheduler;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.*;
 
-@Profile("mockedBlockchainClients")
+
+/**
+ *
+ * Alt: autowire with qualifier name and use normal constructor
+ *
+ */
+@Profile("mockZCashConfiguration")
 @Configuration
 @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = {ExtractionScheduler.class}))
-public class TestApplicationConfiguration {
+public class mockZCashConfiguration {
 
-    @Bean
-    public ReactiveBitcoinClient reactiveBitcoinClient() {
-        return Mockito.mock(ReactiveBitcoinClient.class);
-    }
-
+    @Primary
     @Bean
     public ReactiveZCashClient reactiveZCashClient() {
         return Mockito.mock(ReactiveZCashClient.class);
     }
 
-    @Bean
-    public ReactiveDashClient reactiveDashClient() {
-        return Mockito.mock(ReactiveDashClient.class);
-    }
 
 }

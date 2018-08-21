@@ -8,6 +8,7 @@ import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -42,7 +43,8 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     public BulkExtractorImpl(
             BlockRepository<B> repository,
             TransactionRepository<T> transactionRepository,
-            ReactiveClient<B, T> client) {
+            ReactiveClient<B, T> client
+    ) {
 
         this.transactionRepository = transactionRepository;
         this.blockRepository = repository;
