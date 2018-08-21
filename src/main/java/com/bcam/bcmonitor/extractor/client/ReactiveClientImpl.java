@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
+@Component
 public abstract class ReactiveClientImpl {
 
     @Value("${BITCOIN_HOSTNAME}")
@@ -71,13 +72,6 @@ public abstract class ReactiveClientImpl {
     }
 
 
-    // other string requests
-    // public Mono<String> getBlockchainInfoString() {
-    //     JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-    //
-    //     return client.requestString(request.toString());
-    // }
-
     public Mono<String> getBestBlockHash() {
         JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
 
@@ -93,7 +87,6 @@ public abstract class ReactiveClientImpl {
 
         return client.requestString(request.toString());
     }
-
 
     // client provided requests
     public Mono<String> getRawResponse(String jsonQuery) {

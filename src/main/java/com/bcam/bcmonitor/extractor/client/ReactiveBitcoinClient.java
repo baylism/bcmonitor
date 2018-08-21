@@ -33,9 +33,7 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl implements Reactiv
 
     protected ReactiveHTTPClient client;
 
-    public ReactiveBitcoinClient() {
-
-    }
+    public ReactiveBitcoinClient() { }
 
     @PostConstruct
     protected void buildClient() {

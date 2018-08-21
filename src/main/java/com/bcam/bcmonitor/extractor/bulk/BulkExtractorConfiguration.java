@@ -28,7 +28,7 @@ public class BulkExtractorConfiguration {
     }
 
     @Bean
-    public BulkExtractor<ZCashBlock, ZCashTransaction> bitcoinBulkExtractor(
+    public BulkExtractor<ZCashBlock, ZCashTransaction> zCashBulkExtractor(
             ReactiveZCashClient reactiveZCashClient,
             BlockRepository<ZCashBlock> blockBlockRepository,
             TransactionRepository<ZCashTransaction> transactionRepository) {
