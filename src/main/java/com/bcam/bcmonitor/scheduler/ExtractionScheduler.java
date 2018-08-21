@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.scheduler;
 
 import com.bcam.bcmonitor.extractor.bulk.BitcoinBulkExtractor;
+import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.model.Blockchain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -21,6 +22,8 @@ import static com.bcam.bcmonitor.model.Blockchain.*;
 @Component
 public class ExtractionScheduler {
 
+    private BlockchainTrackerGeneric<ReactiveBitcoinClient> biTracker;
+
     // start extracting blocks from this height
     private Long initialOffset;
 
@@ -28,7 +31,9 @@ public class ExtractionScheduler {
     private BitcoinBulkExtractor bitcoinBulkExtractor;
 
     @Autowired
-    public ExtractionScheduler(BlockchainTracker blockchainTracker, BitcoinBulkExtractor bitcoinBulkExtractor) {
+    public ExtractionScheduler(BlockchainTrackerGeneric<ReactiveBitcoinClient> biTracker, BlockchainTracker blockchainTracker, BitcoinBulkExtractor bitcoinBulkExtractor) {
+
+        this.biTracker = biTracker;
 
         initialOffset = 100L;
 
@@ -36,16 +41,15 @@ public class ExtractionScheduler {
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
     }
 
-    // separate for each blockchain so have different rates?
     @Scheduled(fixedRate = 2000L)
     public void updateHashes() {
 
         // get current height
-        blockchainTracker.updateChainTips();
+        biTracker.updateChainTip();
 
         // check whether synced up to best height
-        long bestHeight = blockchainTracker.getTipFor(BITCOIN);
-        long lastSynced = blockchainTracker.getLastSyncedFor(BITCOIN);
+        long bestHeight = biTracker.getTip();
+        long lastSynced = biTracker.getLastSynced();
 
         // if not synced up to best height
         if (lastSynced < bestHeight) {
@@ -56,5 +60,26 @@ public class ExtractionScheduler {
 
         }
     }
+
+    // // separate for each blockchain so have different rates?
+    // @Scheduled(fixedRate = 2000L)
+    // public void updateHashes() {
+    //
+    //     // get current height
+    //     blockchainTracker.updateChainTips();
+    //
+    //     // check whether synced up to best height
+    //     long bestHeight = blockchainTracker.getTipFor(BITCOIN);
+    //     long lastSynced = blockchainTracker.getLastSyncedFor(BITCOIN);
+    //
+    //     // if not synced up to best height
+    //     if (lastSynced < bestHeight) {
+    //
+    //         long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
+    //
+    //         Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
+    //
+    //     }
+    // }
 
 }
