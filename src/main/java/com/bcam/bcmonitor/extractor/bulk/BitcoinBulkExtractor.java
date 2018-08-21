@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.extractor.bulk;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
+import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.storage.BlockRepository;
@@ -39,30 +40,29 @@ public class BitcoinBulkExtractor implements BulkExtractor {
     final private ReactiveBitcoinClient client;
 
     @Autowired
-    public BitcoinBulkExtractor(BlockRepository blockRepository, TransactionRepository transactionRepository, ReactiveBitcoinClient bitcoinClient) {
+    public BitcoinBulkExtractor(BlockRepository blockRepository,
+                                TransactionRepository transactionRepository,
+                                ReactiveBitcoinClient bitcoinClient) {
+
         this.transactionRepository = transactionRepository;
         client = bitcoinClient;
         this.blockRepository = blockRepository;
     }
 
 
-    /**
-     * @param block containing hashes of transactions to be saved
-     * @return a flux of the saved transactions for further processing
-     */
     public Flux<BitcoinTransaction> saveTransactions(BitcoinBlock block) {
         return Flux.fromIterable(block.getTxids())
-                .map(x -> client.getTransaction(x))
-                .flatMap(source -> source)
-                .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
+                .map(client::getTransaction)
+                .flatMap(source -> source) // == merge()
+                .flatMap(transactionRepository::save);
     }
 
     public Flux<BitcoinTransaction> saveTransactions(Flux<BitcoinBlock> blocks) {
         return blocks
-                .map(block -> block.getTxids())
-                .flatMap(listIds -> Flux.fromIterable(listIds))
-                .flatMap(id -> client.getTransaction(id))
-                .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
+                .map(AbstractBlock::getTxids)
+                .flatMap(Flux::fromIterable)
+                .flatMap(client::getTransaction)
+                .flatMap(transactionRepository::save);
     }
 
     public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
@@ -70,27 +70,11 @@ public class BitcoinBulkExtractor implements BulkExtractor {
         int fromInt = (int) fromHeight;
         int count = (int) (toHeight - fromInt) + 1;
 
-        // logger.info("Count: " + count);
-
         return Flux.range(fromInt, count)
-                .map(height -> client.getBlockHash(height))
-                // .doOnNext(hash -> logger.info("Got hash " + hash))
+                .map(client::getBlockHash)
                 .flatMap(source -> source) // == merge()
-                .flatMap(hash -> client.getBlock(hash))
-                // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(block -> blockRepository.save(block));
-                // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                .flatMap(client::getBlock)
+                .flatMap(blockRepository::save);
 
-    }
-
-
-    public Flux<BitcoinBlock> updateBlocksBetween(long fromHeight, long toHeight) {
-
-        return blockRepository
-                .findAllByHeightInRange(fromHeight, toHeight)
-                .map(bitcoinBlock -> bitcoinBlock.getHash())
-                .map(hash -> client.getBlock(hash))
-                .flatMap(source -> source)
-                .flatMap(block -> blockRepository.save(block));
     }
 }
