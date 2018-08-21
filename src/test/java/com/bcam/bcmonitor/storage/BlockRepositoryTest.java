@@ -1,8 +1,6 @@
 package com.bcam.bcmonitor.storage;
 
 import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -42,32 +39,42 @@ public class BlockRepositoryTest {
 
     // @Before
     // public void before() {
-    //     StepVerifier.create(operations.execute(it -> it.serverCommands().flushDb())).expectNext("OK").verifyComplete();
+    //     // StepVerifier.create(operations.execute(it -> it.serverCommands().flushDb())).expectNext("OK").verifyComplete();
     // }
 
 
     @Before
     public void setUp() {
 
-        // check if block collection exists
-        Mono<Boolean> alreadyExists = operations.collectionExists(BitcoinBlock.class);
+        // // check if block collection exists
+        // Mono<Boolean> alreadyExists = operations.collectionExists(BitcoinBlock.class);
+        //
+        // // if it does, drop collection then recreate. Else just create.
+        // Mono<MongoCollection<Document>> recreateCollection = alreadyExists
+        //         .flatMap(yes -> yes ? operations.dropCollection(BitcoinBlock.class) : Mono.just(alreadyExists))
+        //         .then(operations.createCollection(BitcoinBlock.class, CollectionOptions.empty()
+        //                 .size(1024 * 1024)
+        //                 .maxDocuments(100)));
+        //
+        // // run recreation test
+        // StepVerifier
+        //         .create(recreateCollection)
+        //         .expectNextCount(1)
+        //         .verifyComplete();
+        //
+        //
+        // logger.info("already exists? " + alreadyExists.block());
 
-        // if it does, drop collection then recreate. Else just create.
-        Mono<MongoCollection<Document>> recreateCollection = alreadyExists
-                .flatMap(yes -> yes ? operations.dropCollection(BitcoinBlock.class) : Mono.just(alreadyExists))
-                .then(operations.createCollection(BitcoinBlock.class, CollectionOptions.empty()
-                        .size(1024 * 1024)
-                        .maxDocuments(100)
-                        .capped()));
 
-        // run recreation test
+        Mono<Void> delete = blockRepository.deleteAll();
+
         StepVerifier
-                .create(recreateCollection)
-                .expectNextCount(1)
+                .create(delete)
+                // .expectNextCount(1)
                 .verifyComplete();
 
         Mono<Long> saveAndCount = blockRepository.count()
-                .doOnNext(System.out::println)
+                .doOnNext(count -> logger.info("Count start before method: " + count))
                 .thenMany(
                         blockRepository.saveAll(
                                 Flux.just(
@@ -79,7 +86,7 @@ public class BlockRepositoryTest {
                 )
                 .last()
                 .flatMap(v -> blockRepository.count())
-                .doOnNext(System.out::println);
+                .doOnNext(count -> logger.info("Count end before method: " + count));
 
         StepVerifier
                 .create(saveAndCount)
@@ -92,7 +99,7 @@ public class BlockRepositoryTest {
     public void shouldInsertAndCountData() {
 
         Mono<Long> saveAndCount = blockRepository.count()
-                .doOnNext(System.out::println)
+                .doOnNext(count -> logger.info("Count start shouldinsert: " + count))
                 .thenMany(
                         blockRepository.saveAll(
                                 Flux.just(
@@ -104,11 +111,11 @@ public class BlockRepositoryTest {
                 )
                 .last()
                 .flatMap(v -> blockRepository.count())
-                .doOnNext(System.out::println);
+                .doOnNext(count -> logger.info("Count end shouldinsert: " + count));
 
         StepVerifier
                 .create(saveAndCount)
-                .expectNext(
+                .expectNext(6L)
                 .verifyComplete();
     }
 
@@ -121,7 +128,7 @@ public class BlockRepositoryTest {
         StepVerifier
                 .create(insertedBlockMono)
                 .assertNext(insertedBlock -> {
-                    assertEquals("add2", insertedBlock.getHash());
+                    assertEquals("bar", insertedBlock.getHash());
                     assertEquals(1L, insertedBlock.getHeight());
                 })
                 .expectComplete()
