@@ -1,21 +1,13 @@
 package com.bcam.bcmonitor.extractor.bulk;
 
-import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveClient;
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.AbstractTransaction;
-import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.storage.BlockRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
 
 
 /**
@@ -37,15 +29,21 @@ import java.util.ArrayList;
 @Component
 public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransaction> implements BulkExtractor<B, T> {
 
-    final private BlockRepository<B> repository;
+    final private BlockRepository<B> blockRepository;
+    final private TransactionRepository<T> transactionRepository;
 
     final private ReactiveClient<B, T> client;
 
     @Autowired
-    public BulkExtractorImpl(BlockRepository<B> repository, ReactiveClient<B, T> client) {
+    public BulkExtractorImpl(
+            BlockRepository<B> repository,
+            TransactionRepository<T> transactionRepository,
+            ReactiveClient<B, T> client) {
+
+        this.transactionRepository = transactionRepository;
+        this.blockRepository = repository;
 
         this.client = client;
-        this.repository = repository;
     }
 
 
@@ -57,17 +55,24 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
         // logger.info("Count: " + count);
 
         return Flux.range(fromInt, count)
-                .map(height -> client.getBlockHash(height))
+                .map(client::getBlockHash)
                 // .doOnNext(hash -> logger.info("Got hash " + hash))
                 .flatMap(source -> source) // == merge()
-                .flatMap(hash -> client.getBlock(hash))
+                .flatMap(client::getBlock)
                 // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(block -> repository.save(block));
+                .flatMap(blockRepository::save);
 
         // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
 
+    public Flux<T> saveTransactions(Flux<B> blocks) {
+        return blocks
+                .map(block -> block.getTxids())
+                .flatMap(listIds -> Flux.fromIterable(listIds))
+                .flatMap(id -> client.getTransaction(id))
+                .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
+    }
 
     // public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
     //
@@ -84,7 +89,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     //     return blockFlux;
     //
     //     // blockFlux
-    //     //         .map(block -> repository.save());
-    //     // return repository.saveAll(blockFlux);
+    //     //         .map(block -> blockRepository.save());
+    //     // return blockRepository.saveAll(blockFlux);
     // }
 }
