@@ -1,8 +1,11 @@
 package com.bcam.bcmonitor.extractor.bulk;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
+import com.bcam.bcmonitor.extractor.client.ReactiveClient;
 import com.bcam.bcmonitor.model.AbstractBlock;
+import com.bcam.bcmonitor.model.AbstractTransaction;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.storage.BitcoinBlockRepository;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,24 +35,21 @@ import java.util.ArrayList;
  * can make a repo by creating client the to construtor
  */
 @Component
-public class BulkExtractorImpl<T extends AbstractBlock> implements BulkExtractor<T> {
+public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransaction> implements BulkExtractor<B, T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(BulkExtractor.class);
+    final private BlockRepository<B> repository;
 
-    final private BlockRepository<T, String> repository;
-
-    final private ReactiveBitcoinClient client;
+    final private ReactiveClient<B, T> client;
 
     @Autowired
-    public BulkExtractorImpl(BlockRepository<T, String> repository, ReactiveBitcoinClient bitcoinClient) {
-        client = bitcoinClient;
+    public BulkExtractorImpl(BlockRepository<B> repository, ReactiveClient<B, T> client) {
+
+        this.client = client;
         this.repository = repository;
     }
 
 
-    public Flux<T> saveBlocks(long fromHeight, long toHeight) {
-
-
+    public Flux<B> saveBlocks(long fromHeight, long toHeight) {
 
         int fromInt = (int) fromHeight;
         int count = (int) (toHeight - fromInt) + 1;
@@ -62,7 +62,6 @@ public class BulkExtractorImpl<T extends AbstractBlock> implements BulkExtractor
                 .flatMap(source -> source) // == merge()
                 .flatMap(hash -> client.getBlock(hash))
                 // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .cast(BitcoinBlock.class)
                 .flatMap(block -> repository.save(block));
 
         // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));

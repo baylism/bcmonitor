@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 
 @Component
 @Primary
-public class ReactiveBitcoinClient {
+public class ReactiveBitcoinClient implements ReactiveClient<BitcoinBlock, BitcoinTransaction> {
 
     @Value("${BITCOIN_HOSTNAME}")
     private String hostName;
