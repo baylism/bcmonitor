@@ -22,9 +22,10 @@ import reactor.core.publisher.Mono;
  *
  */
 @Repository
-public interface BlockRepository<T extends AbstractBlock> extends ReactiveMongoRepository<T, String>, BlockRepositoryCustom {
+public interface BlockRepository<T extends AbstractBlock> extends ReactiveMongoRepository<T, String>, BlockRepositoryCustom<T> {
 
     Mono<T> findByHeight(long height);
 
     Flux<T> findAllByHeightBetween(long fromHeight, long toHeight);
+
 }

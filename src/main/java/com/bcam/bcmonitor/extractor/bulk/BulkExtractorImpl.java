@@ -2,6 +2,7 @@ package com.bcam.bcmonitor.extractor.bulk;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.model.AbstractBlock;
+import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,18 +42,28 @@ public class BulkExtractorImpl<T extends AbstractBlock> implements BulkExtractor
         this.repository = repository;
     }
 
-
+    @Override
     public Flux<T> saveBlocks(long fromHeight, long toHeight) {
-
-        int fromInt = (int) fromHeight;
-        int count = (int) (toHeight - fromInt) + 1;
-
-        System.out.println("Count: " + count);
-
-        return Flux.range(fromInt, count)
-                .map(client::getBlockHash)
-                .flatMap(source -> source) // == merge()
-                .flatMap(client::getBlock)
-                .flatMap(block -> repository.save(block));
+        return null;
     }
+
+
+    // public Flux<BitcoinBlock> saveBlocks(long fromHeight, long toHeight) {
+    //
+    //     int fromInt = (int) fromHeight;
+    //     int count = (int) (toHeight - fromInt) + 1;
+    //
+    //     System.out.println("Count: " + count);
+    //
+    //     Flux<BitcoinBlock> blockFlux = Flux.range(fromInt, count)
+    //             .map(client::getBlockHash)
+    //             .flatMap(source -> source) // == merge()
+    //             .flatMap(hash -> client.getBlock(hash));
+    //
+    //     return blockFlux;
+    //
+    //     // blockFlux
+    //     //         .map(block -> repository.save());
+    //     // return repository.saveAll(blockFlux);
+    // }
 }

@@ -59,7 +59,7 @@ public class BitcoinBulkExtractorTest {
     ReactiveDashClient mockDashClient;
 
     @Autowired
-    BitcoinBulkExtractor bulkExtractor;
+    BulkExtractor<BitcoinBlock> bulkExtractor;
 
     @Autowired
     BlockRepository blockRepository;
@@ -67,120 +67,6 @@ public class BitcoinBulkExtractorTest {
     @Autowired
     ReactiveMongoOperations operations;
 
-
-    @Test
-    public void testSaveHashes() {
-
-        BlockchainInfo info1 = new BlockchainInfo();
-        info1.setBestblockhash("hash1");
-        info1.setBlocks(3L);
-
-        Mockito.when(mockBitcoinClient.getBlockchainInfo())
-                .thenReturn(Mono.just(info1));
-
-
-        Mockito.when(mockBitcoinClient.getBlockHash(0L))
-                .thenReturn(Mono.just("hash0"));
-
-        Mockito.when(mockBitcoinClient.getBlockHash(1L))
-                .thenReturn(Mono.just("hash1"));
-
-        Mockito.when(mockBitcoinClient.getBlockHash(2L))
-                .thenReturn(Mono.just("hash2"));
-
-
-        bulkExtractor.saveHashes(0L, 3L);
-
-        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 3L);
-
-        StepVerifier
-                .create(insertedBlocks)
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock);
-                    assertEquals("hash0", insertedBlock.getHash());
-                    assertEquals(0L, insertedBlock.getHeight());
-                })
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock);
-                    assertEquals("hash1", insertedBlock.getHash());
-                    assertEquals(1L, insertedBlock.getHeight());
-                })
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock);
-                    assertEquals("hash2", insertedBlock.getHash());
-                    assertEquals(2L, insertedBlock.getHeight());
-                })
-                .expectComplete()
-                .verify();
-    }
-
-    @Test
-    public void saveBlocksFromHashes() throws InterruptedException {
-
-        // insert some block hashes
-        Flux<BitcoinBlock> insertAll = operations.insertAll(
-                Flux.just(
-                        new BitcoinBlock("hash0", 0L),
-                        new BitcoinBlock("hash1", 1L),
-                        new BitcoinBlock("hash2", 2L)
-                ).collectList());
-
-        // run insertion test
-        StepVerifier
-                .create(insertAll)
-                .expectNextCount(3)
-                .verifyComplete();
-
-        //setup mock client
-        BitcoinBlock block0 = new BitcoinBlock("hash0", 0L);
-        block0.setConfirmations(2);
-
-        BitcoinBlock block1 = new BitcoinBlock("hash1", 1L);
-        block1.setConfirmations(1);
-
-        BitcoinBlock block2 = new BitcoinBlock("hash2", 2L);
-        block2.setConfirmations(0);
-
-        Mockito.when(mockBitcoinClient.getBlock("hash0"))
-                .thenReturn(Mono.just(block0));
-
-        Mockito.when(mockBitcoinClient.getBlock("hash1"))
-                .thenReturn(Mono.just(block1));
-
-        Mockito.when(mockBitcoinClient.getBlock("hash2"))
-                .thenReturn(Mono.just(block2));
-
-
-        Flux<BitcoinBlock> save = bulkExtractor.saveBlocksFromHashes(0L, 2L);
-
-        save.blockLast();
-
-        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
-
-        StepVerifier
-                .create(insertedBlocks)
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
-                    assertEquals("hash0", insertedBlock.getHash());
-                    assertEquals(0L, insertedBlock.getHeight());
-                    assertEquals(2, insertedBlock.getConfirmations());
-                })
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
-                    assertEquals("hash1", insertedBlock.getHash());
-                    assertEquals(1L, insertedBlock.getHeight());
-                    assertEquals(1, insertedBlock.getConfirmations());
-
-                })
-                .assertNext(insertedBlock -> {
-                    logger.info("Got block " + insertedBlock + "confirmations " + insertedBlock.getConfirmations());
-                    assertEquals("hash2", insertedBlock.getHash());
-                    assertEquals(2L, insertedBlock.getHeight());
-                    assertEquals(0, insertedBlock.getConfirmations());
-                })
-                .expectComplete()
-                .verify();
-    }
 
     @Test
     public void saveBlocks() throws InterruptedException {
@@ -216,8 +102,6 @@ public class BitcoinBulkExtractorTest {
 
         Mockito.when(mockBitcoinClient.getBlock("hash2"))
                 .thenReturn(Mono.just(block2));
-
-
 
 
         Flux<BitcoinBlock> save = bulkExtractor.saveBlocks(0L, 2L);

@@ -1,7 +1,5 @@
 package com.bcam.bcmonitor.storage;
 
-import com.bcam.bcmonitor.extractor.bulk.BitcoinBulkExtractor;
-import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.bson.Document;
@@ -22,9 +20,8 @@ import reactor.test.StepVerifier;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -36,7 +33,7 @@ public class BlockRepositoryTest {
 
 
     @Autowired
-    BlockRepository blockRepository;
+    BlockRepository<BitcoinBlock> blockRepository;
 
     @Autowired
     ReactiveMongoOperations operations;
@@ -69,18 +66,24 @@ public class BlockRepositoryTest {
                 .expectNextCount(1)
                 .verifyComplete();
 
-        // insert some blocks
-        Flux<BitcoinBlock> insertAll = operations.insertAll(
-                Flux.just(
-                        new BitcoinBlock("foo", 0L),
-                        new BitcoinBlock("bar", 1L),
-                        new BitcoinBlock("baz", 2L)
-                ).collectList());
+        Mono<Long> saveAndCount = blockRepository.count()
+                .doOnNext(System.out::println)
+                .thenMany(
+                        blockRepository.saveAll(
+                                Flux.just(
+                                        new BitcoinBlock("foo", 0L),
+                                        new BitcoinBlock("bar", 1L),
+                                        new BitcoinBlock("baz", 2L)
+                                )
+                        )
+                )
+                .last()
+                .flatMap(v -> blockRepository.count())
+                .doOnNext(System.out::println);
 
-        // run insertion test
         StepVerifier
-                .create(insertAll)
-                .expectNextCount(3)
+                .create(saveAndCount)
+                .expectNext(3L)
                 .verifyComplete();
 
     }
@@ -105,7 +108,7 @@ public class BlockRepositoryTest {
 
         StepVerifier
                 .create(saveAndCount)
-                .expectNext(6L)
+                .expectNext(
                 .verifyComplete();
     }
 
@@ -113,13 +116,12 @@ public class BlockRepositoryTest {
     @Test
     public void findByHeight() {
 
-
         Mono<BitcoinBlock> insertedBlockMono = blockRepository.findByHeight(1L);
 
         StepVerifier
                 .create(insertedBlockMono)
                 .assertNext(insertedBlock -> {
-                    assertEquals("bar", insertedBlock.getHash());
+                    assertEquals("add2", insertedBlock.getHash());
                     assertEquals(1L, insertedBlock.getHeight());
                 })
                 .expectComplete()
