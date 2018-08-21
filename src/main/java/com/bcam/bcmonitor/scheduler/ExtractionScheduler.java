@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import static com.bcam.bcmonitor.model.Blockchain.*;
 
@@ -35,13 +36,6 @@ public class ExtractionScheduler {
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
     }
 
-
-    // @Scheduled(fixedRate = 1000L)
-    // public void updateTips() {
-    //     blockchainTracker.updateChainTips();
-    // }
-
-
     // separate for each blockchain so have different rates?
     @Scheduled(fixedRate = 2000L)
     public void updateHashes() {
@@ -58,7 +52,8 @@ public class ExtractionScheduler {
 
             long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
 
-            // bitcoinBulkExtractor.saveHashes(fromHeight, bestHeight);
+            Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
+
         }
     }
 
