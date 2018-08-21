@@ -4,6 +4,7 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class DashController {
     private ReactiveDashClient client;
 
     @Autowired
-    public DashController(ReactiveDashClient client) {
+    public DashController(@Qualifier("ReactiveDashClient") ReactiveDashClient client) {
         this.client = client;
     }
 

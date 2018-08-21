@@ -7,6 +7,7 @@ import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,10 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
-
+@Qualifier("ReactiveBitcoinClient")
 @Component
 @Primary
-public class ReactiveBitcoinClient implements ReactiveClient<BitcoinBlock, BitcoinTransaction> {
+public class ReactiveBitcoinClient extends ReactiveClientImpl {
 
     @Value("${BITCOIN_HOSTNAME}")
     private String hostName;

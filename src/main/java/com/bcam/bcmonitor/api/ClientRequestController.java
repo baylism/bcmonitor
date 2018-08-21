@@ -4,6 +4,7 @@ import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,12 +15,17 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api")
 public class ClientRequestController {
 
+    @Qualifier("ReactiveZCashClient")
     private ReactiveZCashClient zCashClient;
     private ReactiveDashClient dashClient;
     private ReactiveBitcoinClient bitcoinClient;
 
     @Autowired
-    public ClientRequestController(ReactiveZCashClient zCashClient, ReactiveDashClient dashClient, ReactiveBitcoinClient bitcoinClient) {
+    public ClientRequestController(
+            @Qualifier("ReactiveZCashClient") ReactiveZCashClient zCashClient,
+            @Qualifier("ReactiveDashClient")ReactiveDashClient dashClient,
+            @Qualifier("ReactiveBitcoinClient")ReactiveBitcoinClient bitcoinClient
+    ) {
         this.zCashClient = zCashClient;
         this.dashClient = dashClient;
         this.bitcoinClient = bitcoinClient;

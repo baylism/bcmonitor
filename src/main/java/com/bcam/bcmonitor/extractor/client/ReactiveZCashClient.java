@@ -6,6 +6,7 @@ import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -21,6 +22,7 @@ import javax.annotation.PostConstruct;
  *
  * the account parameter exists in the API, please use “” as its value, otherwise an error will be returned
  */
+@Qualifier("ReactiveZCashClient")
 @Component
 public class ReactiveZCashClient extends ReactiveBitcoinClient {
 

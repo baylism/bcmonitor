@@ -4,6 +4,7 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +15,11 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/zcash")
 public class ZCashController {
 
+    @Qualifier("reactiveDashClient")
     private ReactiveZCashClient client;
 
     @Autowired
-    public ZCashController(ReactiveZCashClient client) {
+    public ZCashController(@Qualifier("ReactiveZCashClient") ReactiveZCashClient client) {
         this.client = client;
     }
 

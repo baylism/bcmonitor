@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
-
+@Deprecated
 @Component
 public class ReactiveClientGenerix<B, T> {
 

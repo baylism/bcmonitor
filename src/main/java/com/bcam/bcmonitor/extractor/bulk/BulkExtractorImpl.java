@@ -5,6 +5,8 @@ import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.AbstractTransaction;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -29,6 +31,8 @@ import reactor.core.publisher.Flux;
 @Component
 public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransaction> implements BulkExtractor<B, T> {
 
+    private static final Logger logger = LoggerFactory.getLogger(BulkExtractorImpl.class);
+
     final private BlockRepository<B> blockRepository;
     final private TransactionRepository<T> transactionRepository;
 
@@ -52,17 +56,16 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
         int fromInt = (int) fromHeight;
         int count = (int) (toHeight - fromInt) + 1;
 
-        // logger.info("Count: " + count);
+        logger.info("Count: " + count);
 
         return Flux.range(fromInt, count)
                 .map(client::getBlockHash)
-                // .doOnNext(hash -> logger.info("Got hash " + hash))
+                .doOnNext(hash -> logger.info("Got hash " + hash))
                 .flatMap(source -> source) // == merge()
                 .flatMap(client::getBlock)
-                // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(blockRepository::save);
-
-        // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                .flatMap(blockRepository::save)
+                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
 

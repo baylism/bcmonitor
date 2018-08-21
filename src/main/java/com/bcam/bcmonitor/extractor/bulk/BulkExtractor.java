@@ -7,6 +7,8 @@ import reactor.core.publisher.Flux;
 
 public interface BulkExtractor<B, T> {
 
-    public Flux<B> saveBlocks(long fromHeight, long toHeight);
+    Flux<B> saveBlocks(long fromHeight, long toHeight);
+
+    Flux<T> saveTransactions(Flux<B> blocks);
 
 }
