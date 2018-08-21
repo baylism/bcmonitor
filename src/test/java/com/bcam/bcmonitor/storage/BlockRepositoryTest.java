@@ -28,49 +28,17 @@ public class BlockRepositoryTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockRepositoryTest.class);
 
-
     @Autowired
     BlockRepository<BitcoinBlock> blockRepository;
-
-    @Autowired
-    ReactiveMongoOperations operations;
-
-
-
-    // @Before
-    // public void before() {
-    //     // StepVerifier.create(operations.execute(it -> it.serverCommands().flushDb())).expectNext("OK").verifyComplete();
-    // }
 
 
     @Before
     public void setUp() {
 
-        // // check if block collection exists
-        // Mono<Boolean> alreadyExists = operations.collectionExists(BitcoinBlock.class);
-        //
-        // // if it does, drop collection then recreate. Else just create.
-        // Mono<MongoCollection<Document>> recreateCollection = alreadyExists
-        //         .flatMap(yes -> yes ? operations.dropCollection(BitcoinBlock.class) : Mono.just(alreadyExists))
-        //         .then(operations.createCollection(BitcoinBlock.class, CollectionOptions.empty()
-        //                 .size(1024 * 1024)
-        //                 .maxDocuments(100)));
-        //
-        // // run recreation test
-        // StepVerifier
-        //         .create(recreateCollection)
-        //         .expectNextCount(1)
-        //         .verifyComplete();
-        //
-        //
-        // logger.info("already exists? " + alreadyExists.block());
-
-
         Mono<Void> delete = blockRepository.deleteAll();
 
         StepVerifier
                 .create(delete)
-                // .expectNextCount(1)
                 .verifyComplete();
 
         Mono<Long> saveAndCount = blockRepository.count()
