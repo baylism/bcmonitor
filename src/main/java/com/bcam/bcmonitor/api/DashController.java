@@ -24,10 +24,6 @@ public class DashController {
         this.client = client;
     }
 
-    // public DashController(@Qualifier("ReactiveDashClient") ReactiveDashClient client) {
-    //     this.client = client;
-    // }
-
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
     Mono<DashBlock> getBlock(@PathVariable String hash) {

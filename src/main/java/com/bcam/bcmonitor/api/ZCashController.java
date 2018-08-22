@@ -1,11 +1,11 @@
 package com.bcam.bcmonitor.api;
 
 
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BlockRepository;
+import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,22 +16,30 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/zcash")
 public class ZCashController {
 
-    // @Qualifier("reactiveDashClient")
     private ReactiveZCashClient client;
 
+    private BlockRepository<ZCashBlock> blockRepository;
+    private TransactionRepository<ZCashTransaction> transactionRepository;
+
     @Autowired
-    public ZCashController(ReactiveZCashClient client) {
+    public ZCashController(ReactiveZCashClient client, BlockRepository<ZCashBlock> blockRepository, TransactionRepository<ZCashTransaction> transactionRepository) {
         this.client = client;
+        this.blockRepository = blockRepository;
+        this.transactionRepository = transactionRepository;
     }
-    // @Autowired
-    // public ZCashController(@Qualifier("ReactiveZCashClient") ReactiveZCashClient client) {
-    //     this.client = client;
-    // }
+
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
     Mono<ZCashBlock> getBlock(@PathVariable String hash) {
-        return client.getBlock(hash);
+
+        return blockRepository
+                .findById(hash)
+                .doOnNext(b -> System.out.println("block from repo" + b))
+                .switchIfEmpty(client.getBlock(hash))
+                .doOnNext(b -> System.out.println("block from client" + b));
+
+        // return client.getBlock(hash);
     }
 
     @GetMapping("/transaction/{hash}")
