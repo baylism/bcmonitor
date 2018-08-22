@@ -17,5 +17,4 @@ public interface ReactiveClient<B extends AbstractBlock, T extends AbstractTrans
 
     Mono<BlockchainInfo> getBlockchainInfo();
 
-
 }

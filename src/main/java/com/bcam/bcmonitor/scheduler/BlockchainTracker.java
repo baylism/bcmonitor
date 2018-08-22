@@ -1,11 +1,14 @@
 package com.bcam.bcmonitor.scheduler;
 
-import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
+import com.bcam.bcmonitor.extractor.client.*;
 import com.bcam.bcmonitor.model.Blockchain;
+import com.bcam.bcmonitor.model.BlockchainInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,9 +18,22 @@ import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
 
 /**
  * Class to keep track of current blockchain status
+ * <p>
+ * <p>
+ * blocks:
+ * current height
+ * last synced
+ * <p>
+ * transactions:
+ * transactions synced up to block height
  */
 @Component
 public class BlockchainTracker {
+
+    private static final Logger logger = LoggerFactory.getLogger(BlockchainTracker.class);
+
+
+    Mono<Long> tip;
 
     private ConcurrentHashMap<Blockchain, Long> tips;
     private ConcurrentHashMap<Blockchain, Long> lastSynced;
@@ -44,11 +60,37 @@ public class BlockchainTracker {
     }
 
     public void updateChainTips() {
-        tips.put(BITCOIN, bitcoinClient.getBlockchainInfo().block().getBlocks());
-        tips.put(DASH, dashClient.getBlockchainInfo().block().getBlocks());
-        tips.put(ZCASH, zCashClient.getBlockchainInfo().block().getBlocks());
+        // Mono<BlockchainInfo> bcinfo = bitcoinClient.getBlockchainInfo();
+
+        logger.info("Calling update tips");
+
+        tips.forEachKey(Long.MAX_VALUE, this::updateTip);
+
     }
 
+    private void updateTip(Blockchain blockchain) {
+
+        logger.info("Updating client for " + blockchain);
+
+        Long newTip = getClient(blockchain).getBlockchainInfo().block().getBlocks();
+        tips.put(blockchain, newTip);
+
+        logger.info("Updated client for " + blockchain + " to " + newTip);
+
+    }
+
+    private ReactiveClientImpl getClient(Blockchain blockchain) {
+        switch (blockchain) {
+            case DASH:
+                return dashClient;
+            case ZCASH:
+                return zCashClient;
+            case BITCOIN:
+                return bitcoinClient;
+            default:
+                throw new RuntimeException("can't find client");
+        }
+    }
 
     public Long getTipFor(Blockchain blockchain) {
         return tips.get(blockchain);
@@ -57,4 +99,5 @@ public class BlockchainTracker {
     public long getLastSyncedFor(Blockchain blockchain) {
         return lastSynced.get(blockchain);
     }
+
 }

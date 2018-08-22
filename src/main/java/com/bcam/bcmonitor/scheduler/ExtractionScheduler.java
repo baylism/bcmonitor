@@ -1,19 +1,13 @@
 package com.bcam.bcmonitor.scheduler;
 
 import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
-import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
-import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
+import com.bcam.bcmonitor.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
-import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 
 /**
  *
@@ -25,47 +19,74 @@ import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 @Component
 public class ExtractionScheduler {
 
-    // private BlockchainTrackerGeneric<BitcoinBlock> bitcoinTracker;
-    // private BlockchainTrackerGeneric<ReactiveZCashClient> zCashTracker;
+    private static final Logger logger = LoggerFactory.getLogger(ExtractionScheduler.class);
 
-    private BlockchainTracker blockchainTracker;
+
     // start extracting blocks from this height
     private Long initialOffset;
 
     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
+    private BlockchainTracker tracker;
+
 
     @Autowired
     public ExtractionScheduler(
             BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor,
-            BlockchainTracker blockchainTracker
-            // BlockchainTrackerGeneric<BitcoinBlock> bitcoinTracker
-    ) {
-        this.blockchainTracker = blockchainTracker;
+            BlockchainTracker tracker) {
 
-        initialOffset = 100L;
 
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
-
+        this.tracker = tracker;
     }
 
     @Scheduled(fixedRate = 2000L)
-    public void syncBlocks() {
+    public void updateTrackers() {
 
-        // get current height
-        blockchainTracker.updateChainTips();
+        tracker.updateChainTips();
 
-        // check whether synced up to best height
-        // long bestHeight = blockchainTracker.getTips();
-        // long lastSynced = blockchainTracker.getLastSynced();
+    }
 
-        // // if not synced up to best height
-        // if (lastSynced < bestHeight) {
-        //
-        //     long fromHeight = lastSynced > initialOffset ? lastSynced : initialOffset;
-        //
-        //     Mono<Void> completed = bitcoinBulkExtractor.saveBlocks(fromHeight, bestHeight).then();
-        //
-        // }
+    public void foo() {
+        logger.info(tracker.getClass().toString());
+
     }
 
 }
+
+// @Profile("scheduler")  // prevent scheduler from unless we need it
+// @Component
+// public class ExtractionScheduler {
+//
+//     private static final Logger logger = LoggerFactory.getLogger(ExtractionScheduler.class);
+//
+//
+//     // start extracting blocks from this height
+//     private Long initialOffset;
+//
+//     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
+//     private BlockchainTrackerSingle<BitcoinBlock, BitcoinTransaction> bitcoinTracker;
+//
+//
+//     @Autowired
+//     public ExtractionScheduler(
+//             BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor,
+//             BlockchainTrackerSingle<BitcoinBlock, BitcoinTransaction> bitcoinTracker) {
+//
+//
+//         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
+//         this.bitcoinTracker = bitcoinTracker;
+//     }
+//
+//     @Scheduled(fixedRate = 2000L)
+//     public void updateTrackers() {
+//
+//         bitcoinTracker.updateChainTip();
+//
+//     }
+//
+//     public void foo() {
+//         logger.info(bitcoinTracker.getClass().toString());
+//
+//     }
+//
+// }

@@ -1,4 +1,4 @@
-package com.bcam.bcmonitor;
+package com.bcam.bcmonitor.configurations;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.scheduler.ExtractionScheduler;

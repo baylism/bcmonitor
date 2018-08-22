@@ -42,12 +42,10 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     public BulkExtractorImpl(
             BlockRepository<B> repository,
             TransactionRepository<T> transactionRepository,
-            ReactiveClient<B, T> client
-    ) {
+            ReactiveClient<B, T> client) {
 
-        this.transactionRepository = transactionRepository;
         this.blockRepository = repository;
-
+        this.transactionRepository = transactionRepository;
         this.client = client;
     }
 
@@ -61,12 +59,12 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
         return Flux.range(fromInt, count)
                 .map(client::getBlockHash)
-                .doOnNext(hash -> logger.info("Got hash " + hash))
+                // .doOnNext(hash -> logger.info("Got hash " + hash))
                 .flatMap(source -> source) // == merge()
                 .flatMap(client::getBlock)
-                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(blockRepository::save)
-                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                .flatMap(blockRepository::save);
+                // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
 
