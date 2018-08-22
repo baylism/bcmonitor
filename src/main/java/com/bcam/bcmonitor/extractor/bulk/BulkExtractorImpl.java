@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 
 /**
@@ -58,23 +61,75 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
         logger.info("Count: " + count);
 
         return Flux.range(fromInt, count)
-                .map(client::getBlockHash)
-                // .doOnNext(hash -> logger.info("Got hash " + hash))
-                .flatMap(source -> source) // == merge()
+                .flatMap(client::getBlockHash)
+                .doOnNext(hash -> logger.info("Got block hash from client " + hash))
+                // .flatMap(source -> source) // == merge()
                 .flatMap(client::getBlock)
-                // .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(blockRepository::save);
-                // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                .flatMap(blockRepository::save)
+                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
+
+    public Flux<T> saveTransactions(B block) {
+        return Flux.fromIterable(block.getTxids())
+                .doOnNext(txids -> logger.info("Got txids " + txids))
+                .flatMap(client::getTransaction)
+                .doOnNext(txids -> logger.info("Created transactions from client " + txids))
+                // .flatMap(source -> source) // == merge()
+                .flatMap(transactionRepository::save)
+                .doOnNext(txids -> logger.info("Saved txids " + txids));
+
+    }
+
 
     public Flux<T> saveTransactions(Flux<B> blocks) {
 
         return blocks
-                .map(block -> block.getTxids())
-                .flatMap(listIds -> Flux.fromIterable(listIds))
-                .flatMap(id -> client.getTransaction(id))
-                .flatMap(bitcoinTransaction -> transactionRepository.save(bitcoinTransaction));
+                .map(AbstractBlock::getTxids)
+                .flatMap(Flux::fromIterable)
+                .flatMap(client::getTransaction)
+                .flatMap(transactionRepository::save);
     }
 
+
+    public Disposable saveBlocksAndTransactions(long fromHeight, long toHeight) {
+
+        return saveBlocks(fromHeight, toHeight)
+                .doOnNext(
+                        block -> {
+                            saveTransactions(block)
+                                    .subscribe(transaction -> logger.info("Saved transaction " + transaction));
+                        }
+                )
+                .subscribe(block -> logger.info("Saved block " + block));
+
+    }
+
+
+    /**
+     * Flux<String> ids = ifhrIds();
+     *
+     * Flux<String> combinations =
+     *                 ids.flatMap(id -> {
+     *                         Mono<String> nameTask = ifhrName(id);
+     *                         Mono<Integer> statTask = ifhrStat(id);
+     *
+     *                         return nameTask.zipWith(statTask,
+     *                                         (name, stat) -> "Name " + name + " has stats " + stat);
+     *                 });
+     *
+     * Mono<List<String>> result = combinations.collectList();
+     *
+     * List<String> results = result.block();
+     * assertThat(results).containsExactly(
+     *                 "Name NameJoe has stats 103",
+     *                 "Name NameBart has stats 104",
+     *                 "Name NameHenry has stats 105",
+     *                 "Name NameNicole has stats 106",
+     *
+     *
+     *                 also :
+     *                 Example of Reactor code with timeout and fallback
+     */
 }

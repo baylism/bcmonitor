@@ -44,7 +44,7 @@ public class ExtractionSchedulerTest {
     ReactiveDashClient mockDashClient;
 
     @Test
-    public void testAutowire() throws InterruptedException {
+    public void testSyncTips() throws InterruptedException {
 
         BlockchainInfo info = new BlockchainInfo();
         info.setBlocks(0L);
@@ -56,7 +56,7 @@ public class ExtractionSchedulerTest {
                             @Override
                             public Mono<BlockchainInfo> answer(InvocationOnMock invocation) throws InterruptedException {
                                 logger.info("Bitcoin client about to sleep");
-                                Thread.sleep(10000);
+                                Thread.sleep(2000);
                                 return Mono.just(info);
                             }
                         }
@@ -71,12 +71,50 @@ public class ExtractionSchedulerTest {
                 // .thenThrow(new RuntimeException("THRWOM zc"))
                 .thenReturn(Mono.just(info));
 
-        logger.info("Runnning");
+        logger.info("Runnning scheduler");
 
-        Thread.sleep(20000L);
+        // let scheduler run
+        Thread.sleep(5000L);
 
         scheduler.foo();
 
-
     }
+
+
+    // @Test
+    // public void testSyncBlocks() throws InterruptedException {
+    //
+    //     BlockchainInfo info = new BlockchainInfo();
+    //     info.setBlocks(0L);
+    //
+    //     //setup mock client
+    //     Mockito.when(mockBitcoinClient.getBlockchainInfo())
+    //             .thenAnswer(
+    //                     new Answer<Mono<BlockchainInfo>>() {
+    //                         @Override
+    //                         public Mono<BlockchainInfo> answer(InvocationOnMock invocation) throws InterruptedException {
+    //                             logger.info("Bitcoin client about to sleep");
+    //                             Thread.sleep(10000);
+    //                             return Mono.just(info);
+    //                         }
+    //                     }
+    //             );
+    //
+    //
+    //     Mockito.when(mockDashClient.getBlockchainInfo())
+    //             // .thenThrow(new RuntimeException("THRWOM dash"))
+    //             .thenReturn(Mono.just(info));
+    //
+    //     Mockito.when(mockZCashClient.getBlockchainInfo())
+    //             // .thenThrow(new RuntimeException("THRWOM zc"))
+    //             .thenReturn(Mono.just(info));
+    //
+    //     logger.info("Runnning");
+    //
+    //     Thread.sleep(20000L);
+    //
+    //     scheduler.foo();
+    //
+    //
+    // }
 }

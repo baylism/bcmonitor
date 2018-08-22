@@ -1,11 +1,9 @@
 package com.bcam.bcmonitor.extractor.bulk;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
+import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.ZCashBlock;
-import com.bcam.bcmonitor.model.ZCashTransaction;
+import com.bcam.bcmonitor.model.*;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +35,19 @@ public class BulkExtractorConfiguration {
                 blockBlockRepository,
                 transactionRepository,
                 reactiveZCashClient
+        );
+    }
+
+    @Bean
+    public BulkExtractor<DashBlock, DashTransaction> dashBulkExtractor(
+            ReactiveDashClient reactiveDashClient,
+            BlockRepository<DashBlock> blockBlockRepository,
+            TransactionRepository<DashTransaction> transactionRepository) {
+
+        return new BulkExtractorImpl<>(
+                blockBlockRepository,
+                transactionRepository,
+                reactiveDashClient
         );
     }
 }

@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.scheduler;
 
 import com.bcam.bcmonitor.extractor.client.*;
+import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.Blockchain;
 import com.bcam.bcmonitor.model.BlockchainInfo;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +45,7 @@ public class BlockchainTracker {
 
     @Autowired
     public BlockchainTracker(ReactiveBitcoinClient bitcoinClient, ReactiveDashClient dashClient, ReactiveZCashClient zCashClient) {
+
         this.bitcoinClient = bitcoinClient;
         this.dashClient = dashClient;
         this.zCashClient = zCashClient;
@@ -73,12 +76,14 @@ public class BlockchainTracker {
 
         logger.info("Updating client for " + blockchain);
 
+        // check for increase?
         Long newTip = getClient(blockchain).getBlockchainInfo().block().getBlocks();
         tips.put(blockchain, newTip);
 
         logger.info("Updated client for " + blockchain + " to " + newTip);
 
     }
+
 
     private ReactiveClientImpl getClient(Blockchain blockchain) {
         switch (blockchain) {
