@@ -15,7 +15,7 @@ import static com.bcam.bcmonitor.model.Blockchain.*;
  * should take generic bulk extractors in array?
  * or better to wire up each separately?
  */
-@Profile("scheduler")  // prevent scheduler from unless we need it
+// @Profile("scheduler")  // prevent scheduler from unless we need it
 @Component
 public class ExtractionScheduler {
 
@@ -30,7 +30,6 @@ public class ExtractionScheduler {
     private BulkExtractor<DashBlock, DashTransaction> dashBulkExtractor;
 
     private BlockchainTracker tracker;
-
 
     @Autowired
     public ExtractionScheduler(

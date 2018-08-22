@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.constraints.Null;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
@@ -76,10 +77,20 @@ public class BlockchainTracker {
         logger.info("Updating client for " + blockchain);
 
         // check for increase?
-        Long newTip = getClient(blockchain).getBlockchainInfo().block().getBlocks();
-        tips.put(blockchain, newTip);
+        try {
+            Long newTip = getClient(blockchain).getBlockchainInfo().block().getBlocks();
 
-        logger.info("Updated client for " + blockchain + " to " + newTip);
+            tips.put(blockchain, newTip);
+            logger.info("Updated client for " + blockchain + " to " + newTip);
+
+        } catch (NullPointerException e){
+
+            logger.info("Couldn't get tip " + e);
+            return;
+
+        }
+
+
 
     }
 

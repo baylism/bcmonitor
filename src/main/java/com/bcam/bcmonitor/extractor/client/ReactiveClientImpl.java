@@ -45,6 +45,10 @@ public abstract class ReactiveClientImpl {
     public Mono<BlockchainInfo> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
+        BlockchainInfo info = new BlockchainInfo();
+        info.setBlocks(0L);
+
+        // return Mono.just(info);
         return getClient()
                 .requestResponseSpec(request.toString())
                 .bodyToMono(BlockchainInfo.class);
