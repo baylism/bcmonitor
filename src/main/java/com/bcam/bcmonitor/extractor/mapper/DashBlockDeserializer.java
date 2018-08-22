@@ -39,6 +39,8 @@ public class DashBlockDeserializer extends BlockchainDeserializer<DashBlock> {
         block.setTimeStamp(result.get("time").asLong());
         block.setPrevBlockHash(result.get("previousblockhash").asText());
 
+        block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
         // for now, just add TXIDs
         ArrayList<String> txids = new ArrayList<>();
         result.get("tx").forEach(jsonNode -> txids.add(jsonNode.asText()));

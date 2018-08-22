@@ -29,6 +29,8 @@ public class EthereumBlockDeserializer extends BlockchainDeserializer<EthereumBl
         block.setTimeStamp(hexNodeToLong(node.get("timestamp")));
         block.setPrevBlockHash(node.get("parentHash").textValue());
 
+        block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
         // eth
         block.setGasLimit(hexNodeToBigInt(node.get("gasLimit")));
         block.setGasUsed(hexNodeToBigInt(node.get("gasUsed")));

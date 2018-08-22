@@ -44,6 +44,7 @@ public class DashTransactionDeserializer extends StdDeserializer<DashTransaction
         transaction.setHash(result.get("txid").asText());
         transaction.setSizeBytes(result.get("size").asInt());
         transaction.setBlockHash(result.get("blockhash").asText());
+        transaction.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
 
         transaction.setVin(readInputs(result));
         transaction.setVout(readOutputs(result));

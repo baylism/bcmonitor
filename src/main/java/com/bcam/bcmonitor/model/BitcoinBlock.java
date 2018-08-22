@@ -16,8 +16,7 @@ public class BitcoinBlock extends AbstractBlock {
     private BigInteger chainWork;
     private int confirmations; // 1 at best chain tip, -1 not in best chain
 
-    public BitcoinBlock() {
-    }
+    public BitcoinBlock() { }
 
     public BitcoinBlock(String hash, long height) {
         super(hash, height);

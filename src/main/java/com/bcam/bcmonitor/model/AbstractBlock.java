@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Document
 public abstract class AbstractBlock {
@@ -21,6 +22,7 @@ public abstract class AbstractBlock {
     private long sizeBytes;
 
     private BigDecimal difficulty;
+    private long timeReceived;
     private ArrayList<String> minerHashes;
 
     private ArrayList<AbstractTransaction> transactions;
@@ -45,6 +47,15 @@ public abstract class AbstractBlock {
         minerHashes = new ArrayList<>();
         transactions = new ArrayList<>();
         txids = new ArrayList<>();
+    }
+
+
+    public long getTimeReceived() {
+        return timeReceived;
+    }
+
+    public void setTimeReceived(long timeReceived) {
+        this.timeReceived = timeReceived;
     }
 
     public String getHash() {

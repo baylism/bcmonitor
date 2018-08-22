@@ -10,9 +10,9 @@ public abstract class AbstractTransaction {
     private String hash;
     private String blockHash;
 
-    private int timeReceived;
-    private int timeInBlock;
-    private int timeConfirmed;
+    private long timeReceived;
+    private long timeInBlock;
+    private long timeConfirmed;
 
     public AbstractTransaction(String hash) {
         this.hash = hash;
@@ -40,27 +40,27 @@ public abstract class AbstractTransaction {
         this.hash = hash;
     }
 
-    public int getTimeReceived() {
+    public long getTimeReceived() {
         return timeReceived;
     }
 
-    public void setTimeReceived(int timeReceived) {
+    public void setTimeReceived(long timeReceived) {
         this.timeReceived = timeReceived;
     }
 
-    public int getTimeInBlock() {
+    public long getTimeInBlock() {
         return timeInBlock;
     }
 
-    public void setTimeInBlock(int timeInBlock) {
+    public void setTimeInBlock(long timeInBlock) {
         this.timeInBlock = timeInBlock;
     }
 
-    public int getTimeConfirmed() {
+    public long getTimeConfirmed() {
         return timeConfirmed;
     }
 
-    public void setTimeConfirmed(int timeConfirmed) {
+    public void setTimeConfirmed(long timeConfirmed) {
         this.timeConfirmed = timeConfirmed;
     }
 
