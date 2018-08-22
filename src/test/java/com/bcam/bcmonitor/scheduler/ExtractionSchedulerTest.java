@@ -55,7 +55,8 @@ public class ExtractionSchedulerTest {
                         new Answer<Mono<BlockchainInfo>>() {
                             @Override
                             public Mono<BlockchainInfo> answer(InvocationOnMock invocation) throws InterruptedException {
-                                // Thread.sleep(5000);
+                                logger.info("Bitcoin client about to sleep");
+                                Thread.sleep(10000);
                                 return Mono.just(info);
                             }
                         }
@@ -64,19 +65,15 @@ public class ExtractionSchedulerTest {
 
         Mockito.when(mockDashClient.getBlockchainInfo())
                 // .thenThrow(new RuntimeException("THRWOM dash"))
-                .
-
-                        thenReturn(Mono.just(info));
+                .thenReturn(Mono.just(info));
 
         Mockito.when(mockZCashClient.getBlockchainInfo())
                 // .thenThrow(new RuntimeException("THRWOM zc"))
-                .
-
-                        thenReturn(Mono.just(info));
+                .thenReturn(Mono.just(info));
 
         logger.info("Runnning");
 
-        Thread.sleep(10000L);
+        Thread.sleep(20000L);
 
         scheduler.foo();
 

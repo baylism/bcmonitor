@@ -39,7 +39,7 @@ public class ExtractionScheduler {
         this.tracker = tracker;
     }
 
-    @Scheduled(fixedRate = 2000L)
+    @Scheduled(initialDelay = 1000L, fixedRate = 2000L)
     public void updateTrackers() {
 
         tracker.updateChainTips();

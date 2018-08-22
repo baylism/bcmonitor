@@ -32,7 +32,6 @@ public class BlockchainTracker {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockchainTracker.class);
 
-
     Mono<Long> tip;
 
     private ConcurrentHashMap<Blockchain, Long> tips;
@@ -59,6 +58,7 @@ public class BlockchainTracker {
         lastSynced.put(ZCASH, 0L);
     }
 
+    @Async
     public void updateChainTips() {
         // Mono<BlockchainInfo> bcinfo = bitcoinClient.getBlockchainInfo();
 
@@ -68,7 +68,8 @@ public class BlockchainTracker {
 
     }
 
-    private void updateTip(Blockchain blockchain) {
+    @Async
+    public void updateTip(Blockchain blockchain) {
 
         logger.info("Updating client for " + blockchain);
 
