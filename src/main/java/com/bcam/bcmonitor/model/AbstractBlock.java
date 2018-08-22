@@ -12,11 +12,12 @@ import java.util.Date;
 public abstract class AbstractBlock {
 
     @Id
+    @Indexed
     private String hash; // in RPC byte order
 
     private String prevBlockHash;
 
-    @Indexed
+    // @Indexed
     private long height;
     private long timeStamp;
     private long sizeBytes;

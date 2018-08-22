@@ -1,10 +1,13 @@
 package com.bcam.bcmonitor.api;
 
 
+import com.bcam.bcmonitor.extractor.bulk.BulkExtractorImpl;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +19,8 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/zcash")
 public class ZCashController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZCashController.class);
+
     private ReactiveZCashClient client;
 
     private BlockRepository<ZCashBlock> blockRepository;
@@ -23,7 +28,9 @@ public class ZCashController {
 
     @Autowired
     public ZCashController(ReactiveZCashClient client, BlockRepository<ZCashBlock> blockRepository, TransactionRepository<ZCashTransaction> transactionRepository) {
+
         this.client = client;
+
         this.blockRepository = blockRepository;
         this.transactionRepository = transactionRepository;
     }
@@ -35,17 +42,16 @@ public class ZCashController {
 
         return blockRepository
                 .findById(hash)
-                .doOnNext(b -> System.out.println("block from repo" + b))
-                .switchIfEmpty(client.getBlock(hash))
-                .doOnNext(b -> System.out.println("block from client" + b));
+                .switchIfEmpty(client.getBlock(hash));
 
-        // return client.getBlock(hash);
     }
 
     @GetMapping("/transaction/{hash}")
     Mono<ZCashTransaction> getTransaction(@PathVariable String hash) {
 
-        return client.getTransaction(hash);
+        return transactionRepository
+                .findById(hash)
+                .switchIfEmpty(client.getTransaction(hash));
     }
 
 

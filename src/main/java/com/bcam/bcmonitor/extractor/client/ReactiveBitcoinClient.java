@@ -72,8 +72,6 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl implements Reactiv
         request.addParam(hash);
         request.addParam(2); // always request decoded JSON with transactions
 
-        System.out.println(request);
-
         return client
                 .requestResponseSpec(request.toString())
                 .bodyToMono(BitcoinBlock.class);

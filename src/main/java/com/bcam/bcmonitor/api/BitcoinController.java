@@ -2,8 +2,11 @@ package com.bcam.bcmonitor.api;
 
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
-import com.bcam.bcmonitor.extractor.client.ReactiveClientImpl;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BlockRepository;
+import com.bcam.bcmonitor.storage.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,22 +18,37 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/bitcoin")
 public class BitcoinController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BitcoinController.class);
+
     private ReactiveBitcoinClient client;
 
+    private BlockRepository<BitcoinBlock> blockRepository;
+    private TransactionRepository<BitcoinTransaction> transactionRepository;
+
     @Autowired
-    public BitcoinController(ReactiveBitcoinClient client) {
+    public BitcoinController(ReactiveBitcoinClient client, BlockRepository<BitcoinBlock> blockRepository, TransactionRepository<BitcoinTransaction> transactionRepository) {
+
         this.client = client;
+
+        this.blockRepository = blockRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     // parameterised requests
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
-        return client.getBlock(hash);
+
+        return blockRepository
+                .findById(hash)
+                .switchIfEmpty(client.getBlock(hash));
     }
 
     @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
-        return client.getTransaction(hash);
+
+        return transactionRepository
+                .findById(hash)
+                .switchIfEmpty(client.getTransaction(hash));
     }
 
 
