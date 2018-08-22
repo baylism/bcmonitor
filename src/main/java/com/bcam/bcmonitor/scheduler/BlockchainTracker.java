@@ -106,4 +106,10 @@ public class BlockchainTracker {
         return lastSynced.get(blockchain);
     }
 
+
+    public void setLastSyncedFor(Blockchain blockchain, Long tip) {
+
+        lastSynced.put(blockchain, tip);
+    }
+
 }

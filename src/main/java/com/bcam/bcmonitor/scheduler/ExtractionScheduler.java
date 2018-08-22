@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
+
+import static com.bcam.bcmonitor.model.Blockchain.*;
 
 /**
  * should take generic bulk extractors in array?
@@ -21,7 +21,9 @@ public class ExtractionScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ExtractionScheduler.class);
 
-    private Long initialOffset;
+    private Long initialBitcoinOffset;
+    private Long initialDashOffset;
+    private Long initialZCashOffset;
 
     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
     private BulkExtractor<ZCashBlock, ZCashTransaction> zCashBulkExtractor;
@@ -52,31 +54,42 @@ public class ExtractionScheduler {
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncBitcoinBlocks() {
-        Long tip = tracker.getTipFor(Blockchain.BITCOIN);
-        Long synced = tracker.getLastSyncedFor(Blockchain.BITCOIN);
+        Long tip = tracker.getTipFor(BITCOIN);
+        Long synced = tracker.getLastSyncedFor(BITCOIN);
 
         if (tip > synced) {
-            bitcoinBulkExtractor.saveBlocksAndTransactions(tip + 1, synced);
+            long fromHeight = synced > initialBitcoinOffset ? synced : initialBitcoinOffset;
+            bitcoinBulkExtractor.saveBlocksAndTransactions(fromHeight + 1, synced);
+
+            tracker.setLastSyncedFor(BITCOIN, tip);
         }
     }
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncZCashBlocks() {
-        Long tip = tracker.getTipFor(Blockchain.ZCASH);
-        Long synced = tracker.getLastSyncedFor(Blockchain.ZCASH);
+        Long tip = tracker.getTipFor(ZCASH);
+        Long synced = tracker.getLastSyncedFor(ZCASH);
 
         if (tip > synced) {
-            zCashBulkExtractor.saveBlocksAndTransactions(tip + 1, synced);
+            long fromHeight = synced > initialZCashOffset ? synced : initialZCashOffset;
+            zCashBulkExtractor.saveBlocksAndTransactions(fromHeight + 1, synced);
+
+            tracker.setLastSyncedFor(ZCASH, tip);
+
         }
     }
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncDashBlocks() {
-        Long tip = tracker.getTipFor(Blockchain.DASH);
-        Long synced = tracker.getLastSyncedFor(Blockchain.DASH);
+        Long tip = tracker.getTipFor(DASH);
+        Long synced = tracker.getLastSyncedFor(DASH);
 
         if (tip > synced) {
-            dashBulkExtractor.saveBlocksAndTransactions(tip + 1, synced);
+            long fromHeight = synced > initialBitcoinOffset ? synced : initialDashOffset;
+            dashBulkExtractor.saveBlocksAndTransactions(fromHeight + 1, synced);
+
+            tracker.setLastSyncedFor(DASH, tip);
+
         }
     }
 
