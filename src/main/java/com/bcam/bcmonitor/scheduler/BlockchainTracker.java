@@ -29,7 +29,6 @@ import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
  * transactions:
  * transactions synced up to block height
  */
-@Component
 public class BlockchainTracker {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockchainTracker.class);
