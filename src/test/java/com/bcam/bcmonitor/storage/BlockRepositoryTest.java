@@ -1,6 +1,7 @@
 package com.bcam.bcmonitor.storage;
 
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -106,6 +108,11 @@ public class BlockRepositoryTest {
 
     @Test
     public void findAllByHeightInRange() {
+
+        Sort sort = new Sort(Sort.Direction.ASC, "hash");
+
+        // Flux<BitcoinTransaction> insertedTransactions = blockRepository.findAll(sort);
+
 
         Flux<BitcoinBlock> insertedBlockFlux = blockRepository.findAllByHeightInRange(0L, 2L);
 
