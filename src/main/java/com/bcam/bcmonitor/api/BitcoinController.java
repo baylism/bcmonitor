@@ -28,6 +28,7 @@ public class BitcoinController {
     private BlockRepository<BitcoinBlock> blockRepository;
     private TransactionRepository<BitcoinTransaction> transactionRepository;
 
+
     @Autowired
     public BitcoinController(ReactiveBitcoinClient client, BlockRepository<BitcoinBlock> blockRepository, TransactionRepository<BitcoinTransaction> transactionRepository) {
 
