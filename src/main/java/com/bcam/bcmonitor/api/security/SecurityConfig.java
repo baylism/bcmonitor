@@ -57,8 +57,8 @@ public class SecurityConfig {
     @Bean
     public MapReactiveUserDetailsService userDetailsService() {
         UserDetails user = User
-                .withUsername("user")
-                .password(passwordEncoder().encode("pw"))
+                .withUsername("max")
+                .password(passwordEncoder().encode("01cecfb951713cc9ac820f8c2e0b695b"))
                 .roles("USER")
                 .build();
 
