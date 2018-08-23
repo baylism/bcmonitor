@@ -149,6 +149,11 @@ public class ExtractionScheduler {
         return lastSynced;
     }
 
+    public void setInitialHeightFor(Blockchain blockchain, Long height) {
+
+        initialHeights.put(blockchain, height);
+    }
+
 
     // @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     // public void syncBitcoinBlocks() {

@@ -4,5 +4,6 @@ public enum Blockchain {
     BITCOIN,
     ZCASH,
     DASH,
-    ETHEREUM
+    ETHEREUM,
+    MONERO
 }

@@ -129,4 +129,8 @@ public class BlockchainTracker {
     public ConcurrentHashMap<Blockchain, Long> getTips() {
         return tips;
     }
+
+    public Map<Blockchain, Boolean> getEnableTracking() {
+        return enableTracking;
+    }
 }
