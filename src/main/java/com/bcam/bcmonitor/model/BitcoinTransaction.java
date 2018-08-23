@@ -16,6 +16,10 @@ public class BitcoinTransaction extends AbstractTransaction {
         vout = new ArrayList<>();
     }
 
+    public BitcoinTransaction(String hash) {
+        super(hash);
+    }
+
     // abstract method implementations
     @Override
     public float calculateValue() {

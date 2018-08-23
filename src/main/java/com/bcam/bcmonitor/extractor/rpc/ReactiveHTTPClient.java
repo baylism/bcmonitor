@@ -115,8 +115,8 @@ public class ReactiveHTTPClient {
     }
 
 
-    // requests
-    public ResponseSpec requestResponseSpec(String blockchain, String method, String param) {
+    // GET requests
+    public ResponseSpec getResponseSpec(String blockchain, String method, String param) {
 
         String URIPath = String.join("/", blockchain, method, param);
         return client.get()
@@ -125,17 +125,29 @@ public class ReactiveHTTPClient {
                 .retrieve();
     }
 
-    // requests
-    public ResponseSpec requestResponseSpec(String blockchain, String method) {
+    public ResponseSpec getResponseSpec(String blockchain, String method) {
 
         String URIPath = String.join("/", blockchain, method);
+
         return client.get()
                 .uri(URIPath)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
     }
 
+    public Mono<String> getString(String blockchain, String method) {
 
+        String URIPath = String.join("/", blockchain, method);
+
+        return client.get()
+                .uri(URIPath)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+
+    // POST requests
     public ResponseSpec requestResponseSpec(String JSONRequest) {
 
         return client.post()

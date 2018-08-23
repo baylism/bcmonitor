@@ -25,16 +25,14 @@ public class ZCashTransactionDeserializer extends BlockchainDeserializer<ZCashTr
 
         JsonNode result = node.get("result");
 
+        transaction.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
         // Bitcoin data
         transaction.setHash(result.get("txid").asText());  // fine where "hash" and "txid" are same (change for segwit)
         // transaction.setSizeBytes(result.get("size").asInt()); TODO zcash transaction size
         transaction.setBlockHash(result.get("blockhash").asText());
         transaction.setVin(readInputs(result));
         transaction.setVout(readOutputs(result));
-
-
-        // Zcash specific
-
 
 
         return transaction;

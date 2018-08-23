@@ -1,27 +1,32 @@
 package com.bcam.bcmonitor.api;
 
 import com.bcam.bcmonitor.BitcoinRPCResponses;
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.BitcoinTransaction;
-import com.bcam.bcmonitor.model.RPCResult;
-import com.bcam.bcmonitor.model.TransactionPool;
+import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BlockRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -32,6 +37,12 @@ import static org.mockserver.model.HttpResponse.response;
 @TestPropertySource(properties = {
         "BITCOIN_HOSTNAME=localhost", "BITCOIN_PORT=9998", "BITCOIN_UN=bitcoinuser1", "BITCOIN_PW=password", "DASH_HOSTNAME=localhost", "DASH_PORT=9998", "DASH_UN=dashuser1", "DASH_PW=password", "ZCASH_HOSTNAME=localhost", "ZCASH_PORT=9998", "ZCASH_UN=dashuser1", "ZCASH_PW=password"})
 public class BitcoinControllerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(BitcoinControllerTest.class);
+
+    @Autowired
+    BlockRepository<BitcoinBlock> blockRepository;
+
 
     @Autowired
     private WebTestClient webTestClient;
@@ -46,6 +57,60 @@ public class BitcoinControllerTest {
     @After
     public void stopServer() {
         mockServer.stop();
+    }
+
+
+    @Test
+    public void getBlockFromRepository() {
+
+        logger.info("TEST REPOSITORY IS " + blockRepository);
+
+        BitcoinBlock expectedBlock = new BitcoinBlock();
+
+        expectedBlock.setHash("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
+
+        ArrayList<String> txids = new ArrayList<>();
+        txids.add("txid in the repository block");
+        expectedBlock.setTxids(txids);
+
+        blockRepository.save(expectedBlock).block();
+
+        Mono<BitcoinBlock> insertedBlockMono = blockRepository.findById("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
+
+        StepVerifier
+                .create(insertedBlockMono)
+                .assertNext(insertedBlock -> {
+                    assertEquals("00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048", insertedBlock.getHash());
+                    assertEquals(txids, insertedBlock.getTxids());
+                })
+                .expectComplete()
+                .verify();
+
+
+        mockServer
+                .when(
+                        request()
+                                .withMethod("POST")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",2]}")
+                )
+                .respond(
+                        response()
+                                .withBody(BitcoinRPCResponses.validBlockResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/block/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BitcoinBlock.class)
+                .consumeWith(result -> {
+                    logger.info("Result in testwebclient is " + result.getResponseBody());
+                    assertEquals(txids, result.getResponseBody().getTxids());
+                });
+
+        blockRepository.deleteAll().block();
     }
 
 
@@ -128,30 +193,25 @@ public class BitcoinControllerTest {
                 )
                 .respond(
                         response()
-                                .withBody(BitcoinRPCResponses.getBlockchainInfoResponse)
+                                .withBody(BitcoinRPCResponses.getBlockchainInfoResponsePretty)
                                 .withHeader("Content-Type", "text/html")
                 );
 
+        BlockchainInfo expectedResult = new BlockchainInfo();
+        expectedResult.setBlocks(531489L);
 
-        RPCResult expectedRPCResult = new RPCResult();
-        expectedRPCResult.setResponse("{\"chain\":\"main\"}");
-
-        // webTestClient
-        //         .get()
-        //         .uri("/api/bitcoin/blockchaininfo")
-        //         .exchange()
-        //         .expectStatus().isOk()
-        //         .expectBody(RPCResult.class).isEqualTo(expectedRPCResult)
-        //         .consumeWith(result -> {
-        //             Assertions.assertTrue(result.getResponseBody().getResponse().startsWith(expectedRPCResult.getResponse()));
-        //         });
 
         webTestClient
                 .get()
                 .uri("/api/bitcoin/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("{\"chain\":\"main\"}");
+                .expectBody(BlockchainInfo.class)
+                .consumeWith(result -> {
+                    Assertions.assertEquals(result.getResponseBody().getBlocks(), 531489L);
+                    Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "0000000000000000003092e0372f341f5e027e026612b79d24558211eb486909");
+                    // Assertions.assertEquals(result.getResponseBody().getMediantime(), 1531318259L);
+                });
     }
 
     @Test
@@ -200,8 +260,6 @@ public class BitcoinControllerTest {
     }
 
 
-
-
     @Test
     public void getTransactionPool() {
 
@@ -231,6 +289,7 @@ public class BitcoinControllerTest {
     }
 
 
+    @WithMockUser
     @Test
     public void getCustomResponse() {
         mockServer
@@ -252,6 +311,7 @@ public class BitcoinControllerTest {
                 .expectBody(String.class).isEqualTo("\"00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff\"");
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithOneParamString() {
         mockServer
@@ -276,6 +336,7 @@ public class BitcoinControllerTest {
                 });
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithOneParamInt() {
         mockServer
@@ -301,6 +362,7 @@ public class BitcoinControllerTest {
     }
 
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithTwoParamSecondInt() {
         mockServer
@@ -325,6 +387,7 @@ public class BitcoinControllerTest {
                 });
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithTwoParamSecondString() {
         mockServer
@@ -347,6 +410,58 @@ public class BitcoinControllerTest {
                 .consumeWith(result -> {
                     Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
                 });
+    }
+
+    @Test
+    public void getCustomResponseUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getbestblockhash")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithOneParamStringUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2a")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithOneParamIntUnAuth() {
+
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondIntUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/2")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondStringUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/abs8921")
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
 }

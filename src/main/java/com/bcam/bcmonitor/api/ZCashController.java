@@ -1,8 +1,13 @@
 package com.bcam.bcmonitor.api;
 
 
+import com.bcam.bcmonitor.extractor.bulk.BulkExtractorImpl;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BlockRepository;
+import com.bcam.bcmonitor.storage.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,32 +19,43 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/zcash")
 public class ZCashController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZCashController.class);
+
     private ReactiveZCashClient client;
 
+    private BlockRepository<ZCashBlock> blockRepository;
+    private TransactionRepository<ZCashTransaction> transactionRepository;
+
     @Autowired
-    public ZCashController(ReactiveZCashClient client) {
+    public ZCashController(ReactiveZCashClient client, BlockRepository<ZCashBlock> blockRepository, TransactionRepository<ZCashTransaction> transactionRepository) {
+
         this.client = client;
+
+        this.blockRepository = blockRepository;
+        this.transactionRepository = transactionRepository;
     }
 
-    // parameterised requests
-    @GetMapping("/raw/{jsonQuery}")
-    Mono<String> getRawResponse(String jsonQuery) {
-        return client.getRawResponse(jsonQuery);
-    }
 
+    // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
-    Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
-        return client.getBlock(hash);
+    Mono<ZCashBlock> getBlock(@PathVariable String hash) {
+
+        return blockRepository
+                .findById(hash)
+                .switchIfEmpty(client.getBlock(hash));
+
     }
 
     @GetMapping("/transaction/{hash}")
     Mono<ZCashTransaction> getTransaction(@PathVariable String hash) {
 
-        return client.getZCashTransaction(hash);
+        return transactionRepository
+                .findById(hash)
+                .switchIfEmpty(client.getTransaction(hash));
     }
 
 
-    // other objects
+    // ============ other objects ============
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
         return client.getTransactionPool();
@@ -50,16 +66,21 @@ public class ZCashController {
         return client.getTransactionPoolInfo();
     }
 
-
-    // other string requests
     @GetMapping("/blockchaininfo")
-    Mono<String> getInfo() {
+    Mono<BlockchainInfo> getInfo() {
         return client.getBlockchainInfo();
     }
 
+
+    // ============ other string requests ============
     @GetMapping("/bestblockhash")
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();
+    }
+
+    @GetMapping("/blockhash/{height}")
+    Mono<String> getBestBlockHash(@PathVariable long height) {
+        return client.getBlockHash(height);
     }
 
 }

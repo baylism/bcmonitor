@@ -25,6 +25,8 @@ public class EthereumTransactionDeserializer extends BlockchainDeserializer<Ethe
             transaction.setHash(node.get("hash").asText());
             transaction.setBlockHash(node.get("blockHash").asText());
 
+            transaction.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
             // eth
             transaction.setTo(node.get("to").asText());
             transaction.setFrom(node.get("from").asText());

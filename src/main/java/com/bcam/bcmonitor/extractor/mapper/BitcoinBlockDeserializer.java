@@ -1,21 +1,27 @@
 package com.bcam.bcmonitor.extractor.mapper;
 
+import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.DashBlock;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+
 public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
 
 
     @Override
-    public BitcoinBlock deserialize(JsonParser parser, DeserializationContext deserializer) throws IOException {
+    public BitcoinBlock deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+
         BitcoinBlock block = new BitcoinBlock();
+
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
@@ -33,6 +39,8 @@ public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBloc
         block.setTimeStamp(result.get("time").asLong());
         block.setPrevBlockHash(result.get("previousblockhash").asText());
 
+        block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
         // for now, just add TXIDs
         ArrayList<String> txids = new ArrayList<>();
         result.get("tx").forEach(jsonNode -> txids.add(jsonNode.asText()));
@@ -47,5 +55,4 @@ public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBloc
 
         return block;
     }
-
 }

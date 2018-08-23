@@ -1,12 +1,15 @@
 package com.bcam.bcmonitor.api;
 
+import com.bcam.bcmonitor.BitcoinRPCResponses;
 import com.bcam.bcmonitor.ZCashRPCResponses;
 import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BlockchainInfo;
 import com.bcam.bcmonitor.model.TransactionPool;
 import com.bcam.bcmonitor.model.ZCashTransaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +116,12 @@ public class ZCashControllerTest {
                 .uri("/api/zcash/blockchaininfo")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class);
+                .expectBody(BlockchainInfo.class)
+                .consumeWith(result -> {
+                    Assertions.assertEquals(result.getResponseBody().getBlocks(), 378358L);
+                    Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "00000000008c9baaf66c73b434713306648da5653ab9afa659f970fa8619421c");
+                    // Assertions.assertEquals(result.getResponseBody().getMediantime(), 1531318259L);
+                });
     }
 
     @Test

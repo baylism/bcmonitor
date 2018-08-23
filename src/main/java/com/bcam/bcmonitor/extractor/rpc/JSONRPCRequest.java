@@ -39,6 +39,10 @@ public class JSONRPCRequest {
         params.add(param);
     }
 
+    public void addParam(long param) {
+        params.add(param);
+    }
+
     public void addParam(ArrayList<String> params) {
         params.addAll(params);
     }

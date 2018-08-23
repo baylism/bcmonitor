@@ -3,6 +3,10 @@ package com.bcam.bcmonitor.api;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BlockRepository;
+import com.bcam.bcmonitor.storage.TransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,28 +20,41 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/dash")
 public class DashController {
 
+    private static final Logger logger = LoggerFactory.getLogger(DashController.class);
+
     private ReactiveDashClient client;
 
+    private BlockRepository<DashBlock> blockRepository;
+    private TransactionRepository<DashTransaction> transactionRepository;
+
     @Autowired
-    public DashController(ReactiveDashClient client) {
+    public DashController(ReactiveDashClient client, BlockRepository<DashBlock> blockRepository, TransactionRepository<DashTransaction> transactionRepository) {
+
         this.client = client;
+
+        this.blockRepository = blockRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
-    Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
+    Mono<DashBlock> getBlock(@PathVariable String hash) {
 
-        return client.getBlock(hash);
+        return blockRepository
+                .findById(hash)
+                .switchIfEmpty(client.getBlock(hash));
     }
 
     @GetMapping("/transaction/{hash}")
-    Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
-        return client.getTransaction(hash);
+    Mono<DashTransaction> getTransaction(@PathVariable String hash) {
+
+        return transactionRepository
+                .findById(hash)
+                .switchIfEmpty(client.getTransaction(hash));
     }
 
 
     // ============ other objects ============
-    //TODO
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
         return client.getTransactionPool();
@@ -48,62 +65,21 @@ public class DashController {
         return client.getTransactionPoolInfo();
     }
 
-
-    // ============ other string requests ============
     @GetMapping("/blockchaininfo")
-    Mono<String> getInfo() {
+    Mono<BlockchainInfo> getInfo() {
         return client.getBlockchainInfo();
     }
 
+
+    // ============ other string requests ============
     @GetMapping("/bestblockhash")
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();
     }
 
     @GetMapping("/blockhash/{height}")
-    Mono<String> getBestBlockHash(@PathVariable int height) {
+    Mono<String> getBestBlockHash(@PathVariable long height) {
         return client.getBlockHash(height);
-    }
-
-
-    // ============ client provided requests ============
-    @GetMapping("/raw/{jsonQuery}")
-    Mono<String> getRawResponse(@PathVariable String jsonQuery) {
-        return client.getRawResponse(jsonQuery);
-    }
-
-
-    @GetMapping("/method/{methodName}")
-    Mono<String> getCustomResponse(@PathVariable String methodName) {
-
-        return client.getCustomResponse(methodName);
-    }
-
-    // match requests where param contains a letter (e.g. a hash)
-    @GetMapping("/method/{methodName}/{param:.*[a-z]+.*}")
-    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param) {
-
-        return client.getCustomResponse(methodName, param);
-    }
-
-    // match requests where param contains only numbers (e.g. a block height)
-    @GetMapping("/method/{methodName}/{param:[0-9]+}")
-    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() int param) {
-
-        return client.getCustomResponse(methodName, param);
-    }
-
-    // only support double parameter request where the first is a string
-    @GetMapping("/method/{methodName}/{param}/{param2:.*[a-z]+.*}")
-    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() String param2) {
-
-        return client.getCustomResponse(methodName, param, param2);
-    }
-
-    @GetMapping("/method/{methodName}/{param}/{param2:[0-9]+}")
-    Mono<String> getCustomResponse(@PathVariable String methodName, @PathVariable() String param, @PathVariable() int param2) {
-
-        return client.getCustomResponse(methodName, param, param2);
     }
 
 }

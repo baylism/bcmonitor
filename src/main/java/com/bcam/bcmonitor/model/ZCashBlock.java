@@ -7,4 +7,10 @@ package com.bcam.bcmonitor.model;
  */
 public class ZCashBlock extends BitcoinBlock {
 
+    public ZCashBlock() {
+    }
+
+    public ZCashBlock(String hash, long height) {
+        super(hash, height);
+    }
 }

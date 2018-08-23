@@ -7,6 +7,7 @@ import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,9 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
-
+// @Qualifier("ReactiveBitcoinClient")
 @Component
-@Primary
-public class ReactiveBitcoinClient {
+public class ReactiveBitcoinClient extends ReactiveClientImpl implements ReactiveClient<BitcoinBlock, BitcoinTransaction>, BlockchainInfoClient {
 
     @Value("${BITCOIN_HOSTNAME}")
     private String hostName;
@@ -33,9 +33,7 @@ public class ReactiveBitcoinClient {
 
     protected ReactiveHTTPClient client;
 
-    public ReactiveBitcoinClient() {
-
-    }
+    public ReactiveBitcoinClient() { }
 
     @PostConstruct
     protected void buildClient() {
@@ -55,6 +53,7 @@ public class ReactiveBitcoinClient {
         module.addDeserializer(BitcoinTransaction.class, new BitcoinTransactionDeserializer());
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
+        module.addDeserializer(BlockchainInfo.class, new BlockchainInfoDeserializer());
         module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
 
         mapper.registerModule(module);
@@ -62,13 +61,16 @@ public class ReactiveBitcoinClient {
         return mapper;
     }
 
+    @Override
+    ReactiveHTTPClient getClient() {
+        return client;
+    }
+
     // parameterised queries
     public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
         request.addParam(2); // always request decoded JSON with transactions
-
-        System.out.println(request);
 
         return client
                 .requestResponseSpec(request.toString())
@@ -87,92 +89,6 @@ public class ReactiveBitcoinClient {
                 .bodyToMono(BitcoinTransaction.class);
     }
 
-    // other objects
-    public Mono<TransactionPool> getTransactionPool() {
-        JSONRPCRequest request = new JSONRPCRequest("getrawmempool");
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(TransactionPool.class);
-    }
-
-    public Mono<TransactionPoolInfo> getTransactionPoolInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getmempoolinfo");
-
-        return client
-                .requestResponseSpec(request.toString())
-                .bodyToMono(TransactionPoolInfo.class);
-    }
-
-
-    // other string requests
-    public Mono<String> getBlockchainInfo() {
-        JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getBestBlockHash() {
-        JSONRPCRequest request = new JSONRPCRequest("getbestblockhash");
-
-        return client.requestString(request.toString());
-    }
-
-
-    public Mono<String> getBlockHash(int height) {
-        JSONRPCRequest request = new JSONRPCRequest("getblockhash");
-
-        request.addParam(height);
-
-        return client.requestString(request.toString());
-    }
-
-
-    // client provided requests
-    public Mono<String> getRawResponse(String jsonQuery) {
-
-        return client.requestString(jsonQuery);
-    }
-
-    public Mono<String> getCustomResponse(String methodName) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, int param) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param, String param2) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-        request.addParam(param2);
-
-        return client.requestString(request.toString());
-    }
-
-    public Mono<String> getCustomResponse(String methodName, String param, int param2) {
-        JSONRPCRequest request = new JSONRPCRequest(methodName);
-
-        request.addParam(param);
-        request.addParam(param2);
-
-        return client.requestString(request.toString());
-    }
 
 }
 

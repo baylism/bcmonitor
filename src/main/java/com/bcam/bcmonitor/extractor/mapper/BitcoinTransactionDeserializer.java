@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTransaction> {
 
@@ -81,6 +82,9 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
 
             transaction.setVin(readInputs(result));
             transaction.setVout(readOutputs(result));
+
+            transaction.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
+
 
         }
 

@@ -1,18 +1,29 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 
+@Document
 public abstract class AbstractBlock {
 
+    @Id
+    @Indexed
     private String hash; // in RPC byte order
+
     private String prevBlockHash;
 
-    private int height;
+    // @Indexed
+    private long height;
     private long timeStamp;
     private long sizeBytes;
 
     private BigDecimal difficulty;
+    private long timeReceived;
     private ArrayList<String> minerHashes;
 
     private ArrayList<AbstractTransaction> transactions;
@@ -22,6 +33,30 @@ public abstract class AbstractBlock {
         minerHashes = new ArrayList<>();
         transactions = new ArrayList<>();
         txids = new ArrayList<>();
+    }
+
+    public AbstractBlock(String hash){
+        this.hash = hash;
+        minerHashes = new ArrayList<>();
+        transactions = new ArrayList<>();
+        txids = new ArrayList<>();
+    }
+
+    public AbstractBlock(String hash, long height){
+        this.hash = hash;
+        this.height = height;
+        minerHashes = new ArrayList<>();
+        transactions = new ArrayList<>();
+        txids = new ArrayList<>();
+    }
+
+
+    public long getTimeReceived() {
+        return timeReceived;
+    }
+
+    public void setTimeReceived(long timeReceived) {
+        this.timeReceived = timeReceived;
     }
 
     public String getHash() {
@@ -40,11 +75,11 @@ public abstract class AbstractBlock {
         this.prevBlockHash = prevBlockHash;
     }
 
-    public int getHeight() {
+    public long getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(long height) {
         this.height = height;
     }
 
