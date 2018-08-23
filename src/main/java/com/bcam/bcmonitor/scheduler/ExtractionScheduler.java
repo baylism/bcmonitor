@@ -22,7 +22,7 @@ import static com.bcam.bcmonitor.model.Blockchain.*;
  * should take generic bulk extractors in array?
  * or better to wire up each separately?
  */
-@Profile("scheduler")  // prevent scheduler from unless we need it
+// @Profile("scheduler")  // prevent scheduler from unless we need it
 @Component
 public class ExtractionScheduler {
 
@@ -136,6 +136,19 @@ public class ExtractionScheduler {
 
         lastSynced.put(blockchain, tip);
     }
+
+    public Map<Blockchain, Boolean> getEnableSyncing() {
+        return enableSyncing;
+    }
+
+    public Map<Blockchain, Long> getInitialHeights() {
+        return initialHeights;
+    }
+
+    public ConcurrentHashMap<Blockchain, Long> getLastSynced() {
+        return lastSynced;
+    }
+
 
     // @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     // public void syncBitcoinBlocks() {

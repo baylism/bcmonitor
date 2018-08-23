@@ -46,9 +46,11 @@ public class SecurityConfig {
 
         return http
                 .authorizeExchange()
-                    .pathMatchers("/api/**/raw/**", "/api/**/method/**").authenticated()
+                    .pathMatchers("/api/**/raw/**", "/api/**/method/**").hasRole("USER")
+                    .pathMatchers("/admin/**").hasRole("USER")
                     .pathMatchers("/api/**").permitAll()
                 .anyExchange().authenticated()
+                .and().httpBasic()
                 .and().build();
     }
 
@@ -56,7 +58,7 @@ public class SecurityConfig {
     public MapReactiveUserDetailsService userDetailsService() {
         UserDetails user = User
                 .withUsername("user")
-                .password(passwordEncoder().encode("password"))
+                .password(passwordEncoder().encode("pw"))
                 .roles("USER")
                 .build();
 
@@ -65,6 +67,7 @@ public class SecurityConfig {
                 .password("password")
                 .roles("ADMIN")
                 .build();
+
         return new MapReactiveUserDetailsService(user, admin);
     }
 

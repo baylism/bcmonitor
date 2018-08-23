@@ -68,7 +68,7 @@ public class BlockchainTracker {
     @Async
     public void updateChainTips() {
 
-        logger.info("Calling update tips");
+        // logger.info("Calling update tips");
 
         tips.forEachKey(Long.MAX_VALUE, this::updateTip);
 
@@ -124,5 +124,9 @@ public class BlockchainTracker {
     public void disableTrackingFor(Blockchain blockchain) {
 
         enableTracking.put(blockchain, Boolean.FALSE);
+    }
+
+    public ConcurrentHashMap<Blockchain, Long> getTips() {
+        return tips;
     }
 }
