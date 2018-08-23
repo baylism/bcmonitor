@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/bitcoin")
@@ -43,12 +46,33 @@ public class BitcoinController {
                 .switchIfEmpty(client.getBlock(hash));
     }
 
+    @GetMapping("/blocks/{fromHeight}/{toHeight}")
+    Flux<BitcoinBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
+
+        return blockRepository
+                .findAllByHeightInRange(fromHeight, toHeight);
+
+    }
+
+
     @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
 
         return transactionRepository
                 .findById(hash)
                 .switchIfEmpty(client.getTransaction(hash));
+    }
+
+
+    @GetMapping("/transactions/{blockHeight}")
+    Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable long height) {
+
+        Flux<String> ids = blockRepository
+                .findByHeight(height)
+                .map(AbstractBlock::getTxids)
+                .flatMapMany(Flux::fromIterable);
+
+         return transactionRepository.findAllById(ids);
     }
 
 
