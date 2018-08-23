@@ -101,7 +101,7 @@ public class ReactiveHTTPClient {
             logger.info("Request: {} {}", clientRequest.method(), clientRequest.url());
             clientRequest.headers()
                     .forEach((name, values) -> values.forEach(value -> logger.info("{}={}", name, value)));
-            logger.info(clientRequest.body().toString());
+            logger.info("Body: " + clientRequest.body());
             return next.exchange(clientRequest);
         };
     }

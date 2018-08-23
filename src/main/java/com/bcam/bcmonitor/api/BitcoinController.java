@@ -37,7 +37,7 @@ public class BitcoinController {
         this.transactionRepository = transactionRepository;
     }
 
-    // parameterised requests
+    // ============ parameterised requests ============
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
 
@@ -53,7 +53,6 @@ public class BitcoinController {
                 .findAllByHeightInRange(fromHeight, toHeight);
 
     }
-
 
     @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
@@ -74,7 +73,6 @@ public class BitcoinController {
 
          return transactionRepository.findAllById(ids);
     }
-
 
     // ============ other objects ============
     @GetMapping("/transactionpool")

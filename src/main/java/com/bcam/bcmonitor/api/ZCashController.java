@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -46,6 +47,14 @@ public class ZCashController {
 
     }
 
+    @GetMapping("/blocks/{fromHeight}/{toHeight}")
+    Flux<ZCashBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
+
+        return blockRepository
+                .findAllByHeightInRange(fromHeight, toHeight);
+
+    }
+
     @GetMapping("/transaction/{hash}")
     Mono<ZCashTransaction> getTransaction(@PathVariable String hash) {
 
@@ -54,6 +63,16 @@ public class ZCashController {
                 .switchIfEmpty(client.getTransaction(hash));
     }
 
+    @GetMapping("/transactions/{blockHeight}")
+    Flux<ZCashTransaction> getTransactionsInBlock(@PathVariable long height) {
+
+        Flux<String> ids = blockRepository
+                .findByHeight(height)
+                .map(AbstractBlock::getTxids)
+                .flatMapMany(Flux::fromIterable);
+
+        return transactionRepository.findAllById(ids);
+    }
 
     // ============ other objects ============
     @GetMapping("/transactionpool")

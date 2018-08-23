@@ -1,15 +1,15 @@
-apiVersion: extensions
+apiVersion: apps/v1
 kind: Deployment                 
 metadata:
   name: bcmonitor
+  labels:
+    app: bcmonitor
 spec:
   replicas: 1                   
   minReadySeconds: 15
-  strategy:
-    type: RollingUpdate          
-    rollingUpdate: 
-      maxUnavailable: 1          
-      maxSurge: 1                
+  selector:
+      matchLabels:
+        app: bcmonitor
   template:                      
     metadata:
       labels:
