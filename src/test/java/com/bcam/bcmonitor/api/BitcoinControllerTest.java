@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -288,6 +289,7 @@ public class BitcoinControllerTest {
     }
 
 
+    @WithMockUser
     @Test
     public void getCustomResponse() {
         mockServer
@@ -309,6 +311,7 @@ public class BitcoinControllerTest {
                 .expectBody(String.class).isEqualTo("\"00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff\"");
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithOneParamString() {
         mockServer
@@ -333,6 +336,7 @@ public class BitcoinControllerTest {
                 });
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithOneParamInt() {
         mockServer
@@ -358,6 +362,7 @@ public class BitcoinControllerTest {
     }
 
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithTwoParamSecondInt() {
         mockServer
@@ -382,6 +387,7 @@ public class BitcoinControllerTest {
                 });
     }
 
+    @WithMockUser
     @Test
     public void getCustomResponseWithTwoParamSecondString() {
         mockServer
@@ -404,6 +410,58 @@ public class BitcoinControllerTest {
                 .consumeWith(result -> {
                     Assertions.assertTrue(result.getResponseBody().startsWith("{\"hash\""));
                 });
+    }
+
+    @Test
+    public void getCustomResponseUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getbestblockhash")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithOneParamStringUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2a")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithOneParamIntUnAuth() {
+
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblockhash/2")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondIntUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/2")
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    public void getCustomResponseWithTwoParamSecondStringUnAuth() {
+
+        webTestClient
+                .get()
+                .uri("/api/bitcoin/method/getblock/00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048/abs8921")
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
 }
