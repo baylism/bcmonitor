@@ -1,4 +1,3 @@
-# change, then kubectl apply -f deploy-frontend-green-pods.yaml --record
 apiVersion: v1
 kind: Service
 metadata:
