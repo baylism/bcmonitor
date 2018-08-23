@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
-@Component
+// @Component
 public class BlockchainTrackerFactory extends AbstractFactoryBean <BlockchainTracker> {
 
     @Override

@@ -4,15 +4,19 @@ import com.bcam.bcmonitor.extractor.client.*;
 import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.Blockchain;
 import com.bcam.bcmonitor.model.BlockchainInfo;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.Null;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
@@ -30,14 +34,13 @@ import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
  * transactions:
  * transactions synced up to block height
  */
+@Component
 public class BlockchainTracker {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockchainTracker.class);
 
-    Mono<Long> tip;
-
     private ConcurrentHashMap<Blockchain, Long> tips;
-    private ConcurrentHashMap<Blockchain, Long> lastSynced;
+    private Map<Blockchain, Boolean> enableTracking;
 
     private ReactiveBitcoinClient bitcoinClient;
     private ReactiveDashClient dashClient;
@@ -51,19 +54,19 @@ public class BlockchainTracker {
         this.zCashClient = zCashClient;
 
         tips = new ConcurrentHashMap<>();
-        tips.put(BITCOIN, 0L);
-        tips.put(DASH, 0L);
-        tips.put(ZCASH, 0L);
+        tips.put(BITCOIN, -1L);
+        tips.put(DASH, -1L);
+        tips.put(ZCASH, -1L);
 
-        lastSynced = new ConcurrentHashMap<>();
-        lastSynced.put(BITCOIN, 0L);
-        lastSynced.put(DASH, 0L);
-        lastSynced.put(ZCASH, 0L);
+        enableTracking = new HashMap<>();
+        enableTracking.put(BITCOIN, Boolean.FALSE);
+        enableTracking.put(DASH, Boolean.FALSE);
+        enableTracking.put(ZCASH, Boolean.FALSE);
+
     }
 
     @Async
     public void updateChainTips() {
-        // Mono<BlockchainInfo> bcinfo = bitcoinClient.getBlockchainInfo();
 
         logger.info("Calling update tips");
 
@@ -74,23 +77,23 @@ public class BlockchainTracker {
     @Async
     public void updateTip(Blockchain blockchain) {
 
-        logger.info("Updating client for " + blockchain);
+        if (!enableTracking.get(blockchain)) {
+            return;
+        }
+
+        logger.info("Updating tip for " + blockchain);
 
         // check for increase?
         try {
             Long newTip = getClient(blockchain).getBlockchainInfo().block().getBlocks();
 
             tips.put(blockchain, newTip);
-            logger.info("Updated client for " + blockchain + " to " + newTip);
+            logger.info("Updated tip for " + blockchain + " to " + newTip);
 
         } catch (NullPointerException e){
 
             logger.info("Couldn't get tip " + e);
-            return;
-
         }
-
-
 
     }
 
@@ -109,17 +112,17 @@ public class BlockchainTracker {
     }
 
     public Long getTipFor(Blockchain blockchain) {
+
         return tips.get(blockchain);
     }
 
-    public long getLastSyncedFor(Blockchain blockchain) {
-        return lastSynced.get(blockchain);
+    public void enableTrackingFor(Blockchain blockchain) {
+
+        enableTracking.put(blockchain, Boolean.TRUE);
     }
 
+    public void disableTrackingFor(Blockchain blockchain) {
 
-    public void setLastSyncedFor(Blockchain blockchain, Long tip) {
-
-        lastSynced.put(blockchain, tip);
+        enableTracking.put(blockchain, Boolean.FALSE);
     }
-
 }
