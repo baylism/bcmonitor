@@ -110,20 +110,8 @@ public class ExtractionSchedulerTest {
 
         // blockchain info
         Mockito.when(mockBitcoinClient.getBlockchainInfo())
-                .thenReturn(Mono.just(info));
-        // .thenAnswer(
-                //         (Answer<Mono<BlockchainInfo>>) invocation -> {
-                //             logger.info("Bitcoin client about to sleep");
-                //             Thread.sleep(10000);
-                //             return Mono.just(info);
-                //         }
-                // );
-
-        Mockito.when(mockDashClient.getBlockchainInfo())
-                .thenReturn(Mono.just(info));
-
-        Mockito.when(mockZCashClient.getBlockchainInfo())
-                .thenReturn(Mono.just(info));
+                .thenReturn(Mono.just(info))
+                .thenReturn(Mono.just(info1));
 
 
         // get block hash
@@ -131,18 +119,6 @@ public class ExtractionSchedulerTest {
                 .thenReturn(Mono.just("blockhash0"));
 
         Mockito.when(mockBitcoinClient.getBlockHash(1L))
-                .thenReturn(Mono.just("blockhash1"));
-
-        Mockito.when(mockDashClient.getBlockHash(0L))
-                .thenReturn(Mono.just("blockhash0"));
-
-        Mockito.when(mockDashClient.getBlockHash(1L))
-                .thenReturn(Mono.just("blockhash1"));
-
-        Mockito.when(mockZCashClient.getBlockHash(0L))
-                .thenReturn(Mono.just("blockhash0"));
-
-        Mockito.when(mockZCashClient.getBlockHash(1L))
                 .thenReturn(Mono.just("blockhash1"));
 
 
@@ -168,32 +144,6 @@ public class ExtractionSchedulerTest {
                 .thenReturn(Mono.just(block1));
 
 
-        DashBlock dashBlock0 = new DashBlock("blockhash0", 0L);
-        dashBlock0.setTxids(txids);
-
-        DashBlock dashBlock1 = new DashBlock("blockhash1", 1L);
-        dashBlock1.setTxids(txids2);
-
-        Mockito.when(mockDashClient.getBlock("blockhash0"))
-                .thenReturn(Mono.just(dashBlock0));
-
-        Mockito.when(mockDashClient.getBlock("blockhash1"))
-                .thenReturn(Mono.just(dashBlock1));
-
-
-        ZCashBlock zCashBlock0 = new ZCashBlock("blockhash0", 0L);
-        zCashBlock0.setTxids(txids);
-
-        ZCashBlock zCashBlock1 = new ZCashBlock("blockhash1", 1L);
-        zCashBlock1.setTxids(txids2);
-
-        Mockito.when(mockZCashClient.getBlock("blockhash0"))
-                .thenReturn(Mono.just(zCashBlock0));
-
-        Mockito.when(mockZCashClient.getBlock("blockhash1"))
-                .thenReturn(Mono.just(zCashBlock1));
-
-
         // get transaction
         BitcoinTransaction transaction0 = new BitcoinTransaction("aaa");
         BitcoinTransaction transaction1 = new BitcoinTransaction("bbb");
@@ -201,21 +151,6 @@ public class ExtractionSchedulerTest {
         BitcoinTransaction transaction3 = new BitcoinTransaction("ddd");
         BitcoinTransaction transaction4 = new BitcoinTransaction("eee");
         BitcoinTransaction transaction5 = new BitcoinTransaction("fff");
-
-        ZCashTransaction zCashTransaction0 = new ZCashTransaction("aaa");
-        ZCashTransaction zCashTransaction1 = new ZCashTransaction("bbb");
-        ZCashTransaction zCashTransaction2 = new ZCashTransaction("ccc");
-        ZCashTransaction zCashTransaction3 = new ZCashTransaction("ddd");
-        ZCashTransaction zCashTransaction4 = new ZCashTransaction("eee");
-        ZCashTransaction zCashTransaction5 = new ZCashTransaction("fff");
-
-
-        DashTransaction dashTransaction0 = new DashTransaction("aaa");
-        DashTransaction dashTransaction1 = new DashTransaction("bbb");
-        DashTransaction dashTransaction2 = new DashTransaction("ccc");
-        DashTransaction dashTransaction3 = new DashTransaction("ddd");
-        DashTransaction dashTransaction4 = new DashTransaction("eee");
-        DashTransaction dashTransaction5 = new DashTransaction("fff");
 
 
         Mockito.when(mockBitcoinClient.getTransaction("aaa"))
@@ -231,33 +166,6 @@ public class ExtractionSchedulerTest {
         Mockito.when(mockBitcoinClient.getTransaction("fff"))
                 .thenReturn(Mono.just(transaction5));
 
-        Mockito.when(mockZCashClient.getTransaction("aaa"))
-                .thenReturn(Mono.just(zCashTransaction0));
-        Mockito.when(mockZCashClient.getTransaction("bbb"))
-                .thenReturn(Mono.just(zCashTransaction1));
-        Mockito.when(mockZCashClient.getTransaction("ccc"))
-                .thenReturn(Mono.just(zCashTransaction2));
-        Mockito.when(mockZCashClient.getTransaction("ddd"))
-                .thenReturn(Mono.just(zCashTransaction3));
-        Mockito.when(mockZCashClient.getTransaction("eee"))
-                .thenReturn(Mono.just(zCashTransaction4));
-        Mockito.when(mockZCashClient.getTransaction("fff"))
-                .thenReturn(Mono.just(zCashTransaction5));
-
-
-        Mockito.when(mockDashClient.getTransaction("aaa"))
-                .thenReturn(Mono.just(dashTransaction0));
-        Mockito.when(mockDashClient.getTransaction("bbb"))
-                .thenReturn(Mono.just(dashTransaction1));
-        Mockito.when(mockDashClient.getTransaction("ccc"))
-                .thenReturn(Mono.just(dashTransaction2));
-        Mockito.when(mockDashClient.getTransaction("ddd"))
-                .thenReturn(Mono.just(dashTransaction3));
-        Mockito.when(mockDashClient.getTransaction("eee"))
-                .thenReturn(Mono.just(dashTransaction4));
-        Mockito.when(mockDashClient.getTransaction("fff"))
-                .thenReturn(Mono.just(dashTransaction5));
-
 
         tracker.disableTrackingFor(Blockchain.DASH);
         tracker.disableTrackingFor(Blockchain.ZCASH);
@@ -267,7 +175,7 @@ public class ExtractionSchedulerTest {
 
         logger.info("Runnning");
 
-        Thread.sleep(20000L);
+        Thread.sleep(10000L);
 
 
         Sort sort = new Sort(Sort.Direction.ASC, "hash");

@@ -48,12 +48,12 @@ public abstract class ReactiveClientImpl {
         BlockchainInfo info = new BlockchainInfo();
         info.setBlocks(0L);
 
-        throw new RuntimeException("CALLED REAL CLIENT");
+        // throw new RuntimeException("CALLED REAL CLIENT");
 
         // return Mono.just(info);
-        // return getClient()
-        //         .requestResponseSpec(request.toString())
-        //         .bodyToMono(BlockchainInfo.class);
+        return getClient()
+                .requestResponseSpec(request.toString())
+                .bodyToMono(BlockchainInfo.class);
     }
 
 

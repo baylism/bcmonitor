@@ -66,8 +66,8 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
                 // .flatMap(source -> source) // == merge()
                 .flatMap(client::getBlock)
                 .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(blockRepository::save)
-                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                .flatMap(blockRepository::save);
+                // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
 
