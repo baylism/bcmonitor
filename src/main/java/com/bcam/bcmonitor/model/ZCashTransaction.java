@@ -35,6 +35,16 @@ public class ZCashTransaction extends BitcoinTransaction {
         private float vpubOld; // value added to shielded pool by this joinsplit
     }
 
+    public ZCashTransaction() {
+        joinSplitDescriptions = new ArrayList<>();
+    }
+
+    public ZCashTransaction(String hash) {
+        super(hash);
+
+        joinSplitDescriptions = new ArrayList<>();
+    }
+
     @Override
     public float calculateFee() {
         return fee;
