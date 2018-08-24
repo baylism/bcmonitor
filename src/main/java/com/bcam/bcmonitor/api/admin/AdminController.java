@@ -33,7 +33,7 @@ public class AdminController {
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
     }
 
-    @GetMapping("/extract/{fromHeight}/{toHeight}")
+    @GetMapping(value = "/extract/{fromHeight}/{toHeight}", produces = "application/stream+json")
     public Flux<BitcoinBlock> extract(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
 
         return bitcoinBulkExtractor
@@ -41,7 +41,7 @@ public class AdminController {
 
     }
 
-    @GetMapping("/extractblock/{fromHeight}/{toHeight}")
+    @GetMapping(value = "/extractblock/{fromHeight}/{toHeight}", produces = "application/stream+json")
     public Flux<BitcoinBlock> extractBlocks(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
 
         return bitcoinBulkExtractor

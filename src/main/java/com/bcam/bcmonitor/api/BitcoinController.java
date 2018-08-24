@@ -39,7 +39,7 @@ public class BitcoinController {
     }
 
     // ============ block/transaction requests ============
-    @GetMapping("/block/{hash:.*[a-z]+.*}")
+    @GetMapping(value = "/block/{hash:.*[a-z]+.*}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
 
         return blockRepository
@@ -56,7 +56,7 @@ public class BitcoinController {
 
     }
 
-    @GetMapping("/blocks/{fromHeight}/{toHeight}")
+    @GetMapping(value = "/blocks/{fromHeight}/{toHeight}", produces = "application/stream+json")
     Flux<BitcoinBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
         return blockRepository
@@ -73,7 +73,7 @@ public class BitcoinController {
     }
 
 
-    @GetMapping("/transactions/{blockHeight}")
+    @GetMapping(value = "/transactions/{blockHeight}", produces = "application/stream+json")
     Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable long height) {
 
         Flux<String> ids = blockRepository

@@ -1,8 +1,11 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
+@Document
 public class BitcoinTransaction extends AbstractTransaction {
     private float inputsSum;
     private float outputsSum;

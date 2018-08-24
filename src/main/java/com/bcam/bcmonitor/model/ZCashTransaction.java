@@ -1,6 +1,8 @@
 package com.bcam.bcmonitor.model;
 
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.ArrayList;
 
 /**
@@ -21,6 +23,7 @@ import java.util.ArrayList;
  *
  *
  */
+@Document
 public class ZCashTransaction extends BitcoinTransaction {
 
     // TODO check this as client response not include

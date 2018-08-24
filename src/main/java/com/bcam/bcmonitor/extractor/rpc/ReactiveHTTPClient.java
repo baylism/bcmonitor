@@ -158,6 +158,15 @@ public class ReactiveHTTPClient {
                 .retrieve();
     }
 
+    // POST requests
+    public ResponseSpec requestResponseSpec(Mono<String> JSONRequest) {
+
+        return client.post()
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(JSONRequest))
+                .retrieve();
+    }
+
     public Mono<String> requestString(String JSONRequest) {
 
         return client.post()

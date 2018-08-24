@@ -73,8 +73,8 @@ public class ExtractionSchedulerTest {
                         new Answer<Mono<BlockchainInfo>>() {
                             @Override
                             public Mono<BlockchainInfo> answer(InvocationOnMock invocation) throws InterruptedException {
-                                logger.info("Bitcoin client about to sleep");
-                                Thread.sleep(2000);
+                                // logger.info("Bitcoin client about to sleep");
+                                // Thread.sleep(2000);
                                 return Mono.just(info);
                             }
                         }
@@ -95,7 +95,7 @@ public class ExtractionSchedulerTest {
         logger.info("Runnning scheduler");
 
         // let scheduler run
-        Thread.sleep(5000L);
+        Thread.sleep(1000L);
     }
 
 
@@ -175,7 +175,7 @@ public class ExtractionSchedulerTest {
 
         logger.info("Runnning");
 
-        Thread.sleep(10000L);
+        Thread.sleep(1000L);
 
 
         Sort sort = new Sort(Sort.Direction.ASC, "hash");

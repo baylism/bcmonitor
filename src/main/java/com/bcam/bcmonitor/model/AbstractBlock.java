@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
-@Document
 public abstract class AbstractBlock {
 
     @Id

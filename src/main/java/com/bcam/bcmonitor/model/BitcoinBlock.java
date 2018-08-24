@@ -1,5 +1,7 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.math.BigInteger;
 
 /**
@@ -10,6 +12,7 @@ import java.math.BigInteger;
  *
  *
  */
+@Document
 public class BitcoinBlock extends AbstractBlock {
 
     private long medianTime; // of previous 11 block

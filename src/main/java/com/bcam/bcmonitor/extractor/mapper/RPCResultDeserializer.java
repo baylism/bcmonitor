@@ -23,7 +23,7 @@ public class RPCResultDeserializer extends BlockchainDeserializer<RPCResult> {
         verifyResponse(node);
 
         JsonNode result = node.get("result");
-        logger.info("deser got " + result);
+        // logger.info("RPCResult deserializer got " + result);
 
 
         RPCResult response = new RPCResult();
@@ -37,7 +37,7 @@ public class RPCResultDeserializer extends BlockchainDeserializer<RPCResult> {
             response.setResponse(result.toString());
         }
 
-        logger.info("final response is " + response);
+        // logger.info("Final response is " + response);
 
         return response;
     }

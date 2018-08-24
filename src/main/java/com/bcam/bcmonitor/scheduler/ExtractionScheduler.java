@@ -75,13 +75,15 @@ public class ExtractionScheduler {
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncBitcoinBlocks() {
 
+        // logger.info("Calling sync blocks for bitcoin");
+
         syncBlocks(BITCOIN, bitcoinBulkExtractor);
     }
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncDashBlocks() {
 
-        logger.info("Calling sync blocks for dash");
+        // logger.info("Calling sync blocks for dash");
 
         syncBlocks(DASH, dashBulkExtractor);
     }

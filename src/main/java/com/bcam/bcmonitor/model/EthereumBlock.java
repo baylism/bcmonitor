@@ -1,5 +1,7 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.math.BigInteger;
 
 /**
@@ -7,6 +9,7 @@ import java.math.BigInteger;
  *
  *
  */
+@Document
 public class EthereumBlock extends AbstractBlock {
     private BigInteger gasLimit;
     private BigInteger gasUsed;

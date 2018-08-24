@@ -1,5 +1,8 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class EthereumTransaction extends AbstractTransaction {
 
     private String from;

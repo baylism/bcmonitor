@@ -48,6 +48,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     }
 
 
+    // see https://github.com/reactor/reactive-streams-commons/issues/21#issuecomment-210178344
     public Flux<B> saveBlocks(long fromHeight, long toHeight) {
 
         int fromInt = (int) fromHeight;
@@ -56,13 +57,22 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
         logger.info("Count: " + count);
 
         return Flux.range(fromInt, count)
-                .flatMap(client::getBlockHash)
+                .concatMap(client::getBlockHash)
                 .doOnNext(hash -> logger.info("Got block hash from client " + hash))
                 // .flatMap(source -> source) // == merge()
-                .flatMap(hash -> client.getBlock(hash))
+                .concatMap(hash -> client.getBlock(hash))
                 .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .flatMap(blockRepository::save);
+                .concatMap(blockRepository::save);
                 // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+        //
+        // return Flux.range(fromInt, count)
+        //         .flatMap(client::getBlockHash)
+        //         .doOnNext(hash -> logger.info("Got block hash from client " + hash))
+        //         // .flatMap(source -> source) // == merge()
+        //         .flatMap(client::getBlock)
+        //         .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+        //         .flatMap(blockRepository::save);
+        //         // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
 
     }
 
@@ -101,6 +111,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
     }
 
+    // issue: transaction sub not take part in backpressure. do we want it to wait? not an issue if speed of blocks slow anyway?
     public Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
 
         logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight);
