@@ -2,20 +2,26 @@
 
 # ========= Authentication =========
 
-ZCASH_HOSTNAME=zcash-0
-ZCASH_PORT=9998
-ZCASH_UN=
-ZCASH_PW=
-
-DASH_HOSTNAME=dash-0
-DASH_PORT=9998
-DASH_UN=
-DASH_PW=
-
 BITCOIN_HOSTNAME=bitcoin-0
 BITCOIN_PORT=9998
 BITCOIN_UN=
 BITCOIN_PW=
+DASH_HOSTNAME=dash-0
+DASH_PORT=9998
+DASH_UN=
+DASH_PW=
+ZCASH_HOSTNAME=zcash-0
+ZCASH_PORT=9998
+ZCASH_UN=
+ZCASH_PW=
+MONERO_HOSTNAME=monero-0
+MONERO_PORT=9998
+MONERO_UN=
+MONERO_PW=
+ETHEREUM_HOSTNAME=ethereum-0
+ETHEREUM_PORT=9998
+ETHEREUM_UN=
+ETHEREUM_PW=
 
 # ========= Params =========
 #params:
@@ -125,30 +131,45 @@ echo Get best block hash
 curl -w "\n\n" --user ${BITCOIN_UN}:${BITCOIN_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getbestblockhash", "params": [] }' -H 'content-type: text/plain;' http://${BITCOIN_HOSTNAME}:${BITCOIN_PORT}
 
 
-#echo ========= Running monero calls =========
-#
-#echo ----- Parameterised calls -----
-#
-#echo Get block
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblock", "params": ["000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582", true] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#echo Get transaction
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getrawtransaction", "params": ["d903e90e5745ca48a88c84d6f2e0431d49a27cfede8e6171c1df7ed6aa7747ed", true] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#
-#echo ----- Other calls -----
-#
-#echo Get block hash
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockhash", "params": [50000] }' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#echo Get raw mempool
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getrawmempool", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#echo Get mempool info
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getmempoolinfo", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#echo Get blockchain info
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
-#
-#echo Get best block hash
-#curl -w "\n\n" --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getbestblockhash", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}
+echo ========= Running monero calls =========
+
+echo ----- Parameterised calls -----
+
+echo Get block
+
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc":"2.0","id":"0","method":"get_block","params":{"hash":"510ee3c4e14330a7b96e883c323a60ebd1b5556ac1262d0bc03c24a3b785516f"}}' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
+
+
+echo Get transaction
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"txs_hashes":["d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408"],"decode_as_json":true}' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transactions
+
+
+echo ----- Other calls -----
+
+echo Get block hash
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc":"2.0","id":"0","method":"on_get_block_hash","params":[50000]}' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
+
+echo Get raw mempool hashes binary
+curl -s -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transaction_pool_hashes.bin -o mnmempoolbin
+
+head -c 1000 mnmempoolbin
+echo ...
+tail -c 1000 mnmempoolbin
+
+echo;echo;
+echo Get raw mempool hashes
+curl -s -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transaction_pool -o mnmempool
+
+head -c 1000 mnmempool
+echo ...
+tail -c 1000 mnmempool
+echo;echo;
+
+echo Get mempool info
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transaction_pool_stats
+
+echo Get blockchain info
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "get_info", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
+
+echo Get best block hash
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "get_last_block_header", "params": [] }' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
