@@ -12,7 +12,7 @@ import java.math.BigInteger;
  *
  *
  */
-@Document
+@Document(collection = "bitcoinBlock")
 public class BitcoinBlock extends AbstractBlock {
 
     private long medianTime; // of previous 11 block
