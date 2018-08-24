@@ -39,12 +39,21 @@ public class BitcoinController {
     }
 
     // ============ block/transaction requests ============
-    @GetMapping("/block/{hash}")
+    @GetMapping("/block/{hash:.*[a-z]+.*}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
 
         return blockRepository
                 .findById(hash)
                 .switchIfEmpty(client.getBlock(hash));
+
+    }
+
+    @GetMapping("/block/{height:[0-9]+}")
+    Mono<BitcoinBlock> getBlock(@PathVariable Long height) {
+
+        return blockRepository
+                .findByHeight(height);
+
     }
 
     @GetMapping("/blocks/{fromHeight}/{toHeight}")

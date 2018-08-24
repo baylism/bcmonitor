@@ -1,5 +1,6 @@
 package com.bcam.bcmonitor.extractor.mapper;
 
+import com.bcam.bcmonitor.api.ZCashController;
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.ZCashBlock;
 import com.bcam.bcmonitor.model.DashBlock;
@@ -8,6 +9,8 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -15,6 +18,8 @@ import java.util.ArrayList;
 
 
 public class ZCashBlockDeserializer extends BlockchainDeserializer<ZCashBlock> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZCashBlockDeserializer.class);
 
 
     @Override

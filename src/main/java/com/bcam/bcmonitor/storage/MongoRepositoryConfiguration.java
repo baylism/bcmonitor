@@ -31,6 +31,6 @@ public class MongoRepositoryConfiguration extends AbstractReactiveMongoConfigura
 
     @Override
     protected String getDatabaseName() {
-        return "reactive";
+        return "test";
     }
 }

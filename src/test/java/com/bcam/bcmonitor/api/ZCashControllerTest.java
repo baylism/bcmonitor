@@ -56,7 +56,7 @@ public class ZCashControllerTest {
                 .when(
                         request()
                                 .withMethod("POST")
-                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"0007bc227e1c57a4a70e237cad00e7b7ce565155ab49166bc57397a26d339283\",2]}")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"0007bc227e1c57a4a70e237cad00e7b7ce565155ab49166bc57397a26d339283\",true]}")
                 )
                 .respond(
                         response()
@@ -90,7 +90,7 @@ public class ZCashControllerTest {
         mockServer
                 .when(request()
                         .withMethod("POST")
-                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getrawtransaction\",\"params\":[\"851bf6fbf7a976327817c738c489d7fa657752445430922d94c983c0b9ed4609\",true]}") //TODO check bool encoding
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getrawtransaction\",\"params\":[\"851bf6fbf7a976327817c738c489d7fa657752445430922d94c983c0b9ed4609\",1]}") //TODO check bool encoding
                 )
                 .respond(
                         response()
@@ -157,7 +157,7 @@ public class ZCashControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 // .expectBody(String.class).isEqualTo(ZCashRPCResponses.getBestBlockHashResponse);
-                .expectBody(String.class).isEqualTo("\"00000000b0e31a8bb7bbcf902e7f854599e369984b9f85f2d2f1e3cfd9c0f265\"");
+                .expectBody(String.class).isEqualTo("00000000b0e31a8bb7bbcf902e7f854599e369984b9f85f2d2f1e3cfd9c0f265");
     }
 
     @Test

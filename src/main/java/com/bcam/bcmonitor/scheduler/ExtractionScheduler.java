@@ -81,11 +81,15 @@ public class ExtractionScheduler {
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncDashBlocks() {
 
+        logger.info("Calling sync blocks for dash");
+
         syncBlocks(DASH, dashBulkExtractor);
     }
 
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncZCashBlocks() {
+
+        // logger.info("Calling sync blocks for zcash");
 
         syncBlocks(ZCASH, zCashBulkExtractor);
     }
@@ -97,13 +101,24 @@ public class ExtractionScheduler {
             return;
         }
 
+        logger.info("Starting sync blocks for bitcoin");
+
+
         Long tip = tracker.getTipFor(blockchain);
         Long synced = getLastSyncedFor(blockchain);
         Long initialHeight = initialHeights.get(blockchain);
 
         long fromHeight = synced > initialHeight ? synced : initialHeight;
 
+        logger.info("tip = " + tip);
+        logger.info("last synced = " + tip);
+        logger.info("initial height = " + tip);
+        logger.info("from height = " + tip);
+
+
         if (tip > fromHeight) {
+
+            logger.info("Calling save blocks and transactions");
 
             extractor.saveBlocksAndTransactions(fromHeight + 1, tip);
 
@@ -152,6 +167,9 @@ public class ExtractionScheduler {
     public void setInitialHeightFor(Blockchain blockchain, Long height) {
 
         initialHeights.put(blockchain, height);
+
+        setLastSyncedFor(blockchain, - 1L); // re-run syncing
+
     }
 
 

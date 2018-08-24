@@ -1,10 +1,14 @@
 package com.bcam.bcmonitor.api.admin;
 
+import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
+import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.BitcoinTransaction;
 import com.bcam.bcmonitor.model.Blockchain;
 import com.bcam.bcmonitor.scheduler.BlockchainTracker;
 import com.bcam.bcmonitor.scheduler.ExtractionScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -17,15 +21,32 @@ public class AdminController {
     private ExtractionScheduler scheduler;
     private BlockchainTracker tracker;
 
+    private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
+
 
     @Autowired
-    AdminController(ExtractionScheduler scheduler, BlockchainTracker tracker) {
+    AdminController(ExtractionScheduler scheduler, BlockchainTracker tracker, BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor) {
 
         this.scheduler = scheduler;
         this.tracker = tracker;
 
+        this.bitcoinBulkExtractor = bitcoinBulkExtractor;
     }
 
+    @GetMapping("/extract/{fromHeight}/{toHeight}")
+    public Flux<BitcoinBlock> extract(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        return bitcoinBulkExtractor
+                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
+
+    }
+
+    @GetMapping("/extractblock/{fromHeight}/{toHeight}")
+    public Flux<BitcoinBlock> extractBlocks(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        return bitcoinBulkExtractor
+                .saveBlocks(fromHeight, toHeight);
+    }
 
     @GetMapping("/extraction")
     public Mono<Map<String, Object>> getAllScheduler() {

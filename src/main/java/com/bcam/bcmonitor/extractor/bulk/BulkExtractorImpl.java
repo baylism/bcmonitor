@@ -3,6 +3,7 @@ package com.bcam.bcmonitor.extractor.bulk;
 import com.bcam.bcmonitor.extractor.client.ReactiveClient;
 import com.bcam.bcmonitor.model.AbstractBlock;
 import com.bcam.bcmonitor.model.AbstractTransaction;
+import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
                 .flatMap(client::getBlockHash)
                 .doOnNext(hash -> logger.info("Got block hash from client " + hash))
                 // .flatMap(source -> source) // == merge()
-                .flatMap(client::getBlock)
+                .flatMap(hash -> client.getBlock(hash))
                 .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
                 .flatMap(blockRepository::save);
                 // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
@@ -98,6 +99,32 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
                 )
                 .subscribe(block -> logger.info("Saved block " + block));
 
+    }
+
+    public Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
+
+        logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight);
+
+        return saveBlocks(fromHeight, toHeight)
+                .doOnNext(
+                        block -> {
+                            saveTransactions(block)
+                                    .subscribe(transaction -> logger.info("Saved transaction " + transaction));
+                        }
+                );
+    }
+
+    public Flux<B> saveBlocksAndTransactionsForward2(long fromHeight, long toHeight) {
+
+        logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight);
+
+        return saveBlocks(fromHeight, toHeight)
+                .doOnNext(
+                        block -> {
+                            saveTransactions(block)
+                                    .subscribe(transaction -> logger.info("Saved transaction " + transaction));
+                        }
+                );
     }
 
 

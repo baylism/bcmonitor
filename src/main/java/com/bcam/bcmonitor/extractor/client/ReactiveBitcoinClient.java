@@ -70,7 +70,7 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl implements Reactiv
     public Mono<BitcoinBlock> getBlock(String hash) {
         JSONRPCRequest request = new JSONRPCRequest("getblock");
         request.addParam(hash);
-        request.addParam(2); // always request decoded JSON with transactions
+        request.addParam(true); // always request decoded JSON with transactions
 
         return client
                 .requestResponseSpec(request.toString())
@@ -82,7 +82,7 @@ public class ReactiveBitcoinClient extends ReactiveClientImpl implements Reactiv
         JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
 
         request.addParam(hash);
-        request.addParam(Boolean.TRUE);
+        request.addParam(true);
 
         return client
                 .requestResponseSpec(request.toString())

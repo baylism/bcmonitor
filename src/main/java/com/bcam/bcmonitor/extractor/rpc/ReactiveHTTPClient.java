@@ -99,9 +99,9 @@ public class ReactiveHTTPClient {
     private ExchangeFilterFunction logRequest() {
         return (clientRequest, next) -> {
             logger.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-            clientRequest.headers()
-                    .forEach((name, values) -> values.forEach(value -> logger.info("{}={}", name, value)));
-            logger.info("Body: " + clientRequest.body());
+            // clientRequest.headers()
+            //         .forEach((name, values) -> values.forEach(value -> logger.info("{}={}", name, value)));
+            logger.info("Attrs: " + clientRequest.attributes());
             return next.exchange(clientRequest);
         };
     }
@@ -123,6 +123,8 @@ public class ReactiveHTTPClient {
                 .uri(URIPath)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
+
+
     }
 
     public ResponseSpec getResponseSpec(String blockchain, String method) {

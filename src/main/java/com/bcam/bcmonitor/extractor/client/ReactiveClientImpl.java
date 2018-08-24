@@ -45,8 +45,8 @@ public abstract class ReactiveClientImpl {
     public Mono<BlockchainInfo> getBlockchainInfo() {
         JSONRPCRequest request = new JSONRPCRequest("getblockchaininfo");
 
-        BlockchainInfo info = new BlockchainInfo();
-        info.setBlocks(0L);
+        // BlockchainInfo info = new BlockchainInfo();
+        // info.setBlocks(0L);
 
         // throw new RuntimeException("CALLED REAL CLIENT");
 
@@ -65,7 +65,7 @@ public abstract class ReactiveClientImpl {
 
 
     public Mono<String> getBlockHash(long height) {
-        System.out.println("RBC Getting hash");
+        // System.out.println("RBC Getting hash");
         JSONRPCRequest request = new JSONRPCRequest("getblockhash");
 
         request.addParam(height);

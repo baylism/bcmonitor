@@ -17,4 +17,6 @@ public interface BulkExtractor<B extends AbstractBlock, T extends AbstractTransa
     Flux<T> saveTransactions(B block);
 
     Disposable saveBlocksAndTransactions(long fromHeight, long toHeight);
+
+    Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight);
 }

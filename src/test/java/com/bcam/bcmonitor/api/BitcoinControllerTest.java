@@ -91,7 +91,7 @@ public class BitcoinControllerTest {
                 .when(
                         request()
                                 .withMethod("POST")
-                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",2]}")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",true]}")
                 )
                 .respond(
                         response()
@@ -138,7 +138,7 @@ public class BitcoinControllerTest {
                 .when(
                         request()
                                 .withMethod("POST")
-                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"hash\",2]}")
+                                .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"getblock\",\"params\":[\"hash\",true]}")
                 )
                 .respond(
                         response()
@@ -234,7 +234,7 @@ public class BitcoinControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 // .expectBody(String.class).isEqualTo(BitcoinRPCResponses.getBestBlockHashResponse);
-                .expectBody(String.class).isEqualTo("\"00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff\"");
+                .expectBody(String.class).isEqualTo("00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff");
     }
 
     @Test
@@ -256,7 +256,7 @@ public class BitcoinControllerTest {
                 .uri("/api/bitcoin/blockhash/0")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("\"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"");
+                .expectBody(String.class).isEqualTo("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f");
     }
 
 
@@ -308,7 +308,7 @@ public class BitcoinControllerTest {
                 .uri("/api/bitcoin/method/getbestblockhash")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("\"00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff\"");
+                .expectBody(String.class).isEqualTo("00000000000000000024c244f9c7d1cc0e593a7a4aa31c1ee2ef35206934bfff");
     }
 
     @WithMockUser

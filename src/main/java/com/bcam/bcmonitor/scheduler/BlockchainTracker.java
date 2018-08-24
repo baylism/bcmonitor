@@ -81,7 +81,7 @@ public class BlockchainTracker {
             return;
         }
 
-        logger.info("Updating tip for " + blockchain);
+        // logger.info("Updating tip for " + blockchain);
 
         // check for increase?
         try {

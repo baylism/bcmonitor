@@ -226,7 +226,7 @@ public class DashControllerTest {
                 .uri("/api/dash/bestblockhash")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("\"000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582\"");
+                .expectBody(String.class).isEqualTo("000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582");
     }
 
 
