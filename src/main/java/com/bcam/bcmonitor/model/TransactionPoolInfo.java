@@ -5,7 +5,7 @@ public class TransactionPoolInfo {
     private long size;
     private long sizeBytes;
     private long memoryUsage;
-    private float minFeePerKB;
+    // private float minFeePerKB;
 
     public long getSize() {
         return size;
@@ -31,11 +31,11 @@ public class TransactionPoolInfo {
         this.memoryUsage = memoryUsage;
     }
 
-    public float getMinFeePerKB() {
-        return minFeePerKB;
-    }
-
-    public void setMinFeePerKB(float minFeePerKB) {
-        this.minFeePerKB = minFeePerKB;
-    }
+    // public float getMinFeePerKB() {
+    //     return minFeePerKB;
+    // }
+    //
+    // public void setMinFeePerKB(float minFeePerKB) {
+    //     this.minFeePerKB = minFeePerKB;
+    // }
 }

@@ -48,7 +48,6 @@ public class ZCashBlockDeserializer extends BlockchainDeserializer<ZCashBlock> {
 
         // bitcoin
         block.setConfirmations(result.get("confirmations").asInt());
-        // block.setMedianTime(result.get("mediantime").asLong());  // TODO check if this actually appears in bitcoin responses
         block.setDifficulty(new BigDecimal(result.get("difficulty").asText()));
         block.setChainWork(hexNodeToBigInt(result.get("chainwork")));
 

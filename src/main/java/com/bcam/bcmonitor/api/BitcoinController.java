@@ -38,7 +38,7 @@ public class BitcoinController {
         this.transactionRepository = transactionRepository;
     }
 
-    // ============ parameterised requests ============
+    // ============ block/transaction requests ============
     @GetMapping("/block/{hash}")
     Mono<BitcoinBlock> getBlock(@PathVariable String hash) {
 

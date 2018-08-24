@@ -93,13 +93,20 @@ public class ReactiveZCashClient extends ReactiveClientImpl implements ReactiveC
         request.addParam(hash);
         request.addParam(2); // always request decoded JSON with transactions
 
-        System.out.println(request);
+        // System.out.println(request);
 
         return client
                 .requestResponseSpec(request.toString())
                 .bodyToMono(ZCashBlock.class);
     }
 
+    @Override
+    public Mono<TransactionPoolInfo> getTransactionPoolInfo() {
+        JSONRPCRequest request = new JSONRPCRequest("getmempoolinfo");
 
+        return client
+                .requestResponseSpec(request.toString())
+                .bodyToMono(TransactionPoolInfo.class);
 
+    }
 }

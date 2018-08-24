@@ -22,7 +22,7 @@ public class BitcoinTransactionPoolInfoDeserializer extends BlockchainDeserializ
         JsonNode result = node.get("result");
 
         info.setMemoryUsage(result.get("usage").asLong());
-        info.setMinFeePerKB(result.get("mempoolminfee").floatValue());
+        // info.setMinFeePerKB(result.get("mempoolminfee").floatValue());
         info.setSize(result.get("size").asInt());
         info.setSizeBytes(result.get("bytes").asInt());
 

@@ -38,12 +38,20 @@ public class ZCashController {
 
 
     // ============ parameterised requests ============
-    @GetMapping("/block/{hash}")
+    @GetMapping("/block/{hash:.*[a-z]+.*}")
     Mono<ZCashBlock> getBlock(@PathVariable String hash) {
 
         return blockRepository
                 .findById(hash)
                 .switchIfEmpty(client.getBlock(hash));
+
+    }
+
+    @GetMapping("/block/{height:[0-9]+}")
+    Mono<ZCashBlock> getBlock(@PathVariable Long height) {
+
+        return blockRepository
+                .findByHeight(height);
 
     }
 
