@@ -25,6 +25,8 @@ public class AdminController {
 
     private BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor;
     private BulkExtractor<DashBlock, DashTransaction> dashBulkExtractor;
+    private BulkExtractor<ZCashBlock, ZCashTransaction> zCashBulkExtractor;
+
 
 
     @Autowired
@@ -53,6 +55,17 @@ public class AdminController {
         logger.info("Admin controller using dash BI " + dashBulkExtractor.toString() + " " + dashBulkExtractor.getClass());
 
         return dashBulkExtractor
+                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
+
+    }
+
+
+    @GetMapping(value = "/extract/zcash/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<ZCashBlock> extractZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        logger.info("Admin controller using dash BI " + zCashBulkExtractor.toString() + " " + zCashBulkExtractor.getClass());
+
+        return zCashBulkExtractor
                 .saveBlocksAndTransactionsForward(fromHeight, toHeight);
 
     }

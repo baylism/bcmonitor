@@ -1,5 +1,7 @@
 package com.bcam.bcmonitor.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -12,8 +14,12 @@ import java.math.BigInteger;
  *
  *
  */
-@Document(collection = "bitcoinBlock")
+@Document(collection = "blocks_bitcoin")
 public class BitcoinBlock extends AbstractBlock {
+    //
+    // @Id
+    // @Indexed
+    // private String hash; // in RPC byte order
 
     private long medianTime; // of previous 11 block
     private BigInteger chainWork;
