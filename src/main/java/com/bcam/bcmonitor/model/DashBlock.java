@@ -11,4 +11,9 @@ public class DashBlock extends BitcoinBlock {
     public DashBlock(String hash, long height) {
         super(hash, height);
     }
+
+    @Override
+    public String toString() {
+        return "DashBlock{ hash = " + getHash() + ", height = " + getHeight() + "}";
+    }
 }

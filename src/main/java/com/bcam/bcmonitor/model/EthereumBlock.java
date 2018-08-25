@@ -29,4 +29,9 @@ public class EthereumBlock extends AbstractBlock {
     public void setGasUsed(BigInteger gasUsed) {
         this.gasUsed = gasUsed;
     }
+
+    @Override
+    public String toString() {
+        return "EthereumBlock{ hash = " + getHash() + ", height = " + getHeight() + "}";
+    }
 }

@@ -48,7 +48,16 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     }
 
 
+
     // see https://github.com/reactor/reactive-streams-commons/issues/21#issuecomment-210178344
+
+    /**
+     *  if fails, could delay manually Flux<document> findAll() {
+     *     return Flux.interval(Duration.ofSeconds(1))
+     *             .takeWhile(i -> i < 9)
+     *             .map(i -> i.intValue() + 1)
+     *             .map(Document::new);
+     */
     public Flux<B> saveBlocks(long fromHeight, long toHeight) {
 
         int fromInt = (int) fromHeight;
@@ -62,8 +71,8 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
                 // .flatMap(source -> source) // == merge()
                 .concatMap(hash -> client.getBlock(hash))
                 .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
-                .concatMap(blockRepository::save);
-                // .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                .concatMap(blockRepository::save)
+                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
         //
         // return Flux.range(fromInt, count)
         //         .flatMap(client::getBlockHash)
@@ -114,7 +123,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     // issue: transaction sub not take part in backpressure. do we want it to wait? not an issue if speed of blocks slow anyway?
     public Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
 
-        logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight);
+        logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight + "; " + this.getClass());
 
         return saveBlocks(fromHeight, toHeight)
                 .doOnNext(
@@ -164,4 +173,13 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
      *                 also :
      *                 Example of Reactor code with timeout and fallback
      */
+
+    @Override
+    public String toString() {
+        return "BulkExtractorImpl{" +
+                "blockRepository=" + blockRepository + " " + blockRepository.getClass() +
+                ", transactionRepository=" + transactionRepository + " " + transactionRepository.getClass() +
+                ", client=" + client +
+                '}';
+    }
 }

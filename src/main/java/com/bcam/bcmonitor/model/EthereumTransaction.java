@@ -63,4 +63,11 @@ public class EthereumTransaction extends AbstractTransaction {
     public void setGas(long gas) {
         this.gas = gas;
     }
+
+    @Override
+    public String toString() {
+        return "EthereumTransaction{" +
+                "hash='" + getHash() + '\'' +
+                '}';
+    }
 }

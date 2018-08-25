@@ -72,4 +72,11 @@ public class ZCashTransaction extends BitcoinTransaction {
     public void setJoinSplitDescriptions(ArrayList<JoinSplit> joinSplitDescriptions) {
         this.joinSplitDescriptions = joinSplitDescriptions;
     }
+
+    @Override
+    public String toString() {
+        return "ZCashTransaction{" +
+                "hash='" + getHash() + '\'' +
+                '}';
+    }
 }

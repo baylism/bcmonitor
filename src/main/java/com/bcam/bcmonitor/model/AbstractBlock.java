@@ -16,7 +16,7 @@ public abstract class AbstractBlock {
 
     private String prevBlockHash;
 
-    // @Indexed
+    @Indexed
     private long height;
     private long timeStamp;
     private long sizeBytes;
@@ -131,4 +131,6 @@ public abstract class AbstractBlock {
         AbstractBlock block = (AbstractBlock) o;
         return hash.equals(block.getHash());
     }
+
+
 }

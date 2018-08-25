@@ -16,4 +16,9 @@ public class ZCashBlock extends BitcoinBlock {
     public ZCashBlock(String hash, long height) {
         super(hash, height);
     }
+
+    @Override
+    public String toString() {
+        return "ZCashBlock{ hash = " + getHash() + ", height = " + getHeight() + "}";
+    }
 }

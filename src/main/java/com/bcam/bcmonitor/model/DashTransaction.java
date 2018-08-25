@@ -12,4 +12,11 @@ public class DashTransaction extends BitcoinTransaction {
     public DashTransaction(String hash) {
         super(hash);
     }
+
+    @Override
+    public String toString() {
+        return "DashTransaction{" +
+                "hash='" + getHash() + '\'' +
+                '}';
+    }
 }

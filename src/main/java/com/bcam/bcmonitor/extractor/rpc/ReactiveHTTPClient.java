@@ -101,7 +101,7 @@ public class ReactiveHTTPClient {
             logger.info("Request: {} {}", clientRequest.method(), clientRequest.url());
             // clientRequest.headers()
             //         .forEach((name, values) -> values.forEach(value -> logger.info("{}={}", name, value)));
-            logger.info("Attrs: " + clientRequest.attributes());
+            // logger.info("Attrs: " + clientRequest.attributes());
             return next.exchange(clientRequest);
         };
     }
@@ -109,7 +109,7 @@ public class ReactiveHTTPClient {
     private ExchangeFilterFunction logResponse() {
         return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
             logger.info("Response Status {}", clientResponse.statusCode());
-            logger.info("Response Content type {}", clientResponse.headers().contentType());
+            // logger.info("Response Content type {}", clientResponse.headers().contentType());
             return Mono.just(clientResponse);
         });
     }

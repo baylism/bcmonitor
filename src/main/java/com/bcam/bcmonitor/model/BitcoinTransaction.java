@@ -101,4 +101,11 @@ public class BitcoinTransaction extends AbstractTransaction {
     public void setVout(ArrayList<TransactionOutput> vout) {
         this.vout = vout;
     }
+
+    @Override
+    public String toString() {
+        return "BitcoinTransaction{" +
+                "hash='" + getHash() + '\'' +
+                '}';
+    }
 }
