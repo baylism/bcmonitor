@@ -3,6 +3,7 @@ package com.bcam.bcmonitor.api;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveBitcoinClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.storage.BitcoinBlockRepository;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
@@ -25,12 +26,13 @@ public class BitcoinController {
 
     private ReactiveBitcoinClient client;
 
-    private BlockRepository<BitcoinBlock> blockRepository;
+    // private BlockRepository<BitcoinBlock> blockRepository;
+    private BitcoinBlockRepository blockRepository;
     private TransactionRepository<BitcoinTransaction> transactionRepository;
 
 
     @Autowired
-    public BitcoinController(ReactiveBitcoinClient client, BlockRepository<BitcoinBlock> blockRepository, TransactionRepository<BitcoinTransaction> transactionRepository) {
+    public BitcoinController(ReactiveBitcoinClient client, BitcoinBlockRepository blockRepository, TransactionRepository<BitcoinTransaction> transactionRepository) {
 
         this.client = client;
 
@@ -56,11 +58,13 @@ public class BitcoinController {
 
     }
 
+    // should default to latest blocks if second param is empty
     @GetMapping(value = "/blocks/{fromHeight}/{toHeight}", produces = "application/stream+json")
     Flux<BitcoinBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
-        return blockRepository
-                .findAllByHeightInRange(fromHeight, toHeight);
+        return blockRepository.
+            findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
+                // .findAllByHeightInRange(fromHeight, toHeight);
 
     }
 

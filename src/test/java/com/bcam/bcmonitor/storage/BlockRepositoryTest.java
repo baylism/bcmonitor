@@ -114,10 +114,11 @@ public class BlockRepositoryTest {
         // Flux<BitcoinTransaction> insertedTransactions = blockRepository.findAll(sort);
 
 
-        Flux<BitcoinBlock> insertedBlockFlux = blockRepository.findAllByHeightInRange(0L, 2L);
+        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightBetween(-1L, 3L);
+        // Flux<BitcoinBlock> insertedBlockFlux = blockRepository.findAllByHeightInRange(0L, 2L);
 
         StepVerifier
-                .create(insertedBlockFlux)
+                .create(insertedBlocks)
                 .assertNext(insertedBlock -> {
                     logger.info("Got block " + insertedBlock);
                     assertEquals("foo", insertedBlock.getHash());

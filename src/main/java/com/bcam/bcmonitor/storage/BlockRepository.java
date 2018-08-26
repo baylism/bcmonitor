@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
  *
  *
  */
-@Repository
+@NoRepositoryBean
 public interface BlockRepository<T extends AbstractBlock> extends ReactiveMongoRepository<T, String>, BlockRepositoryCustom<T> {
 
     Mono<T> findByHeight(long height);

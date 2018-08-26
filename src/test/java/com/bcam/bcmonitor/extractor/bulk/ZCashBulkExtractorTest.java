@@ -76,7 +76,12 @@ public class ZCashBulkExtractorTest {
 
         save.blockLast();
 
-        Flux<ZCashBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+        Long fromHeight = 0L;
+        Long toHeight = 2L;
+
+        // Flux<ZCashBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+        Flux<ZCashBlock> insertedBlocks = blockRepository.findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
+
 
         StepVerifier
                 .create(insertedBlocks)

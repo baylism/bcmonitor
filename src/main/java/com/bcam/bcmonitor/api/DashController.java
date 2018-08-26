@@ -57,7 +57,9 @@ public class DashController {
     Flux<DashBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
         return blockRepository
-                .findAllByHeightInRange(fromHeight, toHeight);
+        .findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
+
+        // .findAllByHeightInRange(fromHeight, toHeight);
 
     }
 

@@ -143,7 +143,13 @@ public class BitcoinBulkExtractorTest {
 
         save.blockLast();
 
-        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+        Long fromHeight = 0L;
+        Long toHeight = 2L;
+
+        // Flux<ZCashBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
+        Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
+
+        // Flux<BitcoinBlock> insertedBlocks = blockRepository.findAllByHeightInRange(0L, 2L);
 
         StepVerifier
                 .create(insertedBlocks)

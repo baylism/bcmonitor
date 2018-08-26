@@ -4,6 +4,6 @@ import reactor.core.publisher.Flux;
 
 public interface BlockRepositoryCustom<T> {
 
-    Flux<T> findAllByHeightInRange(long fromHeight, long toHeight);
+    // Flux<T> findAllByHeightInRange(long fromHeight, long toHeight);
 
 }
