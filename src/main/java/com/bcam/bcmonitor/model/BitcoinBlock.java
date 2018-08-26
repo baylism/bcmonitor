@@ -14,7 +14,7 @@ import java.math.BigInteger;
  *
  *
  */
-@Document(collection = "blocks_bitcoin")
+@Document()
 public class BitcoinBlock extends AbstractBlock {
     //
     // @Id

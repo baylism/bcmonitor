@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@Document(collection = "bitcoinTransaction")
+@Document()
 public class BitcoinTransaction extends AbstractTransaction {
     private float inputsSum;
     private float outputsSum;

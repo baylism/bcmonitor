@@ -2,7 +2,7 @@ package com.bcam.bcmonitor.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "blocks_dash")
+@Document()
 public class DashBlock extends BitcoinBlock {
 
     public DashBlock() {

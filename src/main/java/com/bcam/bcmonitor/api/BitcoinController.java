@@ -78,12 +78,15 @@ public class BitcoinController {
 
 
     @GetMapping(value = "/transactions/{blockHeight}", produces = "application/stream+json")
-    Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable long height) {
+    Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable Long height) {
 
         Flux<String> ids = blockRepository
                 .findByHeight(height)
+                .doOnNext( b -> logger.info("found block" + b))
                 .map(AbstractBlock::getTxids)
-                .flatMapMany(Flux::fromIterable);
+                .doOnNext( b -> logger.info("got tx" + b))
+                .flatMapMany(Flux::fromIterable)
+                .doOnNext( b -> logger.info("tx flux block" + b));
 
          return transactionRepository.findAllById(ids);
     }

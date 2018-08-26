@@ -1,3 +1,24 @@
 #!/bin/bash
 
-curl --user max:01cecfb951713cc9ac820f8c2e0b695b http://localhost:8080/admin/$1/$2 | python -m json.tool
+if [ $# -eq 0 ]
+    then
+        echo usage:
+        echo -e '\t enablesync \t \t [blockchain]'
+        echo -e '\t disablesync \t \t [blockchain]'
+        echo -e '\t enabletracking \t [blockchain]'
+        echo -e '\t disabletracking \t [blockchain]'
+        echo -e '\t setinitialheight \t [blockchain] \t [height]'
+
+    else
+        if [ $# -eq 1 ]; then echo at least two parameters needed; fi
+
+        if [ $# -eq 2 ]
+            then
+                curl -s --user ${adminuser}:${adminpw} http://35.229.87.236/admin/$1/$2 | jq -r .
+            else
+                if [ $# -eq 3 ]
+                    then
+                        curl -s --user ${adminuser}:${adminpw} http://35.229.87.236/admin/$1/$2/$3 | jq -r .
+                fi
+        fi
+fi
