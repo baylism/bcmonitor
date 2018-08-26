@@ -9,6 +9,7 @@ import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +27,9 @@ public class BitcoinController {
 
     private ReactiveBitcoinClient client;
 
-    // private BlockRepository<BitcoinBlock> blockRepository;
-    private BitcoinBlockRepository blockRepository;
+    private ReactiveMongoTemplate template;
+    private BlockRepository<BitcoinBlock> blockRepository;
+    // private BitcoinBlockRepository blockRepository;
     private TransactionRepository<BitcoinTransaction> transactionRepository;
 
 
@@ -55,6 +57,18 @@ public class BitcoinController {
 
         return blockRepository
                 .findByHeight(height);
+
+    }
+
+    @GetMapping(value = "/blocks/{toHeight}", produces = "application/stream+json")
+    Flux<BitcoinBlock> getBlocksUnbounded(@PathVariable long fromHeight) {
+
+        Flux changeStream = template
+                .changeStream(newAggregation(match(where("operationType").is("insert"))),
+                        BitcoinBlock.class, ChangeStreamOptions.empty(), "person");
+
+        // changeStream.doOnNext(event -> System.out.println("Hello " + event.getBody().getFirstname()))
+        //         .subscribe();
 
     }
 
