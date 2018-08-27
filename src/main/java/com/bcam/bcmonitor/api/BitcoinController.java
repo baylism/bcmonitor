@@ -17,7 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 
 @RestController
 @RequestMapping("/api/bitcoin")
@@ -60,27 +64,89 @@ public class BitcoinController {
 
     }
 
-    @GetMapping(value = "/blocks/{toHeight}", produces = "application/stream+json")
-    Flux<BitcoinBlock> getBlocksUnbounded(@PathVariable long fromHeight) {
-
-        Flux changeStream = template
-                .changeStream(newAggregation(match(where("operationType").is("insert"))),
-                        BitcoinBlock.class, ChangeStreamOptions.empty(), "person");
-
-        // changeStream.doOnNext(event -> System.out.println("Hello " + event.getBody().getFirstname()))
-        //         .subscribe();
-
-    }
 
     // should default to latest blocks if second param is empty
     @GetMapping(value = "/blocks/{fromHeight}/{toHeight}", produces = "application/stream+json")
     Flux<BitcoinBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
         return blockRepository.
-            findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
-                // .findAllByHeightInRange(fromHeight, toHeight);
+                findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
+        // .findAllByHeightInRange(fromHeight, toHeight);
 
     }
+
+    @GetMapping(value = "/blocks/{fromHeight}", produces = "application/stream+json")
+    Flux<BitcoinBlock> getLatestBlocks(@PathVariable long fromHeight) {
+
+        return blockRepository.findAllByHeightGreaterThan(fromHeight);
+    }
+
+
+    // @GetMapping(value = "/blocks/{fromHeight}", produces = "application/stream+json")
+    // Flux<BitcoinBlock> getLatestBlocks(@PathVariable long fromHeight) {
+    //
+    //     // UnicastProcessor<BitcoinBlock> hotSource = UnicastProcessor.create();
+    //     //
+    //     // Flux<BitcoinBlock> hotFlux = hotSource.publish()
+    //     //         .autoConnect();
+    //     //
+    //     //
+    //     //
+    //     // return hotFlux;
+    //
+    //
+    //     AtomicReference<Long> reached = new AtomicReference<>(fromHeight);
+    //
+    //     return Flux.generate(
+    //             () -> fromHeight,
+    //             (state, sink) -> {
+    //
+    //                 blockRepository
+    //                         .findAllByHeightGreaterThan(state)
+    //                         .subscribe(block -> {
+    //
+    //                             if (block.getHeight() > reached.get()){
+    //                                 reached.set(block.getHeight());
+    //                                 sink.next(block);
+    //                             }
+    //                         });
+    //
+    //                 // if (state == 10) sink.complete();
+    //                 return reached.get();
+    //             });
+    //  // AtomicReference<Long> reached = new AtomicReference<>(fromHeight);
+    //  //
+    //  //    return Flux.generate(
+    //  //            () -> fromHeight,
+    //  //            (state, sink) -> {
+    //  //
+    //  //
+    //  //                Flux<BitcoinBlock> newBlocks = blockRepository
+    //  //
+    //  //                        .findAllByHeightGreaterThan(state)
+    //  //                        .doOnNext(block -> {
+    //  //
+    //  //                            if (block.getHeight() > reached.get()){
+    //  //                                reached.set(block.getHeight());
+    //  //                            }
+    //  //
+    //  //                        });
+    //  //
+    //  //                newBlocks.subscribe(sink::next);
+    //  //
+    //  //                // if (state == 10) sink.complete();
+    //  //                return reached.get();
+    //  //            });
+    //
+    //     // return flux;
+    //     // return blockRepository.
+    //     //         findAllByHeightGreaterThanOrderByHeightAsc(fromHeight - 1)
+    //     //         .switchIfEmpty();
+    //
+    //     // .findAllByHeightInRange(fromHeight, toHeight);
+    //
+    // }
+
 
     @GetMapping("/transaction/{hash}")
     Mono<BitcoinTransaction> getTransaction(@PathVariable String hash) {
@@ -92,17 +158,19 @@ public class BitcoinController {
 
 
     @GetMapping(value = "/transactions/{blockHeight}", produces = "application/stream+json")
-    Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable Long height) {
+    Flux<BitcoinTransaction> getTransactionsInBlock(@PathVariable Long blockHeight) {
 
         Flux<String> ids = blockRepository
-                .findByHeight(height)
-                .doOnNext( b -> logger.info("found block" + b))
+                .findByHeight(blockHeight)
+                // .doOnNext( b -> logger.info("found block" + b))
                 .map(AbstractBlock::getTxids)
-                .doOnNext( b -> logger.info("got tx" + b))
-                .flatMapMany(Flux::fromIterable)
-                .doOnNext( b -> logger.info("tx flux block" + b));
+                // .doOnNext( b -> logger.info("got tx" + b))
+                .flatMapMany(Flux::fromIterable);
+        // .doOnNext( b -> logger.info("tx flux block" + b));
 
-         return transactionRepository.findAllById(ids);
+        // return ids;
+
+        return transactionRepository.findAllById(ids);
     }
 
     // ============ other objects ============

@@ -88,7 +88,7 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     public Flux<T> saveTransactions(B block) {
         return Flux.fromIterable(block.getTxids())
                 .doOnNext(txids -> logger.info("Got txids " + txids))
-                .flatMap(client::getTransaction)
+                .concatMap(client::getTransaction)
                 .doOnNext(txids -> logger.info("Created transactions from client " + txids))
                 // .flatMap(source -> source) // == merge()
                 .flatMap(transactionRepository::save)
@@ -120,30 +120,27 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
     }
 
-    // issue: transaction sub not take part in backpressure. do we want it to wait? not an issue if speed of blocks slow anyway?
-    public Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
+    // // issue: transaction sub not take part in backpressure. do we want it to wait? not an issue if speed of blocks slow anyway?
+    // public Flux<B> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
+    //
+    //     logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight + "; " + this.getClass());
+    //
+    //     return saveBlocks(fromHeight, toHeight)
+    //             .doOnNext(
+    //                     block -> {
+    //                         saveTransactions(block)
+    //                                 .subscribe(transaction -> logger.info("Saved transaction " + transaction));
+    //                     }
+    //             );
+    // }
 
-        logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight + "; " + this.getClass());
-
-        return saveBlocks(fromHeight, toHeight)
-                .doOnNext(
-                        block -> {
-                            saveTransactions(block)
-                                    .subscribe(transaction -> logger.info("Saved transaction " + transaction));
-                        }
-                );
-    }
-
-    public Flux<B> saveBlocksAndTransactionsForward2(long fromHeight, long toHeight) {
+    public Flux<T> saveBlocksAndTransactionsForward(long fromHeight, long toHeight) {
 
         logger.info("About to save and forward blocks and transactions from " + fromHeight + " to " + toHeight);
 
         return saveBlocks(fromHeight, toHeight)
-                .doOnNext(
-                        block -> {
-                            saveTransactions(block)
-                                    .subscribe(transaction -> logger.info("Saved transaction " + transaction));
-                        }
+                .concatMap(
+                        this::saveTransactions
                 );
     }
 

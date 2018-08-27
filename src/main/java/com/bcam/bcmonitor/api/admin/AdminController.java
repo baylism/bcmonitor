@@ -40,7 +40,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/extract/bitcoin/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<BitcoinBlock> extractBitcoin(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+    public Flux<BitcoinTransaction> extractBitcoin(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
 
         logger.info("Admin controller using bitcoin BI " + bitcoinBulkExtractor.toString() + " " + bitcoinBulkExtractor.getClass());
 
@@ -50,7 +50,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/extract/dash/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<DashBlock> extractDash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+    public Flux<DashTransaction> extractDash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
 
         logger.info("Admin controller using dash BI " + dashBulkExtractor.toString() + " " + dashBulkExtractor.getClass());
 
@@ -61,7 +61,7 @@ public class AdminController {
 
 
     @GetMapping(value = "/extract/zcash/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<ZCashBlock> extractZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+    public Flux<ZCashTransaction> extractZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
 
         logger.info("Admin controller using dash BI " + zCashBulkExtractor.toString() + " " + zCashBulkExtractor.getClass());
 

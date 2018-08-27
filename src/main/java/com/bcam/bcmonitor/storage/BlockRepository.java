@@ -32,4 +32,6 @@ public interface BlockRepository<T extends AbstractBlock> extends ReactiveMongoR
 
     Flux<T> findAllByHeightBetweenOrderByHeightAsc(long fromHeight, long toHeight);
 
+    Flux<T> findAllByHeightGreaterThan(long fromHeight);
+
 }

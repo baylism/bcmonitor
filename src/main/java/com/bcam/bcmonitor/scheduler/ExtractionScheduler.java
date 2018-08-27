@@ -122,7 +122,8 @@ public class ExtractionScheduler {
 
             logger.info("Calling save blocks and transactions");
 
-            extractor.saveBlocksAndTransactions(fromHeight + 1, tip);
+            // extractor.saveBlocksAndTransactions(fromHeight + 1, tip);
+            extractor.saveBlocksAndTransactionsForward(fromHeight + 1, tip).subscribe();
 
             // assumes ^ always succeeds
             setLastSyncedFor(blockchain, tip);
