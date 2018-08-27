@@ -37,6 +37,8 @@ public class DashBlockDeserializer extends BlockchainDeserializer<DashBlock> {
         block.setHeight(result.get("height").asInt());
         block.setSizeBytes(result.get("size").asInt());
         block.setTimeStamp(result.get("time").asLong());
+        block.setMedianTime(result.get("mediantime").asLong());
+
         block.setPrevBlockHash(result.get("previousblockhash").asText());
 
         block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
