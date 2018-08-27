@@ -67,12 +67,11 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
         return Flux.range(fromInt, count)
                 .concatMap(client::getBlockHash)
-                .doOnNext(hash -> logger.info("Got block hash from client " + hash))
-                // .flatMap(source -> source) // == merge()
+                    .doOnNext(hash -> logger.info("Got block hash from client " + hash))
                 .concatMap(hash -> client.getBlock(hash))
-                .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
+                    .doOnNext(bitcoinBlock -> logger.info("Created block " + bitcoinBlock))
                 .concatMap(blockRepository::save)
-                .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
+                    .doOnNext(bitcoinBlock -> logger.info("Saved block " + bitcoinBlock));
         //
         // return Flux.range(fromInt, count)
         //         .flatMap(client::getBlockHash)
@@ -87,12 +86,11 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
     public Flux<T> saveTransactions(B block) {
         return Flux.fromIterable(block.getTxids())
-                .doOnNext(txids -> logger.info("Got txids " + txids))
+                    .doOnNext(txids -> logger.info("Got txids " + txids))
                 .concatMap(client::getTransaction)
-                .doOnNext(txids -> logger.info("Created transactions from client " + txids))
-                // .flatMap(source -> source) // == merge()
+                    .doOnNext(txids -> logger.info("Created transactions from client " + txids))
                 .flatMap(transactionRepository::save)
-                .doOnNext(txids -> logger.info("Saved txids " + txids));
+                .   doOnNext(txids -> logger.info("Saved txids " + txids));
 
     }
 
