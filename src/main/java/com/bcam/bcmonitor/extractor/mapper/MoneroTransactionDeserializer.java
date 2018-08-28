@@ -33,18 +33,9 @@ public class MoneroTransactionDeserializer extends StdDeserializer<MoneroTransac
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
-        JsonNode result = node.get("result");
+        JsonNode result = node.get("txs").get(0);
 
-        transaction.setHash(result.get("txid").asText());  // fine where "hash" and "txid" are same (change for segwit)
-        transaction.setSizeBytes(result.get("size").asInt());
-        transaction.setBlockHash(result.get("blockhash").asText());
-
-        transaction.setVin(readInputs(result));
-        transaction.setVout(readOutputs(result));
-
-
-        transaction.setTimeReceived(new Date(System.currentTimeMillis()).toInstant().getEpochSecond());
-
+        transaction.setHash(result.get("tx_hash").asText());
 
         return transaction;
     }

@@ -54,7 +54,7 @@ public class ReactiveMoneroClient extends ReactiveClientImpl implements Reactive
 
         module.addDeserializer(TransactionPoolInfo.class, new BitcoinTransactionPoolInfoDeserializer());
         module.addDeserializer(TransactionPool.class, new BitcoinTransactionPoolDeserializer());
-        module.addDeserializer(BlockchainInfo.class, new BlockchainInfoDeserializer());
+        module.addDeserializer(BlockchainInfo.class, new MoneroBlockchainInfoDeserializer());
         module.addDeserializer(RPCResult.class, new RPCResultDeserializer());
 
         // Monero
@@ -105,5 +105,22 @@ public class ReactiveMoneroClient extends ReactiveClientImpl implements Reactive
 
     }
 
+    @Override
+    public Mono<BlockchainInfo> getBlockchainInfo() {
+
+
+        JSONRPCRequest request = new JSONRPCRequest("get_info");
+
+        return getClient()
+                .requestResponseSpecURI("ison_rpc", request.toString())
+                .bodyToMono(BlockchainInfo.class);
+
+    }
+
+    @Override
+    public Mono<String> getBestBlockHash() {
+
+        return getBlockchainInfo().map(BlockchainInfo::getBestblockhash);
+    }
 }
 

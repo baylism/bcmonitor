@@ -110,55 +110,58 @@ public class MoneroControllerTest {
                 .expectStatus().isOk()
                 .expectBody(MoneroTransaction.class).isEqualTo(expectedTransaction);
     }
-    //
-    // @Test
-    // public void getBlockchainInfo() {
-    //
-    //     mockServer
-    //             .when(request()
-    //                     .withMethod("POST")
-    //                     .withBody("{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", \"method\": \"get_info\", \"params\": [] }")
-    //             )
-    //             .respond(
-    //                     response()
-    //                             .withBody(MoneroRPCResponses.getBlockchainInfoResponse)
-    //                             .withHeader("Content-Type", "text/html")
-    //             );
-    //
-    //
-    //     webTestClient
-    //             .get()
-    //             .uri("/api/monero/blockchaininfo")
-    //             .exchange()
-    //             .expectStatus().isOk()
-    //             .expectBody(BlockchainInfo.class)
-    //             .consumeWith(result -> {
-    //                 Assertions.assertEquals(result.getResponseBody().getBlocks(), 1648775L);
-    //                 Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "4d543d125b181cf62ab3b7c2562aca3a4c11fa4bd3eb2ab6fdd581545f8d226b");
-    //             });
-    // }
-    //
-    // @Test
-    // public void getBestBlockHash() {
-    //
-    //     mockServer
-    //             .when(request()
-    //                     .withMethod("POST")
-    //                     .withBody("{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", \"method\": \"get_last_block_header\", \"params\": [] }")
-    //             )
-    //             .respond(
-    //                     response()
-    //                             .withBody(MoneroRPCResponses.getBestBlockHashResponse)
-    //                             .withHeader("Content-Type", "text/html")
-    //             );
-    //
-    //     webTestClient
-    //             .get()
-    //             .uri("/api/monero/bestblockhash")
-    //             .exchange()
-    //             .expectStatus().isOk()
-    //             .expectBody(String.class).isEqualTo("4d543d125b181cf62ab3b7c2562aca3a4c11fa4bd3eb2ab6fdd581545f8d226b");
-    // }
+
+    @Test
+    public void getBlockchainInfo() {
+
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"get_info\",\"params\":[]}")
+                )
+                .respond(
+                        response()
+                                .withBody(MoneroRPCResponses.getBlockchainInfoResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+
+        webTestClient
+                .get()
+                .uri("/api/monero/blockchaininfo")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BlockchainInfo.class)
+                .consumeWith(result -> {
+                    Assertions.assertEquals(result.getResponseBody().getBlocks(), 1648814L);
+                    Assertions.assertEquals(result.getResponseBody().getBestblockhash(), "4d543d125b181cf62ab3b7c2562aca3a4c11fa4bd3eb2ab6fdd581545f8d226b");
+                });
+    }
+
+    @Test
+    public void getBestBlockHash() {
+
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"optional_string\",\"method\":\"get_info\",\"params\":[]}")
+                        // .withBody("{\"jsonrpc\":\"jsonrpc\",\"id\":\"curltest\",\"method\":\"get_last_block_header\",\"params\":[]}")
+                )
+                .respond(
+                        response()
+                                .withBody(MoneroRPCResponses.getBlockchainInfoResponse)
+
+                                // .withBody(MoneroRPCResponses.getBestBlockHashResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        webTestClient
+                .get()
+                .uri("/api/monero/bestblockhash")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("4d543d125b181cf62ab3b7c2562aca3a4c11fa4bd3eb2ab6fdd581545f8d226b");
+    }
     //
     // @Test
     // public void getTransactionPool() {
