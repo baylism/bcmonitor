@@ -84,31 +84,32 @@ public class MoneroControllerTest {
                     Assertions.assertEquals(1457720227L, result.getResponseBody().getTimeStamp());
                 });
     }
-    //
-    // @Test
-    // public void getTransaction() {
-    //
-    //     mockServer
-    //             .when(request()
-    //                     .withMethod("POST")
-    //                     .withBody("{\"txs_hashes\":[\"d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408\"]}")
-    //             )
-    //             .respond(
-    //                     response()
-    //                             .withBody(MoneroRPCResponses.getTransactionResponse)
-    //                             .withHeader("Content-Type", "text/html")
-    //             );
-    //
-    //     MoneroTransaction expectedTransaction = new MoneroTransaction();
-    //     expectedTransaction.setHash("d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408");
-    //
-    //     webTestClient
-    //             .get()
-    //             .uri("/api/monero/transaction/d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408")
-    //             .exchange()
-    //             .expectStatus().isOk()
-    //             .expectBody(MoneroTransaction.class).isEqualTo(expectedTransaction);
-    // }
+
+
+    @Test
+    public void getTransaction() {
+
+        mockServer
+                .when(request()
+                        .withMethod("POST")
+                        .withBody("{\"txs_hashes\":[\"d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408\"]}")
+                )
+                .respond(
+                        response()
+                                .withBody(MoneroRPCResponses.getTransactionResponse)
+                                .withHeader("Content-Type", "text/html")
+                );
+
+        MoneroTransaction expectedTransaction = new MoneroTransaction();
+        expectedTransaction.setHash("d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408");
+
+        webTestClient
+                .get()
+                .uri("/api/monero/transaction/d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MoneroTransaction.class).isEqualTo(expectedTransaction);
+    }
     //
     // @Test
     // public void getBlockchainInfo() {

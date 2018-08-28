@@ -33,10 +33,6 @@ public class MoneroTransactionDeserializer extends StdDeserializer<MoneroTransac
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
-        if (!node.get("error").isNull()) {
-            throw new RPCResponseException("Error received from RPC. Message: " + node.get("error").get("message").textValue());
-        }
-
         JsonNode result = node.get("result");
 
         transaction.setHash(result.get("txid").asText());  // fine where "hash" and "txid" are same (change for segwit)

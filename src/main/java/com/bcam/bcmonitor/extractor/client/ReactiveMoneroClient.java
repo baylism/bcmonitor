@@ -7,11 +7,15 @@ import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
 import com.bcam.bcmonitor.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 // @Qualifier("ReactiveDashClient")
 @Component
@@ -82,13 +86,23 @@ public class ReactiveMoneroClient extends ReactiveClientImpl implements Reactive
 
     @Override
     public Mono<MoneroTransaction> getTransaction(String hash) {
-        JSONRPCRequest request = new JSONRPCRequest("getrawtransaction");
-        request.addParam(hash);
-        request.addParam(Boolean.TRUE);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        ArrayNode hashesNode = mapper.createArrayNode();
+
+        hashesNode.add(hash);
+
+        // ArrayList<String> hashes = new ArrayList<>();
+        // hashes.add(hash);
+
+        root.putArray("txs_hashes").addAll(hashesNode);
+
 
         return client
-                .requestResponseSpec(request.toString())
+                .requestResponseSpecURI("get_transaction", root.toString())
                 .bodyToMono(MoneroTransaction.class);
+
     }
 
 }

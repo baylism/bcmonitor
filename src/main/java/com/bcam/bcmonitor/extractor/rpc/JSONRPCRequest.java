@@ -40,7 +40,6 @@ public class JSONRPCRequest {
 
     }
 
-
     public void addJsonParam(String name, String param) {
 
         jsonParams.put(name, param);
