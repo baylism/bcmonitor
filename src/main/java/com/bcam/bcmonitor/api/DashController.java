@@ -3,6 +3,7 @@ package com.bcam.bcmonitor.api;
 
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.scheduler.BlockchainTracker;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.bcam.bcmonitor.model.Blockchain.DASH;
+
 @RestController
 @RequestMapping("/api/dash")
 public class DashController {
@@ -22,17 +25,18 @@ public class DashController {
     private static final Logger logger = LoggerFactory.getLogger(DashController.class);
 
     private ReactiveDashClient client;
-
     private BlockRepository<DashBlock> blockRepository;
     private TransactionRepository<DashTransaction> transactionRepository;
+    private BlockchainTracker tracker;
 
     @Autowired
-    public DashController(ReactiveDashClient client, BlockRepository<DashBlock> blockRepository, TransactionRepository<DashTransaction> transactionRepository) {
+    public DashController(ReactiveDashClient client, BlockRepository<DashBlock> blockRepository, TransactionRepository<DashTransaction> transactionRepository, BlockchainTracker tracker) {
 
         this.client = client;
 
         this.blockRepository = blockRepository;
         this.transactionRepository = transactionRepository;
+        this.tracker = tracker;
     }
 
     // ============ parameterised requests ============
@@ -42,14 +46,12 @@ public class DashController {
         return blockRepository
                 .findById(hash)
                 .switchIfEmpty(client.getBlock(hash));
-
     }
 
     @GetMapping("/block/{height:[0-9]+}")
     Mono<DashBlock> getBlock(@PathVariable Long height) {
 
-        return blockRepository
-                .findByHeight(height);
+        return blockRepository.findByHeight(height);
 
     }
 
@@ -57,11 +59,16 @@ public class DashController {
     Flux<DashBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
         return blockRepository
-        .findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
-
-        // .findAllByHeightInRange(fromHeight, toHeight);
-
+                .findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
     }
+
+
+    @GetMapping(value = "/blocks/{fromHeight}", produces = "application/stream+json")
+    Flux<DashBlock> getLatestBlocks(@PathVariable long fromHeight) {
+
+        return blockRepository.findAllByHeightGreaterThan(fromHeight - 1);
+    }
+
 
     @GetMapping("/transaction/{hash}")
     Mono<DashTransaction> getTransaction(@PathVariable String hash) {
@@ -71,16 +78,24 @@ public class DashController {
                 .switchIfEmpty(client.getTransaction(hash));
     }
 
-    @GetMapping("/transactions/{blockHeight}")
-    Flux<DashTransaction> getTransactionsInBlock(@PathVariable long height) {
+
+    @GetMapping(value = "/transactions/{blockHeight}", produces = "application/stream+json")
+    Flux<DashTransaction> getTransactionsInBlock(@PathVariable Long blockHeight) {
 
         Flux<String> ids = blockRepository
-                .findByHeight(height)
+                .findByHeight(blockHeight)
                 .map(AbstractBlock::getTxids)
                 .flatMapMany(Flux::fromIterable);
 
         return transactionRepository.findAllById(ids);
     }
+
+    @GetMapping("bestblockheight")
+    Mono<Long> getBestHeight() {
+
+        return Mono.justOrEmpty(tracker.getTipFor(DASH));
+    }
+
 
     // ============ other objects ============
     @GetMapping("/transactionpool")

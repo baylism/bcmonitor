@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 
 
 public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBlock> {
+
+    private static final Logger logger = LoggerFactory.getLogger(BitcoinBlockDeserializer.class);
 
 
     @Override
@@ -38,7 +42,12 @@ public class BitcoinBlockDeserializer extends BlockchainDeserializer<BitcoinBloc
         block.setSizeBytes(result.get("size").asInt());
         block.setTimeStamp(result.get("time").asLong());
         block.setMedianTime(result.get("mediantime").asLong());
-        block.setPrevBlockHash(result.get("previousblockhash").asText());
+
+        try {
+            block.setPrevBlockHash(result.get("previousblockhash").asText());
+        } catch (NullPointerException e) {
+            logger.info("Block 0?" + block.getHeight() + " error: " + e);
+        }
 
         block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
 

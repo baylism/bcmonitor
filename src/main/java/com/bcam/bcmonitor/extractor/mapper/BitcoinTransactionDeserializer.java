@@ -39,7 +39,7 @@ public class BitcoinTransactionDeserializer extends StdDeserializer<BitcoinTrans
 
         } catch (NullPointerException e) {
             // if we can't find any inputs this must be a coinbase transaction
-            assert !result.get("vin").get(0).get("coinbase").asText().isEmpty();
+            assert (!result.get("vin").get(0).get("coinbase").asText().isEmpty() );
         }
 
         return vin;

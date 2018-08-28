@@ -1,9 +1,9 @@
 package com.bcam.bcmonitor.api;
 
 
-import com.bcam.bcmonitor.extractor.bulk.BulkExtractorImpl;
 import com.bcam.bcmonitor.extractor.client.ReactiveZCashClient;
 import com.bcam.bcmonitor.model.*;
+import com.bcam.bcmonitor.scheduler.BlockchainTracker;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
+import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
+
 @RestController
 @RequestMapping("/api/zcash")
 public class ZCashController {
@@ -23,17 +26,18 @@ public class ZCashController {
     private static final Logger logger = LoggerFactory.getLogger(ZCashController.class);
 
     private ReactiveZCashClient client;
-
     private BlockRepository<ZCashBlock> blockRepository;
     private TransactionRepository<ZCashTransaction> transactionRepository;
+    private BlockchainTracker tracker;
 
     @Autowired
-    public ZCashController(ReactiveZCashClient client, BlockRepository<ZCashBlock> blockRepository, TransactionRepository<ZCashTransaction> transactionRepository) {
+    public ZCashController(ReactiveZCashClient client, BlockRepository<ZCashBlock> blockRepository, TransactionRepository<ZCashTransaction> transactionRepository, BlockchainTracker tracker) {
 
         this.client = client;
 
         this.blockRepository = blockRepository;
         this.transactionRepository = transactionRepository;
+        this.tracker = tracker;
     }
 
 
@@ -44,14 +48,12 @@ public class ZCashController {
         return blockRepository
                 .findById(hash)
                 .switchIfEmpty(client.getBlock(hash));
-
     }
 
     @GetMapping("/block/{height:[0-9]+}")
     Mono<ZCashBlock> getBlock(@PathVariable Long height) {
 
-        return blockRepository
-                .findByHeight(height);
+        return blockRepository.findByHeight(height);
 
     }
 
@@ -61,8 +63,12 @@ public class ZCashController {
         return blockRepository
                 .findAllByHeightBetweenOrderByHeightAsc(fromHeight - 1, toHeight + 1);
 
-        // .findAllByHeightInRange(fromHeight, toHeight);
+    }
 
+    @GetMapping(value = "/blocks/{fromHeight}", produces = "application/stream+json")
+    Flux<ZCashBlock> getLatestBlocks(@PathVariable long fromHeight) {
+
+        return blockRepository.findAllByHeightGreaterThan(fromHeight - 1);
     }
 
     @GetMapping("/transaction/{hash}")
@@ -73,16 +79,23 @@ public class ZCashController {
                 .switchIfEmpty(client.getTransaction(hash));
     }
 
-    @GetMapping("/transactions/{blockHeight}")
-    Flux<ZCashTransaction> getTransactionsInBlock(@PathVariable long height) {
+    @GetMapping(value = "/transactions/{blockHeight}", produces = "application/stream+json")
+    Flux<ZCashTransaction> getTransactionsInBlock(@PathVariable Long blockHeight) {
 
         Flux<String> ids = blockRepository
-                .findByHeight(height)
+                .findByHeight(blockHeight)
                 .map(AbstractBlock::getTxids)
                 .flatMapMany(Flux::fromIterable);
 
         return transactionRepository.findAllById(ids);
     }
+
+    @GetMapping("bestblockheight")
+    Mono<Long> getBestHeight() {
+
+        return Mono.justOrEmpty(tracker.getTipFor(ZCASH));
+    }
+
 
     // ============ other objects ============
     @GetMapping("/transactionpool")

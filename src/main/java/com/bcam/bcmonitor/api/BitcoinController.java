@@ -50,7 +50,6 @@ public class BitcoinController {
         return blockRepository
                 .findById(hash)
                 .switchIfEmpty(client.getBlock(hash));
-
     }
 
     @GetMapping("/block/{height:[0-9]+}")
@@ -60,7 +59,6 @@ public class BitcoinController {
     }
 
 
-    // should default to latest blocks if second param is empty
     @GetMapping(value = "/blocks/{fromHeight}/{toHeight}", produces = "application/stream+json")
     Flux<BitcoinBlock> getBlocks(@PathVariable long fromHeight, @PathVariable long toHeight) {
 
@@ -102,6 +100,7 @@ public class BitcoinController {
         return Mono.justOrEmpty(tracker.getTipFor(BITCOIN));
     }
 
+
     // ============ other objects ============
     @GetMapping("/transactionpool")
     Mono<TransactionPool> getTransactionPool() {
@@ -118,8 +117,8 @@ public class BitcoinController {
         return client.getBlockchainInfo();
     }
 
-    // ============ other string requests ============
 
+    // ============ other string requests ============
     @GetMapping("/bestblockhash")
     Mono<String> getBestBlockHash() {
         return client.getBestBlockHash();

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 
 @Component
 public class DashBlockDeserializer extends BlockchainDeserializer<DashBlock> {
+
+    private static final Logger logger = LoggerFactory.getLogger(DashBlockDeserializer.class);
 
     @Override
     public DashBlock deserialize(JsonParser parser, DeserializationContext deserializer) throws IOException {
@@ -38,6 +42,12 @@ public class DashBlockDeserializer extends BlockchainDeserializer<DashBlock> {
         block.setSizeBytes(result.get("size").asInt());
         block.setTimeStamp(result.get("time").asLong());
         block.setMedianTime(result.get("mediantime").asLong());
+
+        try {
+            block.setPrevBlockHash(result.get("previousblockhash").asText());
+        } catch (NullPointerException e) {
+            logger.info("Block 0?" + block.getHeight() + " error: " + e);
+        }
 
         block.setPrevBlockHash(result.get("previousblockhash").asText());
 

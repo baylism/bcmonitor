@@ -1,6 +1,5 @@
 package com.bcam.bcmonitor.api.admin;
 
-import com.bcam.bcmonitor.api.BitcoinController;
 import com.bcam.bcmonitor.extractor.bulk.BulkExtractor;
 import com.bcam.bcmonitor.model.*;
 import com.bcam.bcmonitor.scheduler.BlockchainTracker;
@@ -28,54 +27,18 @@ public class AdminController {
     private BulkExtractor<ZCashBlock, ZCashTransaction> zCashBulkExtractor;
 
 
-
     @Autowired
-    AdminController(ExtractionScheduler scheduler, BlockchainTracker tracker, BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor, BulkExtractor<DashBlock, DashTransaction> dashBulkExtractor) {
+    AdminController(ExtractionScheduler scheduler, BlockchainTracker tracker, BulkExtractor<BitcoinBlock, BitcoinTransaction> bitcoinBulkExtractor, BulkExtractor<DashBlock, DashTransaction> dashBulkExtractor, BulkExtractor<ZCashBlock, ZCashTransaction> zCashBulkExtractor) {
 
         this.scheduler = scheduler;
         this.tracker = tracker;
 
         this.bitcoinBulkExtractor = bitcoinBulkExtractor;
         this.dashBulkExtractor = dashBulkExtractor;
+        this.zCashBulkExtractor = zCashBulkExtractor;
     }
 
-    @GetMapping(value = "/extract/bitcoin/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<BitcoinTransaction> extractBitcoin(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
-
-        logger.info("Admin controller using bitcoin BI " + bitcoinBulkExtractor.toString() + " " + bitcoinBulkExtractor.getClass());
-
-        return bitcoinBulkExtractor
-                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
-
-    }
-
-    @GetMapping(value = "/extract/dash/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<DashTransaction> extractDash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
-
-        logger.info("Admin controller using dash BI " + dashBulkExtractor.toString() + " " + dashBulkExtractor.getClass());
-
-        return dashBulkExtractor
-                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
-
-    }
-
-
-    @GetMapping(value = "/extract/zcash/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<ZCashTransaction> extractZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
-
-        logger.info("Admin controller using dash BI " + zCashBulkExtractor.toString() + " " + zCashBulkExtractor.getClass());
-
-        return zCashBulkExtractor
-                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
-
-    }
-
-    @GetMapping(value = "/extractblock/{fromHeight}/{toHeight}", produces = "application/stream+json")
-    public Flux<BitcoinBlock> extractBlocks(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
-
-        return bitcoinBulkExtractor
-                .saveBlocks(fromHeight, toHeight);
-    }
+    // ==================== Admin ====================
 
     @GetMapping("/extraction")
     public Mono<Map<String, Object>> getAllScheduler() {
@@ -132,6 +95,67 @@ public class AdminController {
 
         return Mono.just(scheduler.getInitialHeights());
     }
+
+
+    // ==================== Extract Blocks and Transactions ====================
+
+    @GetMapping(value = "/extract/bitcoin/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<BitcoinTransaction> extractBitcoin(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        logger.info("Admin controller using bitcoin BI " + bitcoinBulkExtractor.toString() + " " + bitcoinBulkExtractor.getClass());
+
+        return bitcoinBulkExtractor
+                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
+
+    }
+
+    @GetMapping(value = "/extract/dash/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<DashTransaction> extractDash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        logger.info("Admin controller using dash BI " + dashBulkExtractor.toString() + " " + dashBulkExtractor.getClass());
+
+        return dashBulkExtractor
+                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
+
+    }
+
+
+    @GetMapping(value = "/extract/zcash/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<ZCashTransaction> extractZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        logger.info("Admin controller using dash BI " + zCashBulkExtractor.toString() + " " + zCashBulkExtractor.getClass());
+
+        return zCashBulkExtractor
+                .saveBlocksAndTransactionsForward(fromHeight, toHeight);
+
+    }
+
+
+    // ==================== Extract Blocks Only ====================
+
+    @GetMapping(value = "/extractblock/bitcoin/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<BitcoinBlock> extractBlocksBitcoin(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        return bitcoinBulkExtractor
+                .saveBlocks(fromHeight, toHeight);
+    }
+
+    @GetMapping(value = "/extractblock/dash/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<DashBlock> extractBlocksDash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        return dashBulkExtractor
+                .saveBlocks(fromHeight, toHeight);
+    }
+
+
+    @GetMapping(value = "/extractblock/zcash/{fromHeight}/{toHeight}", produces = "application/stream+json")
+    public Flux<ZCashBlock> extractBlocksZCash(@PathVariable Long fromHeight, @PathVariable Long toHeight) {
+
+        return zCashBulkExtractor
+                .saveBlocks(fromHeight, toHeight);
+    }
+
+
 
     private Blockchain convertBlockchain(String name) {
 

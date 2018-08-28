@@ -33,8 +33,8 @@ for chain in bitcoin zcash dash
         echo ${BASEURL}/api/${chain}/transaction/${transactionhash}
         curl -s -w "\n\n" ${BASEURL}/api/${chain}/transaction/${transactionhash} | jq -r . ; echo;
 
-        echo ${BASEURL}/api/${chain}/transactions/${blockhash}
-        curl -s -w "\n\n" ${BASEURL}/api/${chain}/transactions/${blockhash} | jq -r . ; echo;
+        echo ${BASEURL}/api/${chain}/transactions/${height}
+        curl -s -w "\n\n" ${BASEURL}/api/${chain}/transactions/${height} | jq -r . ; echo;
 
 
         echo ----- Other objects -----

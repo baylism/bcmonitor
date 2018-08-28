@@ -42,7 +42,12 @@ public class ZCashBlockDeserializer extends BlockchainDeserializer<ZCashBlock> {
         block.setHeight(result.get("height").asInt());
         block.setSizeBytes(result.get("size").asInt());
         block.setTimeStamp(result.get("time").asLong());
-        block.setPrevBlockHash(result.get("previousblockhash").asText());
+
+        try {
+            block.setPrevBlockHash(result.get("previousblockhash").asText());
+        } catch (NullPointerException e) {
+            logger.info("Block 0?" + block.getHeight() + " error: " + e);
+        }
 
         block.setTimeReceived(new java.util.Date(System.currentTimeMillis()).toInstant().getEpochSecond());
 
