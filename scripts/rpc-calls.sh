@@ -141,11 +141,11 @@ echo ----- Parameterised calls -----
 
 echo Get block
 
-curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc":"2.0","id":"0","method":"get_block","params":{"hash":"510ee3c4e14330a7b96e883c323a60ebd1b5556ac1262d0bc03c24a3b785516f"}}' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"jsonrpc":"jsonrpc","id":"0","method":"get_block","params":{"hash":"510ee3c4e14330a7b96e883c323a60ebd1b5556ac1262d0bc03c24a3b785516f"}}' -H 'content-type: text/plain;' http://${MONERO_HOSTNAME}:${MONERO_PORT}/json_rpc
 
 
 echo Get transaction
-curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"txs_hashes":["d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408"],"decode_as_json":true}' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transactions
+curl -w "\n\n" --digest --user ${MONERO_UN}:${MONERO_PW} --data-binary '{"txs_hashes":["d6e48158472848e6687173a91ae6eebfa3e1d778e65252ee99d7515d63090408"]}' http://${MONERO_HOSTNAME}:${MONERO_PORT}/get_transactions
 
 
 echo ----- Other calls -----
