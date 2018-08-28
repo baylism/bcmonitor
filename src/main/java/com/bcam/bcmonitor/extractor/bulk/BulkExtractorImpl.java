@@ -12,22 +12,6 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 
-/**
- * https://github.com/spring-projects/spring-data-examples/blob/master/redis/reactive/src/test/java/example/springdata/redis/operations/ValueOperationsTests.java
- * <p>
- * batch downloads https://dzone.com/articles/bulk-operations-in-mongodb
- * api to select attributes for bulk downloads
- * <p>
- * <p>
- * 20 mins. cache
- * <p>
- * <p>
- * .delete .then(mono.just) https://codereview.stackexchange.com/questions/159139/is-my-implementation-of-a-simple-crud-service-with-spring-webflux-correct
- * <p>
- * <p>
- * <p>
- * can make a repo by creating client the to construtor
- */
 public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransaction> implements BulkExtractor<B, T> {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkExtractorImpl.class);
@@ -50,7 +34,6 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
 
 
     // see https://github.com/reactor/reactive-streams-commons/issues/21#issuecomment-210178344
-
     /**
      *  if fails, could delay manually Flux<document> findAll() {
      *     return Flux.interval(Duration.ofSeconds(1))
@@ -143,31 +126,6 @@ public class BulkExtractorImpl<B extends AbstractBlock, T extends AbstractTransa
     }
 
 
-    /**
-     * Flux<String> ids = ifhrIds();
-     *
-     * Flux<String> combinations =
-     *                 ids.flatMap(id -> {
-     *                         Mono<String> nameTask = ifhrName(id);
-     *                         Mono<Integer> statTask = ifhrStat(id);
-     *
-     *                         return nameTask.zipWith(statTask,
-     *                                         (name, stat) -> "Name " + name + " has stats " + stat);
-     *                 });
-     *
-     * Mono<List<String>> result = combinations.collectList();
-     *
-     * List<String> results = result.block();
-     * assertThat(results).containsExactly(
-     *                 "Name NameJoe has stats 103",
-     *                 "Name NameBart has stats 104",
-     *                 "Name NameHenry has stats 105",
-     *                 "Name NameNicole has stats 106",
-     *
-     *
-     *                 also :
-     *                 Example of Reactor code with timeout and fallback
-     */
 
     @Override
     public String toString() {
