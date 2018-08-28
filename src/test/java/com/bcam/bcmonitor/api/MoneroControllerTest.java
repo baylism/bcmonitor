@@ -162,7 +162,7 @@ public class MoneroControllerTest {
                 .expectStatus().isOk()
                 .expectBody(String.class).isEqualTo("4d543d125b181cf62ab3b7c2562aca3a4c11fa4bd3eb2ab6fdd581545f8d226b");
     }
-    //
+
     // @Test
     // public void getTransactionPool() {
     //
@@ -190,7 +190,7 @@ public class MoneroControllerTest {
     //             .expectStatus().isOk()
     //             .expectBody(TransactionPool.class).isEqualTo(expectedPool);
     // }
-    //
+    // //
     // @Test
     // public void getTransactionPoolInfo() {
     //
