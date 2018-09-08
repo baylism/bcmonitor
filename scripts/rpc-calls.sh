@@ -49,7 +49,7 @@ echo Get block
 curl -w "\n\n" --user ${ZCASH_UN}:${ZCASH_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblock", "params": ["0000000000cc50281e133961f91dea67d6b4a9af68f5bf2bbf3504169dcd45b0", true] }' -H 'content-type: text/plain;' http://${ZCASH_HOSTNAME}:${ZCASH_PORT}
 
 echo Get transaction
-curl -w "\n\n" --user ${ZCASH_UN}:${ZCASH_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getrawtransaction", "params": ["851bf6fbf7a976327817c738c489d7fa657752445430922d94c983c0b9ed4609", 1] }' -H 'content-type: text/plain;' http://${ZCASH_HOSTNAME}:${ZCASH_PORT}
+curl -w "\n\n" --user ${ZCASH_UN}:${ZCASH_PW} --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getrawtransaction", "params": ["f57c21f0015aeac6456e088555fad60037a08df65d6f39ce8d4c27575a81a9b8", 1] }' -H 'content-type: text/plain;' http://${ZCASH_HOSTNAME}:${ZCASH_PORT}
 
 
 echo ----- Other calls -----

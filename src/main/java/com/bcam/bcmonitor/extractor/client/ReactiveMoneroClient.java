@@ -40,7 +40,7 @@ public class ReactiveMoneroClient extends ReactiveClientImpl implements Reactive
 
     @PostConstruct
     protected void buildClient() {
-        System.out.println("Building Dash client with hostname " + hostName);
+        System.out.println("Building Monero client with hostname " + hostName);
 
         ObjectMapper mapper = buildMapper();
 

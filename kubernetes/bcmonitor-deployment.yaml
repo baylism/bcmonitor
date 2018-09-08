@@ -21,6 +21,12 @@ spec:
           name: bcmonitor
           ports:
             - containerPort: 8080
+          env:
+            - name: MONGO_PW
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-auth
+                  key: mongo-admin-password
           envFrom:
           - configMapRef: 
               name: rpc-config

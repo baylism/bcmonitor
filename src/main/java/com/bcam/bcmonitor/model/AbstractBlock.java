@@ -11,7 +11,6 @@ import java.util.Date;
 public abstract class AbstractBlock {
 
     @Id
-    @Indexed
     private String hash; // in RPC byte order
 
     private String prevBlockHash;

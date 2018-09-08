@@ -128,7 +128,7 @@ public class ReactiveHTTPClient {
 
     public ResponseSpec getResponseSpec(String blockchain, String method, String param) {
 
-        String URIPath = String.join("/", blockchain, method, param);
+        String URIPath = String.join("/", "api", blockchain, method, param);
         return client.get()
                 .uri(URIPath)
                 .accept(MediaType.APPLICATION_JSON)
