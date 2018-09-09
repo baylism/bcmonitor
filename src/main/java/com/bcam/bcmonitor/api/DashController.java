@@ -4,6 +4,7 @@ package com.bcam.bcmonitor.api;
 import com.bcam.bcmonitor.extractor.client.ReactiveDashClient;
 import com.bcam.bcmonitor.model.*;
 import com.bcam.bcmonitor.scheduler.BlockchainTracker;
+import com.bcam.bcmonitor.scheduler.ExtractionScheduler;
 import com.bcam.bcmonitor.storage.BlockRepository;
 import com.bcam.bcmonitor.storage.TransactionRepository;
 import org.slf4j.Logger;
@@ -28,15 +29,17 @@ public class DashController {
     private BlockRepository<DashBlock> blockRepository;
     private TransactionRepository<DashTransaction> transactionRepository;
     private BlockchainTracker tracker;
+    private ExtractionScheduler scheduler;
 
     @Autowired
-    public DashController(ReactiveDashClient client, BlockRepository<DashBlock> blockRepository, TransactionRepository<DashTransaction> transactionRepository, BlockchainTracker tracker) {
+    public DashController(ReactiveDashClient client, BlockRepository<DashBlock> blockRepository, TransactionRepository<DashTransaction> transactionRepository, BlockchainTracker tracker, ExtractionScheduler scheduler) {
 
         this.client = client;
 
         this.blockRepository = blockRepository;
         this.transactionRepository = transactionRepository;
         this.tracker = tracker;
+        this.scheduler = scheduler;
     }
 
     // ============ parameterised requests ============
@@ -51,7 +54,12 @@ public class DashController {
     @GetMapping("/block/{height:[0-9]+}")
     Mono<DashBlock> getBlock(@PathVariable Long height) {
 
-        return blockRepository.findByHeight(height);
+        return blockRepository
+                .findByHeight(height)
+                .switchIfEmpty(
+                        client.getBestBlockHash()
+                        .flatMap(hash -> client.getBlock(hash))
+                );
 
     }
 
@@ -93,7 +101,7 @@ public class DashController {
     @GetMapping("bestblockheight")
     Mono<Long> getBestHeight() {
 
-        return Mono.justOrEmpty(tracker.getTipFor(DASH));
+        return Mono.justOrEmpty(scheduler.getLastSyncedFor(DASH));
     }
 
 

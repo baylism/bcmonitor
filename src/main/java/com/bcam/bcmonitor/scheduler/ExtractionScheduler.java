@@ -66,12 +66,14 @@ public class ExtractionScheduler {
         lastSynced.put(ZCASH, -1L);
     }
 
+    // ======= Tips =======
     @Scheduled(initialDelay = 1000L, fixedRate = 2000L)
     public void syncTips() {
 
         tracker.updateChainTips();
     }
 
+    // ======= Blocks =======
     @Scheduled(initialDelay = 1000L, fixedDelay = 3000L)
     public void syncBitcoinBlocks() {
 
@@ -103,7 +105,7 @@ public class ExtractionScheduler {
             return;
         }
 
-        logger.info("Starting sync blocks for bitcoin");
+        logger.info("Starting sync blocks for " + blockchain);
 
 
         Long tip = tracker.getTipFor(blockchain);
@@ -113,17 +115,25 @@ public class ExtractionScheduler {
         long fromHeight = synced > initialHeight ? synced : initialHeight;
 
         logger.info("tip = " + tip);
-        logger.info("last synced = " + tip);
-        logger.info("initial height = " + tip);
-        logger.info("from height = " + tip);
+        logger.info("last synced = " + synced);
+        logger.info("initial height = " + initialHeight);
+        logger.info("from height = " + fromHeight);
 
 
         if (tip > fromHeight) {
 
-            logger.info("Calling save blocks and transactions");
+            logger.info("Calling save blocks");
 
             // extractor.saveBlocksAndTransactions(fromHeight + 1, tip);
-            extractor.saveBlocks(fromHeight + 1, tip).subscribe();
+            // extractor.saveBlocks(fromHeight + 1, tip).subscribe();
+
+            extractor.saveBlocks(fromHeight + 1, tip)
+                    .doOnError((e) -> {
+                        logger.info("Error in syncing " + e);
+                        logger.info("Resetting last synced to " + synced);
+                        setLastSyncedFor(blockchain, synced);
+                    })
+                    .subscribe();
 
             // assumes ^ always succeeds
             setLastSyncedFor(blockchain, tip);
@@ -145,14 +155,17 @@ public class ExtractionScheduler {
         enableSyncing.put(blockchain, Boolean.FALSE);
     }
 
-    private long getLastSyncedFor(Blockchain blockchain) {
+    public long getLastSyncedFor(Blockchain blockchain) {
 
         return lastSynced.get(blockchain);
     }
 
     private void setLastSyncedFor(Blockchain blockchain, Long tip) {
 
-        lastSynced.put(blockchain, tip);
+        if (lastSynced.get(blockchain) < tip) {
+            lastSynced.put(blockchain, tip);
+        }
+
     }
 
     public Map<Blockchain, Boolean> getEnableSyncing() {
