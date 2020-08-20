@@ -14,11 +14,11 @@ if [ $# -eq 0 ]
 
         if [ $# -eq 2 ]
             then
-                curl -s --user ${adminuser}:${adminpw} http://35.229.87.236/admin/$1/$2 | jq -r .
+                curl -s --user ${adminuser}:${adminpw} http://${BASEURL}/admin/$1/$2 | jq -r .
             else
                 if [ $# -eq 3 ]
                     then
-                        curl -s --user ${adminuser}:${adminpw} http://35.229.87.236/admin/$1/$2/$3 | jq -r .
+                        curl -s --user ${adminuser}:${adminpw} http://${BASEURL}/admin/$1/$2/$3 | jq -r .
                 fi
         fi
 fi

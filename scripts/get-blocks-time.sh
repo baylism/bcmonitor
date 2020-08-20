@@ -3,7 +3,7 @@
 
 SECONDS=0
 
-curl -s http://35.229.87.236/api/bitcoin/blocks/$1/$2 > /dev/null
+curl -s ${BASEURL}/api/bitcoin/blocks/$1/$2 > /dev/null
 
 
 duration=$SECONDS

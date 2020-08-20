@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASEURL=http://35.229.87.236
+BASEURL=${BASEURL}
 
 
 
